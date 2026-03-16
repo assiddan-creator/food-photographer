@@ -45,7 +45,7 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
       <AnimatePresence mode="wait">
         {preview ? (
           <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative aspect-square">
-            <img src={preview} alt="Preview" className="w-full h-full object-contain rounded-2xl bg-black" />
+            <img src={preview} alt="תצוגה מקדימה של המנה" className="w-full h-full object-contain rounded-2xl bg-black" />
             <button
               onClick={() => setPreview(null)}
               className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
