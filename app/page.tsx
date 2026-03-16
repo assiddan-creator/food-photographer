@@ -166,10 +166,10 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<null | {
-    menuGenius: unknown;
-    healthScanner: unknown;
-    platingCritic: unknown;
-    recipeDetective: unknown;
+    menuGenius: string;
+    healthScanner: string;
+    platingCritic: string;
+    recipeDetective: string;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -219,18 +219,6 @@ export default function Page() {
       setErrorMessage((err as Error).message);
     } finally {
       setIsAnalyzing(false);
-    }
-  };
-
-  const renderAnalysisValue = (value: unknown) => {
-    if (value == null) return '';
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
-    }
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch {
-      return String(value);
     }
   };
 
@@ -564,35 +552,47 @@ export default function Page() {
             <div className="grid md:grid-cols-2 gap-4">
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-emerald-300 font-semibold">
-                  Menu Genius
+                  גאון הסושיאל
                 </p>
-                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
-                  {renderAnalysisValue(analysisResult.menuGenius)}
-                </pre>
+                <p
+                  className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
+                  dir="rtl"
+                >
+                  {analysisResult.menuGenius}
+                </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-orange-300 font-semibold">
-                  Health Scanner
+                  ערכים תזונתיים
                 </p>
-                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
-                  {renderAnalysisValue(analysisResult.healthScanner)}
-                </pre>
+                <p
+                  className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
+                  dir="rtl"
+                >
+                  {analysisResult.healthScanner}
+                </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-sky-300 font-semibold">
-                  Plating Critic
+                  ביקורת שף
                 </p>
-                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
-                  {renderAnalysisValue(analysisResult.platingCritic)}
-                </pre>
+                <p
+                  className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
+                  dir="rtl"
+                >
+                  {analysisResult.platingCritic}
+                </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-violet-300 font-semibold">
-                  Recipe Detective
+                  סודות המטבח
                 </p>
-                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
-                  {renderAnalysisValue(analysisResult.recipeDetective)}
-                </pre>
+                <p
+                  className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
+                  dir="rtl"
+                >
+                  {analysisResult.recipeDetective}
+                </p>
               </GlassCard>
             </div>
           </div>
