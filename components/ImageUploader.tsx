@@ -31,7 +31,9 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
     }
   }, [onImageReady]);
 
-  const wrapperClassName = `relative overflow-hidden transition-all duration-300 ${isDragging ? 'border-violet-400 bg-violet-500/20' : ''} ${disabled ? 'opacity-50 pointer-events-none' : ''}`;
+  const wrapperClassName = `relative overflow-hidden transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-lg rounded-2xl ${
+    isDragging ? 'border-violet-400/70 bg-violet-500/15' : ''
+  } ${disabled ? 'opacity-50 pointer-events-none' : ''}`;
 
   return (
     <GlassCard
@@ -55,7 +57,7 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
           <motion.label
             key="drop"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center gap-4 p-12 cursor-pointer"
+            className="flex flex-col items-center justify-center gap-4 p-10 cursor-pointer"
             htmlFor="file-upload"
           >
             {isCompressing ? (
@@ -65,9 +67,11 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
             )}
             <div className="text-center">
               <p className="text-white font-medium">
-                {isCompressing ? 'Compressing...' : 'Drop your food photo'}
+                {isCompressing ? 'מכינים את התמונה…' : 'בחר או גרור לכאן צילום של המנה'}
               </p>
-              <p className="text-white/40 text-sm mt-1">or click to browse · Max 10MB · Auto-compressed</p>
+              <p className="text-white/40 text-xs mt-1">
+                JPEG / PNG עד 10MB · נדחס באיכות גבוהה לסטודיו
+              </p>
             </div>
             <input id="file-upload" type="file" accept="image/*" className="sr-only" disabled={disabled || isCompressing} onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
           </motion.label>
