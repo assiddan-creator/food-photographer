@@ -84,7 +84,87 @@ const PRESETS = [
       'Professional overhead shot, soft studio lighting, marble surface, shallow depth of field, sharp focus, magazine style.' +
       AUTHENTICITY_ANCHOR,
   },
+  {
+    id: 'cinematic-cut',
+    title: 'קאט קולנועי',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'Cinematic anamorphic lens shot, 2.35:1 aspect ratio feel, moody atmospheric haze, dramatic rim lighting, shot on ARRI Alexa.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'cyberpunk',
+    title: 'סייברפאנק',
+    image: '/Extreme_out_of_focus_background_of_a_highend_dark__dfb3863541.jpeg',
+    prompt:
+      'Futuristic cyberpunk food styling, dark moody setting with neon pink and cyan practical lights reflecting off glossy textures.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'retro-film',
+    title: 'פילם רטרו',
+    image: '/Steak_with_nutritional_facts_ba0b2f7c78.jpeg',
+    prompt:
+      'Nostalgic 35mm film photography, Kodak Portra 400 emulation, natural grain, subtle light leaks, warm retro color grading.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'live-fire',
+    title: 'אש חיה',
+    image: '/Closeup_street_food_money_shot_45degree_angle_extr_011a4690a6.jpeg',
+    prompt:
+      'Dynamic live-fire cooking aesthetic. Flying embers, thick smoke, intense Maillard reaction visible. Dramatic warm backlighting.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'paparazzi-flash',
+    title: 'פלאש פפראצי',
+    image: '/Food_exploding_midair_ingredients_bdf383a9e6.jpeg',
+    prompt:
+      'Trendy UGC direct flash photography, hard shadows, high contrast, 90s disposable camera aesthetic. Raw, authentic, viral Instagram style.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'zero-gravity',
+    title: 'כוח המשיכה',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'Surreal zero-gravity food photography. Key ingredients gracefully floating in mid-air in ultra slow-motion. High-speed sync flash, dark studio background.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'pov-action',
+    title: 'גוף ראשון',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
+    prompt:
+      'First-person POV action shot, hands dynamically interacting with the food (e.g., pouring sauce, cutting). Motion blur on movement, razor-sharp focus on the dish.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'ai-director',
+    title: 'בימוי חכם (AI Director)',
+    image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
+    prompt:
+      "Reconstruct and elevate this exact dish by strictly applying the following professional chef's critique: [AI_CRITIQUE_PLACEHOLDER]. Photorealistic Michelin-star execution." +
+      AUTHENTICITY_ANCHOR,
+  },
 ] as const;
+
+type CategoryId = 'classics' | 'studio' | 'cinema' | 'social-ai';
+
+const CATEGORY_PRESETS: Record<CategoryId, string[]> = {
+  classics: ['auto', 'menu', 'delivery', 'classic'],
+  studio: ['marketing', 'split', 'ingredients', 'nutrition'],
+  cinema: ['cinematic-cut', 'cyberpunk', 'retro-film', 'live-fire'],
+  'social-ai': ['paparazzi-flash', 'zero-gravity', 'pov-action', 'ai-director'],
+};
+
+const CATEGORY_LABELS: Record<CategoryId, string> = {
+  classics: 'הקלאסיים',
+  studio: 'סטודיו ופרסום',
+  cinema: 'סינמטוגרפיה',
+  'social-ai': 'סושיאל ו-AI',
+};
 
 function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
   if (width > height) return '16:9';
@@ -96,6 +176,7 @@ export default function Page() {
   const [base64, setBase64] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('classics');
   const [inputMode, setInputMode] = useState<'upload' | 'camera'>('upload');
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16' | '1:1'>('9:16');
   const [selectedModel, setSelectedModel] = useState<
@@ -126,7 +207,15 @@ export default function Page() {
   };
 
   const handleGenerate = () => {
-    if (base64 && selectedPreset) run(base64, selectedPreset.prompt, aspectRatio, selectedModel);
+    if (!base64 || !selectedPreset) return;
+
+    let prompt = selectedPreset.prompt;
+
+    if (selectedPreset.id === 'ai-director' && analysisResult?.platingCritic) {
+      prompt = prompt.replace('[AI_CRITIQUE_PLACEHOLDER]', analysisResult.platingCritic);
+    }
+
+    run(base64, prompt, aspectRatio, selectedModel);
   };
 
   const handleAnalyze = async () => {
@@ -223,9 +312,29 @@ export default function Page() {
                 <p className="text-white/60 text-sm font-semibold uppercase tracking-wider">
                   בחר סגנון / מצב עסקי
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {(['classics', 'studio', 'cinema', 'social-ai'] as CategoryId[]).map(category => {
+                    const isActive = selectedCategory === category;
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => !isRunning && setSelectedCategory(category)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          isActive
+                            ? 'bg-white text-black border-white'
+                            : 'bg-white/5 text-white/70 border-white/20 hover:bg-white/10'
+                        }`}
+                      >
+                        {CATEGORY_LABELS[category]}
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[280px] overflow-y-auto pr-1">
-                  {PRESETS.map((preset, index) => {
-                    const isSelected = selectedIndex === index;
+                  {PRESETS.filter(p => CATEGORY_PRESETS[selectedCategory].includes(p.id)).map(preset => {
+                    const originalIndex = PRESETS.findIndex(p => p.id === preset.id);
+                    const isSelected = selectedPreset.id === preset.id;
                     const isAuto = preset.id === 'auto';
                     const isMarketing = preset.id === 'marketing';
                     const isIngredients = preset.id === 'ingredients';
@@ -241,7 +350,7 @@ export default function Page() {
                       <motion.button
                         key={preset.id}
                         type="button"
-                        onClick={() => !isRunning && setSelectedIndex(index)}
+                        onClick={() => !isRunning && originalIndex !== -1 && setSelectedIndex(originalIndex)}
                         disabled={isRunning}
                         whileHover={!isRunning ? { scale: 1.02 } : {}}
                         whileTap={!isRunning ? { scale: 0.98 } : {}}
