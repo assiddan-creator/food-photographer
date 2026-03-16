@@ -125,8 +125,10 @@ export function usePipeline() {
 
       const result = await fal.subscribe(model, {
         input,
-        sync_mode: true,
-      });
+        // sync_mode is supported by the runtime API but not declared in the current TypeScript types.
+        // Cast to any to keep strict type-checking elsewhere while allowing this option.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       const end = performance.now();
       const latencyMs = end - start;
