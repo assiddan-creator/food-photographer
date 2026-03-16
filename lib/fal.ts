@@ -7,6 +7,7 @@ import { fal } from '@fal-ai/client';
 });
 
 export async function generateWithFal(imageUrl: string, prompt: string): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await fal.subscribe('fal-ai/nano-banana-2', {
     input: {
       prompt,
@@ -17,7 +18,7 @@ export async function generateWithFal(imageUrl: string, prompt: string): Promise
     },
     logs: false,
     onResult: () => {},
-  });
+  } as any);
 
   const output = (result as any).images ?? (result as any).output;
   const firstImage = Array.isArray(output) ? output[0] : output;
@@ -25,13 +26,14 @@ export async function generateWithFal(imageUrl: string, prompt: string): Promise
 }
 
 export async function restoreWithFal(imageUrl: string): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await fal.subscribe('fal-ai/face-restorer', {
     input: {
       image_url: imageUrl,
     },
     logs: false,
     onResult: () => {},
-  });
+  } as any);
 
   const output = (result as any).images ?? (result as any).output;
   const firstImage = Array.isArray(output) ? output[0] : output;
