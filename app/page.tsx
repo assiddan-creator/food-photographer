@@ -107,6 +107,16 @@ export default function Page() {
   >('fal-ai/nano-banana/edit');
   const { stage, progress, statusMessage, outputUrl, error, latencyMs, run, reset } = usePipeline();
 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<null | {
+    menuGenius: string;
+    healthScanner: string;
+    platingCritic: string;
+    recipeDetective: string;
+  }>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const isRunning = stage === 'generating';
   const selectedPreset = PRESETS[selectedIndex];
 
@@ -117,6 +127,43 @@ export default function Page() {
 
   const handleGenerate = () => {
     if (base64 && selectedPreset) run(base64, selectedPreset.prompt, aspectRatio, selectedModel);
+  };
+
+  const handleAnalyze = async () => {
+    if (!selectedImage) return;
+    setIsAnalyzing(true);
+    setErrorMessage(null);
+    setAnalysisResult(null);
+
+    try {
+      const base64Data = selectedImage.includes(',')
+        ? selectedImage.split(',')[1]
+        : selectedImage;
+
+      let mimeType = 'image/jpeg';
+      if (selectedImage.startsWith('data:')) {
+        const match = selectedImage.match(/^data:(.*?);base64,/);
+        if (match?.[1]) mimeType = match[1];
+      }
+
+      const res = await fetch('/api/analyze-food', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64Data, mimeType }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to analyze image');
+      }
+
+      const data = await res.json();
+      setAnalysisResult(data);
+    } catch (err) {
+      setErrorMessage((err as Error).message);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -252,6 +299,7 @@ export default function Page() {
                           onImageReady={(b64, prev) => {
                             setBase64(b64);
                             setPreview(prev);
+                            setSelectedImage(b64);
 
                             // Detect aspect ratio from the compressed file URL
                             const img = new Image();
@@ -312,6 +360,7 @@ export default function Page() {
                           onCapture={(base64Image) => {
                             setBase64(base64Image);
                             setPreview(base64Image);
+                            setSelectedImage(base64Image);
 
                             const img = new Image();
                             img.onload = () => {
@@ -336,7 +385,7 @@ export default function Page() {
                     <p className="text-white/40 text-xs mt-2 line-clamp-3">{selectedPreset.prompt}</p>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex flex-col gap-2">
                       <label className="text-white/70 text-xs font-semibold">
                         מודל AI
@@ -364,24 +413,45 @@ export default function Page() {
                       </select>
                     </div>
 
-                    <motion.button
-                    whileHover={!isRunning && base64 ? { scale: 1.02 } : {}}
-                    whileTap={!isRunning && base64 ? { scale: 0.97 } : {}}
-                    onClick={handleGenerate}
-                    disabled={isRunning || !base64}
-                    className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-base rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]"
-                  >
-                    {isRunning ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        מעבד…
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        <Sparkles size={18} /> {'צור תמונה משופרת'}
-                      </span>
-                    )}
-                    </motion.button>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <motion.button
+                        whileHover={!isRunning && base64 ? { scale: 1.02 } : {}}
+                        whileTap={!isRunning && base64 ? { scale: 0.97 } : {}}
+                        onClick={handleGenerate}
+                        disabled={isRunning || !base64}
+                        className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]"
+                      >
+                        {isRunning ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            מעבד…
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-2">
+                            <Sparkles size={18} /> {'צור תמונה משופרת'}
+                          </span>
+                        )}
+                      </motion.button>
+
+                      <motion.button
+                        whileHover={!isAnalyzing && selectedImage ? { scale: 1.02 } : {}}
+                        whileTap={!isAnalyzing && selectedImage ? { scale: 0.97 } : {}}
+                        onClick={handleAnalyze}
+                        disabled={isAnalyzing || !selectedImage}
+                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                      >
+                        {isAnalyzing ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            Chef AI מנתח את המנה...
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-2">
+                            <Sparkles size={16} /> נתח את המנה (Gemini)
+                          </span>
+                        )}
+                      </motion.button>
+                    </div>
                   </div>
 
                   <p className="text-center text-white/40 text-xs">
@@ -409,6 +479,56 @@ export default function Page() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {errorMessage && (
+          <div className="max-w-4xl mx-auto">
+            <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-100 text-sm">
+              {errorMessage}
+            </div>
+          </div>
+        )}
+
+        {analysisResult && (
+          <div className="max-w-4xl mx-auto space-y-4">
+            <h2 className="text-white text-lg font-semibold text-center">
+              Chef AI – ניתוח מנה
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
+                <p className="text-xs uppercase tracking-wide text-emerald-300 font-semibold">
+                  Menu Genius
+                </p>
+                <p className="text-sm text-white/80 whitespace-pre-line">
+                  {analysisResult.menuGenius}
+                </p>
+              </GlassCard>
+              <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
+                <p className="text-xs uppercase tracking-wide text-orange-300 font-semibold">
+                  Health Scanner
+                </p>
+                <p className="text-sm text-white/80 whitespace-pre-line">
+                  {analysisResult.healthScanner}
+                </p>
+              </GlassCard>
+              <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
+                <p className="text-xs uppercase tracking-wide text-sky-300 font-semibold">
+                  Plating Critic
+                </p>
+                <p className="text-sm text-white/80 whitespace-pre-line">
+                  {analysisResult.platingCritic}
+                </p>
+              </GlassCard>
+              <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
+                <p className="text-xs uppercase tracking-wide text-violet-300 font-semibold">
+                  Recipe Detective
+                </p>
+                <p className="text-sm text-white/80 whitespace-pre-line">
+                  {analysisResult.recipeDetective}
+                </p>
+              </GlassCard>
+            </div>
+          </div>
+        )}
 
         <footer className="text-center pt-4 pb-2">
           <p className="text-white/30 text-xs">
