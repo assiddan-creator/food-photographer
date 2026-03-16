@@ -1,6 +1,8 @@
-import fal from '@fal-ai/client';
+import { fal } from '@fal-ai/client';
 
-fal.configure({
+// Runtime supports configure, but TS types may lag behind.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(fal as any).configure({
   credentials: process.env.FAL_KEY!,
 });
 
