@@ -382,7 +382,6 @@ export default function Page() {
                   <div className="rounded-2xl p-5 flex-1 flex flex-col justify-center bg-white/5 backdrop-blur-lg border border-white/10 text-white">
                     <p className="text-white/50 text-sm mb-1">נבחר</p>
                     <p className="font-semibold">{selectedPreset.title}</p>
-                    <p className="text-white/40 text-xs mt-2 line-clamp-3">{selectedPreset.prompt}</p>
                   </div>
 
                   <div className="space-y-4">
@@ -496,7 +495,7 @@ export default function Page() {
             <div className="grid md:grid-cols-2 gap-4">
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-emerald-300 font-semibold">
-                  Menu Genius
+                  גאון הסושיאל
                 </p>
                 <p className="text-sm text-white/80 whitespace-pre-line">
                   {analysisResult.menuGenius}
@@ -504,7 +503,7 @@ export default function Page() {
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-orange-300 font-semibold">
-                  Health Scanner
+                  ערכים תזונתיים
                 </p>
                 <p className="text-sm text-white/80 whitespace-pre-line">
                   {analysisResult.healthScanner}
@@ -512,7 +511,7 @@ export default function Page() {
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-sky-300 font-semibold">
-                  Plating Critic
+                  ביקורת שף
                 </p>
                 <p className="text-sm text-white/80 whitespace-pre-line">
                   {analysisResult.platingCritic}
@@ -520,7 +519,7 @@ export default function Page() {
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-violet-300 font-semibold">
-                  Recipe Detective
+                  סודות המטבח
                 </p>
                 <p className="text-sm text-white/80 whitespace-pre-line">
                   {analysisResult.recipeDetective}
@@ -532,7 +531,7 @@ export default function Page() {
 
         <footer className="text-center pt-4 pb-2">
           <p className="text-white/30 text-xs">
-            Powered by Nano Banana 2 + CodeFormer.
+            מופעל ע״י Nano Banana 2 + CodeFormer.
           </p>
         </footer>
       </div>

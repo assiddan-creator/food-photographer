@@ -43,7 +43,7 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
       <AnimatePresence mode="wait">
         {preview ? (
           <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative aspect-square">
-            <img src={preview} alt="Preview" className="w-full h-full object-contain rounded-2xl bg-black" />
+            <img src={preview} alt="תצוגה מקדימה" className="w-full h-full object-contain rounded-2xl bg-black" />
             <button
               onClick={() => setPreview(null)}
               className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
@@ -65,9 +65,9 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
             )}
             <div className="text-center">
               <p className="text-white font-medium">
-                {isCompressing ? 'Compressing...' : 'Drop your food photo'}
+                {isCompressing ? 'מכווץ תמונה...' : 'גרור את תמונת המנה לכאן'}
               </p>
-              <p className="text-white/40 text-sm mt-1">or click to browse · Max 10MB · Auto-compressed</p>
+              <p className="text-white/40 text-sm mt-1">או לחץ להעלאה · עד 10MB · כיווץ אוטומטי</p>
             </div>
             <input id="file-upload" type="file" accept="image/*" className="sr-only" disabled={disabled || isCompressing} onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
           </motion.label>

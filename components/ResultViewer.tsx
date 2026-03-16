@@ -54,7 +54,7 @@ export function ResultViewer({ outputUrl, originalPreview, onReset, latencyMs }:
           onClick={download}
           className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl"
         >
-          <Download size={17} /> Download
+          <Download size={17} /> הורדת תמונה
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.02 }}

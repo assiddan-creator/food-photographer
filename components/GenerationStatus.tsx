@@ -5,10 +5,10 @@ import { GlassCard } from './GlassCard';
 import { type PipelineStage } from '@/hooks/usePipeline';
 
 const LABELS: Record<PipelineStage, string> = {
-  idle: 'Ready',
-  generating: 'Generating',
-  done: 'Complete',
-  error: 'Error',
+  idle: 'מוכן למשימה',
+  generating: 'מייצר קסמים...',
+  done: 'הושלם בהצלחה',
+  error: 'שגיאה',
 };
 
 const BAR_COLORS: Record<PipelineStage, string> = {
