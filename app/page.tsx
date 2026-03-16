@@ -166,10 +166,10 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<null | {
-    menuGenius: string;
-    healthScanner: string;
-    platingCritic: string;
-    recipeDetective: string;
+    menuGenius: unknown;
+    healthScanner: unknown;
+    platingCritic: unknown;
+    recipeDetective: unknown;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -219,6 +219,18 @@ export default function Page() {
       setErrorMessage((err as Error).message);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const renderAnalysisValue = (value: unknown) => {
+    if (value == null) return '';
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
     }
   };
 
@@ -554,33 +566,33 @@ export default function Page() {
                 <p className="text-xs uppercase tracking-wide text-emerald-300 font-semibold">
                   Menu Genius
                 </p>
-                <p className="text-sm text-white/80 whitespace-pre-line">
-                  {analysisResult.menuGenius}
-                </p>
+                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
+                  {renderAnalysisValue(analysisResult.menuGenius)}
+                </pre>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-orange-300 font-semibold">
                   Health Scanner
                 </p>
-                <p className="text-sm text-white/80 whitespace-pre-line">
-                  {analysisResult.healthScanner}
-                </p>
+                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
+                  {renderAnalysisValue(analysisResult.healthScanner)}
+                </pre>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-sky-300 font-semibold">
                   Plating Critic
                 </p>
-                <p className="text-sm text-white/80 whitespace-pre-line">
-                  {analysisResult.platingCritic}
-                </p>
+                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
+                  {renderAnalysisValue(analysisResult.platingCritic)}
+                </pre>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
                 <p className="text-xs uppercase tracking-wide text-violet-300 font-semibold">
                   Recipe Detective
                 </p>
-                <p className="text-sm text-white/80 whitespace-pre-line">
-                  {analysisResult.recipeDetective}
-                </p>
+                <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans">
+                  {renderAnalysisValue(analysisResult.recipeDetective)}
+                </pre>
               </GlassCard>
             </div>
           </div>
