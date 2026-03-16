@@ -201,10 +201,10 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<null | {
-    menuGenius: string;
-    healthScanner: string;
-    platingCritic: string;
-    recipeDetective: string;
+    menuGenius: unknown;
+    healthScanner: unknown;
+    platingCritic: unknown;
+    recipeDetective: unknown;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -249,17 +249,43 @@ export default function Page() {
       }
 
       const data = await res.json();
-      setAnalysisResult(data as {
-        menuGenius: string;
-        healthScanner: string;
-        platingCritic: string;
-        recipeDetective: string;
-      });
+      setAnalysisResult(data);
     } catch (err) {
       setErrorMessage((err as Error).message);
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const renderValue = (value: unknown) => {
+    if (value == null) return '';
+
+    let text = '';
+    if (typeof value === 'string') {
+      text = value;
+    } else if (Array.isArray(value) || typeof value === 'object') {
+      try {
+        text = JSON.stringify(value);
+      } catch {
+        text = String(value);
+      }
+    } else {
+      text = String(value);
+    }
+
+    // strip JSON-y punctuation and common English labels that might leak through
+    text = text.replace(/[{}\[\]"]/g, '');
+    text = text
+      .replace(/caption\s*:/gi, '')
+      .replace(/shotList\s*:/gi, '')
+      .replace(/menuGenius\s*:/gi, '')
+      .replace(/healthScanner\s*:/gi, '')
+      .replace(/platingCritic\s*:/gi, '')
+      .replace(/recipeDetective\s*:/gi, '')
+      .replace(/key\s*:/gi, '')
+      .replace(/value\s*:/gi, '');
+
+    return text.trim();
   };
 
   return (
@@ -345,14 +371,7 @@ export default function Page() {
                       <motion.button
                         key={preset.id}
                         type="button"
-                        onClick={() => {
-                          if (isRunning) return;
-                          setSelectedIndex(index);
-                          // If a result is currently shown, return to the style view so the change is visible
-                          if (stage === 'done') {
-                            reset();
-                          }
-                        }}
+                        onClick={() => !isRunning && setSelectedIndex(index)}
                         disabled={isRunning}
                         whileHover={!isRunning ? { scale: 1.02 } : {}}
                         whileTap={!isRunning ? { scale: 0.98 } : {}}
@@ -618,7 +637,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.menuGenius}
+                  {renderValue(analysisResult.menuGenius)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -629,7 +648,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.healthScanner}
+                  {renderValue(analysisResult.healthScanner)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -640,7 +659,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.platingCritic}
+                  {renderValue(analysisResult.platingCritic)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -651,7 +670,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.recipeDetective}
+                  {renderValue(analysisResult.recipeDetective)}
                 </p>
               </GlassCard>
             </div>
