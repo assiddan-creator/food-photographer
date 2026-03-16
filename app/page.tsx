@@ -25,7 +25,7 @@ const PRESETS = [
     title: 'שיפור חכם (אוטומטי)',
     image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
-      'Analyze the uploaded food image. Preserve everything exactly as photographed. Apply the most commercially effective food photography enhancement based on the dish type. Improve lighting, color balance, texture clarity, and depth. Natural, realistic, appetizing result. No artistic interpretation. Looks professionally photographed for selling food.' +
+      'Analyze the uploaded food image. Preserve everything exactly as photographed. Apply the most commercially effective food photography enhancement based on the dish type. Improve lighting, color balance, texture clarity, and depth. Natural, realistic, appetizing result. No artistic interpretation. Looks professionally photographed for selling food. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds composition and intentional negative space.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -33,7 +33,7 @@ const PRESETS = [
     title: 'פיצוץ שיווקי',
     image: '/Food_exploding_midair_ingredients_bdf383a9e6.jpeg',
     prompt:
-      'Professional food advertising composition based on the uploaded image. Analyze the dish in the photo and transform it into a photorealistic action shot. The main dish dynamically explodes mid-air, with its key ingredients, textures, and garnishes bursting outward in multiple directions. Motion frozen at 1/8000 second shutter speed. Background is a cinematic dark studio setting with heavy bokeh. Apply ultra-detailed photorealistic textures, 8k UHD resolution, and razor-sharp focus. Professional advertising lighting with dramatic side-lighting. Everything must look natural, realistic, and appetizing for a high-end menu. No artistic interpretation, preserve the authentic identity of the food. Remove messy crumbs and clean plate edges.' +
+      'Professional food advertising composition based on the uploaded image. Analyze the dish in the photo and transform it into a photorealistic action shot. The main dish dynamically explodes mid-air, with its key ingredients, textures, and garnishes bursting outward in multiple directions. Motion frozen at 1/8000 second shutter speed. Background is a cinematic dark studio setting with heavy bokeh. Apply ultra-detailed photorealistic textures, 8k UHD resolution, and razor-sharp focus. Professional advertising lighting with dramatic side-lighting. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, composed with rule of thirds and controlled negative space for maximum impact. Everything must look natural, realistic, and appetizing for a high-end menu. No artistic interpretation, preserve the authentic identity of the food. Remove messy crumbs and clean plate edges.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -41,7 +41,7 @@ const PRESETS = [
     title: 'תצוגה כפולה',
     image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
     prompt:
-      'A professional food photography diptych, split screen. Left side: perfect overhead top-down view of the dish. Right side: extreme macro profile shot showing layers and texture. Studio lighting, cohesive background.' +
+      'A professional food photography diptych, split screen. Left side: perfect overhead top-down view of the dish. Right side: extreme macro profile shot showing layers and texture. Studio lighting, cohesive background. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds and intentional negative space to separate the two frames.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -49,7 +49,7 @@ const PRESETS = [
     title: 'תפריט יוקרתי',
     image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
     prompt:
-      'Michelin star fine dining presentation. Dark moody lighting, high contrast, side-lit shadows, rustic dark background. Elegant minimalist styling. Remove messy crumbs, clean plate edges, boost crispness and juicy textures, keep the core food authentic.' +
+      'Michelin star fine dining presentation. Dark moody lighting, high contrast, side-lit shadows, rustic dark background. Elegant minimalist styling. Remove messy crumbs, clean plate edges, boost crispness and juicy textures, keep the core food authentic. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, emphasizing diffused side light, rule of thirds plating and sophisticated negative space like a Michelin guide photo.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -57,7 +57,7 @@ const PRESETS = [
     title: 'משלוחים (וולט)',
     image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
     prompt:
-      'Commercial delivery app food photography, square composition, centered dish, highly vibrant colors, bright even studio lighting, clean minimal background, ultra-sharp detail, mouth-watering appetizing look.' +
+      'Commercial delivery app food photography, square composition, centered dish, highly vibrant colors, bright even studio lighting, clean minimal background, ultra-sharp detail, mouth-watering appetizing look. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using soft diffused side light, rule of thirds framing within the box and clean negative space for app thumbnails.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -65,7 +65,7 @@ const PRESETS = [
     title: 'פירוק מרכיבים',
     image: '/Commercial_food_photography_infographic_style_anal_669a6beeec.jpeg',
     prompt:
-      'Commercial food photography infographic style. Analyze the uploaded dish and visually highlight its key ingredients with elegant, minimalist text labels pointing to them. Studio lighting, dark premium background. High-end culinary magazine editorial aesthetic. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      'Commercial food photography infographic style. Analyze the uploaded dish and visually highlight its key ingredients with elegant, minimalist text labels pointing to them. Studio lighting, dark premium background. High-end culinary magazine editorial aesthetic. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds grid and generous negative space for the labels. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
       HEBREW_TYPOGRAPHY,
   },
   {
@@ -73,7 +73,7 @@ const PRESETS = [
     title: 'ערכים תזונתיים',
     image: '/Steak_with_nutritional_facts_ba0b2f7c78.jpeg',
     prompt:
-      'High-end fitness and wellness food photography. Analyze the food and display a sleek, modern, floating digital text overlay with estimated macronutrients, calories, and nutritional facts next to the dish. Clean typography, premium dark athletic aesthetic, cinematic lighting. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      'High-end fitness and wellness food photography. Analyze the food and display a sleek, modern, floating digital text overlay with estimated macronutrients, calories, and nutritional facts next to the dish. Clean typography, premium dark athletic aesthetic, cinematic lighting. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, with diffused side light, rule of thirds placement of text and controlled negative space around the plate. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
       HEBREW_TYPOGRAPHY,
   },
   {
@@ -81,8 +81,131 @@ const PRESETS = [
     title: 'קלאסי עילי',
     image: '/Steak_with_fries_explosion_6b69564913.jpeg',
     prompt:
-      'Professional overhead shot, soft studio lighting, marble surface, shallow depth of field, sharp focus, magazine style.' +
+      'Professional overhead shot, soft studio lighting, marble surface, shallow depth of field, sharp focus, magazine style. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, perfectly balanced with diffused side light, rule of thirds composition and elegant negative space around the plate.' +
       AUTHENTICITY_ANCHOR,
+  },
+] as const;
+
+const PRESETS = [
+  {
+    id: 'auto',
+    title: 'שיפור חכם (אוטומטי)',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
+    prompt:
+      'Analyze the uploaded food image. Preserve everything exactly as photographed. Apply the most commercially effective food photography enhancement based on the dish type. Improve lighting, color balance, texture clarity, and depth. Natural, realistic, appetizing result. No artistic interpretation. Looks professionally photographed for selling food. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds composition and intentional negative space.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'marketing',
+    title: 'פיצוץ שיווקי',
+    image: '/Food_exploding_midair_ingredients_bdf383a9e6.jpeg',
+    prompt:
+      'Professional food advertising composition based on the uploaded image. Analyze the dish in the photo and transform it into a photorealistic action shot. The main dish dynamically explodes mid-air, with its key ingredients, textures, and garnishes bursting outward in multiple directions. Motion frozen at 1/8000 second shutter speed. Background is a cinematic dark studio setting with heavy bokeh. Apply ultra-detailed photorealistic textures, 8k UHD resolution, and razor-sharp focus. Professional advertising lighting with dramatic side-lighting. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, composed with rule of thirds and controlled negative space for maximum impact. Everything must look natural, realistic, and appetizing for a high-end menu. No artistic interpretation, preserve the authentic identity of the food. Remove messy crumbs and clean plate edges.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'split',
+    title: 'תצוגה כפולה',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'A professional food photography diptych, split screen. Left side: perfect overhead top-down view of the dish. Right side: extreme macro profile shot showing layers and texture. Studio lighting, cohesive background. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds and intentional negative space to separate the two frames.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'menu',
+    title: 'תפריט יוקרתי',
+    image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
+    prompt:
+      'Michelin star fine dining presentation. Dark moody lighting, high contrast, side-lit shadows, rustic dark background. Elegant minimalist styling. Remove messy crumbs, clean plate edges, boost crispness and juicy textures, keep the core food authentic. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, emphasizing diffused side light, rule of thirds plating and sophisticated negative space like a Michelin guide photo.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'delivery',
+    title: 'משלוחים (וולט)',
+    image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
+    prompt:
+      'Commercial delivery app food photography, square composition, centered dish, highly vibrant colors, bright even studio lighting, clean minimal background, ultra-sharp detail, mouth-watering appetizing look. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using soft diffused side light, rule of thirds framing within the box and clean negative space for app thumbnails.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'ingredients',
+    title: 'פירוק מרכיבים',
+    image: '/Commercial_food_photography_infographic_style_anal_669a6beeec.jpeg',
+    prompt:
+      'Commercial food photography infographic style. Analyze the uploaded dish and visually highlight its key ingredients with elegant, minimalist text labels pointing to them. Studio lighting, dark premium background. High-end culinary magazine editorial aesthetic. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, using diffused side light, rule of thirds grid and generous negative space for the labels. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      HEBREW_TYPOGRAPHY,
+  },
+  {
+    id: 'nutrition',
+    title: 'ערכים תזונתיים',
+    image: '/Steak_with_nutritional_facts_ba0b2f7c78.jpeg',
+    prompt:
+      'High-end fitness and wellness food photography. Analyze the food and display a sleek, modern, floating digital text overlay with estimated macronutrients, calories, and nutritional facts next to the dish. Clean typography, premium dark athletic aesthetic, cinematic lighting. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, with diffused side light, rule of thirds placement of text and controlled negative space around the plate. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      HEBREW_TYPOGRAPHY,
+  },
+  {
+    id: 'classic',
+    title: 'קלאסי עילי',
+    image: '/Steak_with_fries_explosion_6b69564913.jpeg',
+    prompt:
+      'Professional overhead shot, soft studio lighting, marble surface, shallow depth of field, sharp focus, magazine style. Shot on a Hasselblad X2D 100C medium format camera with a Hasselblad XCD 120mm f/3.5 Macro lens, perfectly balanced with diffused side light, rule of thirds composition and elegant negative space around the plate.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'angle-45',
+    title: 'זווית 45 (מנות גבוהות)',
+    image: '/Steak_with_fries_explosion_6b69564913.jpeg',
+    prompt:
+      '45-degree angle diner\'s perspective food photography. Ideal for burgers, stacks, and tall dishes. Shot on a Hasselblad X2D 100C with XCD 120mm Macro lens. Diffused side window light. Rule of thirds, elegant depth of field highlighting the vertical layers. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'macro-asmr',
+    title: 'מאקרו ASMR',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'Extreme macro ASMR style food photography. Focus entirely on sensual textures, crisp crusts, cheese pulls, or glossy nappé sauces. Shot on a Hasselblad X2D 100C with XCD 120mm Macro lens at f/3.5 for razor-thin depth of field. Cinematic lighting. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'pov-social',
+    title: 'POV (סושיאל)',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
+    prompt:
+      'First-person POV "cook with me" or diner\'s perspective, highly popular on TikTok and Reels. Casual yet professional lighting. Shot on a Hasselblad X2D 100C. The dish is the focal point, inviting the viewer to take a bite. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'flat-lay',
+    title: 'פלאט-ליי (צילום עילי)',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'Perfect 90-degree flatlay overhead shot. Ideal for composed plates or boards. Shot on a Hasselblad X2D 100C. Diffused natural light from the side for depth. Clean, contrasting background, meticulous layout using the rule of thirds. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'minimal-michelin',
+    title: 'מינימליזם (מישלן)',
+    image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
+    prompt:
+      'Ultra-minimalist nouvelle cuisine plating. Extreme use of negative space on a clean white or dark canvas canvas. Shot on a Hasselblad X2D 100C. Focus on a single quenelle or primary protein. Flawless garnish discipline. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'rustic',
+    title: 'ראסטיק / כפרי',
+    image: '/Closeup_street_food_money_shot_45degree_angle_extr_011a4690a6.jpeg',
+    prompt:
+      'Rustic artisan food photography. Warm, moody lighting. Textured background like aged wood or stone. Shot on a Hasselblad X2D 100C. Rich earthy color grading. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'brunch-morning',
+    title: 'בראנץ׳ / אור בוקר',
+    image: '/Steak_with_nutritional_facts_ba0b2f7c78.jpeg',
+    prompt:
+      'Bright, airy golden hour morning light. Fresh, vibrant, lifestyle aesthetic. Diffused sunlight casting soft long shadows. Shot on a Hasselblad X2D 100C. High-key lighting, appetizing and energizing color palette. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.',
+  },
+  {
+    id: 'chef-table-dramatic',
+    title: 'שולחן השף (דרמטי)',
+    image: '/Extreme_out_of_focus_background_of_a_highend_dark__dfb3863541.jpeg',
+    prompt:
+      "Moody dramatic chef's pass. High contrast, directional spotlighting mimicking a high-end restaurant kitchen. Deep shadows, glowing highlights on the food. Shot on a Hasselblad X2D 100C. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.",
   },
 ] as const;
 
