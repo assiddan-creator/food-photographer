@@ -276,6 +276,26 @@ export default function Page() {
     }
   };
 
+  const getSectionText = (
+    result: {
+      menuGenius: unknown;
+      healthScanner: unknown;
+      platingCritic: unknown;
+      recipeDetective: unknown;
+    },
+    key: 'menuGenius' | 'healthScanner' | 'platingCritic' | 'recipeDetective',
+  ) => {
+    // Primary: try the expected key
+    const direct = (result as Record<string, unknown>)[key];
+    if (direct != null && direct !== '') {
+      return renderValue(direct);
+    }
+
+    // Fallback: if Gemini returned a different but still useful shape,
+    // show the full object so the user sees content instead of empty cards.
+    return renderValue(result);
+  };
+
   return (
     <main
       className={`min-h-screen relative p-4 md:p-8 ${assistant.className}`}
@@ -632,7 +652,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {renderValue(analysisResult.menuGenius)}
+                  {getSectionText(analysisResult, 'menuGenius')}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -643,7 +663,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {renderValue(analysisResult.healthScanner)}
+                  {getSectionText(analysisResult, 'healthScanner')}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -654,7 +674,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {renderValue(analysisResult.platingCritic)}
+                  {getSectionText(analysisResult, 'platingCritic')}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -665,7 +685,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {renderValue(analysisResult.recipeDetective)}
+                  {getSectionText(analysisResult, 'recipeDetective')}
                 </p>
               </GlassCard>
             </div>
