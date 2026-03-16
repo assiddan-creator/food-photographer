@@ -306,6 +306,7 @@ export default function Page() {
                 originalPreview={preview}
                 onReset={handleReset}
                 latencyMs={latencyMs}
+                menuGenius={analysisResult?.menuGenius ?? undefined}
               />
             </motion.div>
           ) : (
