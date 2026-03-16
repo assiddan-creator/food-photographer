@@ -197,6 +197,7 @@ export default function Page() {
     recipeDetective: string;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [customPrompt, setCustomPrompt] = useState('');
 
   const isRunning = stage === 'generating';
   const selectedPreset = PRESETS[selectedIndex];
@@ -209,10 +210,17 @@ export default function Page() {
   const handleGenerate = () => {
     if (!base64 || !selectedPreset) return;
 
-    let prompt = selectedPreset.prompt;
+    let prompt: string;
 
-    if (selectedPreset.id === 'ai-director' && analysisResult?.platingCritic) {
-      prompt = prompt.replace('[AI_CRITIQUE_PLACEHOLDER]', analysisResult.platingCritic);
+    if (customPrompt.trim() !== '') {
+      prompt =
+        customPrompt.trim() +
+        '. Shot on ARRI Alexa 65 cinema camera with an ARRI/Zeiss Master Prime 50mm T1.3 lens. Adaptive cinematic lighting that perfectly matches the described environment while maintaining appetizing highlights, rich textures, and commercial food styling on the main dish. 8k resolution, ultra-photorealistic. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.';
+    } else {
+      prompt = selectedPreset.prompt;
+      if (selectedPreset.id === 'ai-director' && analysisResult?.platingCritic) {
+        prompt = prompt.replace('[AI_CRITIQUE_PLACEHOLDER]', analysisResult.platingCritic);
+      }
     }
 
     run(base64, prompt, aspectRatio, selectedModel);
@@ -521,6 +529,15 @@ export default function Page() {
                       </select>
                     </div>
 
+                    <textarea
+                      dir="rtl"
+                      value={customPrompt}
+                      onChange={e => setCustomPrompt(e.target.value)}
+                      placeholder="כתוב חופשי: איפה תרצה לצלם את המנה? (אופציונלי)"
+                      disabled={isRunning}
+                      rows={3}
+                      className="w-full rounded-xl border border-white/20 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/50 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 resize-y min-h-[80px] disabled:opacity-50 backdrop-blur-sm"
+                    />
                     <div className="grid sm:grid-cols-2 gap-3">
                       <motion.button
                         whileHover={!isRunning && base64 ? { scale: 1.02 } : {}}
