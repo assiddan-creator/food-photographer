@@ -166,10 +166,10 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<null | {
-    menuGenius: string;
-    healthScanner: string;
-    platingCritic: string;
-    recipeDetective: string;
+    menuGenius: unknown;
+    healthScanner: unknown;
+    platingCritic: unknown;
+    recipeDetective: unknown;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -220,6 +220,19 @@ export default function Page() {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const renderValue = (value: unknown) => {
+    if (value == null) return '';
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value) || typeof value === 'object') {
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch {
+        return String(value);
+      }
+    }
+    return String(value);
   };
 
   return (
@@ -558,7 +571,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.menuGenius}
+                  {renderValue(analysisResult.menuGenius)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -569,7 +582,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.healthScanner}
+                  {renderValue(analysisResult.healthScanner)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -580,7 +593,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.platingCritic}
+                  {renderValue(analysisResult.platingCritic)}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -591,7 +604,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {analysisResult.recipeDetective}
+                  {renderValue(analysisResult.recipeDetective)}
                 </p>
               </GlassCard>
             </div>
