@@ -282,14 +282,14 @@ export default function Page() {
           className="text-center space-y-4"
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 text-white text-sm font-medium">
-            <Sparkles size={13} /> סטודיו אוכל חכם של אסי
+            <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
-            סטודיו פרימיום ליצירת תמונות אוכל שמוכרות
+            סטודיו פרימיום לתמונות אוכל חכמות
           </h1>
           <p className="text-white/45 text-sm md:text-base max-w-2xl mx-auto">
-            העלה צילום אמיתי של המנה, בחר סגנון יצירתי – והסטודיו ידאג לתמונה משודרגת ולניתוח חכם של שף,
-            תזונאי ויוצר תוכן, הכל בעברית אחת ברורה.
+            העלה צילום אמיתי של המנה, בחר מצב יצירתי – וקבל תמונה שמוכרת + ניתוח חכם של שף, תזונאי
+            ויוצר תוכן, הכל במקום אחד.
           </p>
         </motion.header>
 
@@ -323,7 +323,7 @@ export default function Page() {
                       שלב 1 · מצב יצירתי
                     </p>
                     <p className="text-white text-sm mt-1">
-                      בחר את מצב הצילום והאווירה הוויזואלית שאתה רוצה לתת למנה.
+                      בחר את המוד / סגנון הצילום שאתה רוצה לתת למנה.
                     </p>
                   </div>
                 </div>
@@ -504,7 +504,7 @@ export default function Page() {
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2">
                       <label className="text-white/70 text-xs font-semibold">
-                        מודל ה‑AI של הסטודיו
+                        מודל AI
                       </label>
                       <select
                         value={selectedModel}
@@ -521,11 +521,11 @@ export default function Page() {
                         disabled={isRunning}
                         className="w-full rounded-lg border border-white/20 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 disabled:opacity-50"
                       >
-                        <option value="fal-ai/nano-banana/edit">Nano Banana · קלאסי</option>
-                        <option value="fal-ai/nano-banana-2/edit">Nano Banana 2 · מהיר</option>
-                        <option value="fal-ai/nano-banana-pro/edit">Nano Banana Pro · איכותי</option>
-                        <option value="fal-ai/bytedance/seedream/v5/lite/edit">Seedream 5.0 Lite · קולנועי</option>
-                        <option value="fal-ai/flux-2-pro/edit">Flux 2 Pro · יצירתי</option>
+                        <option value="fal-ai/nano-banana/edit">Nano Banana (Original)</option>
+                        <option value="fal-ai/nano-banana-2/edit">Nano Banana 2 (Fast)</option>
+                        <option value="fal-ai/nano-banana-pro/edit">Nano Banana Pro (Quality)</option>
+                        <option value="fal-ai/bytedance/seedream/v5/lite/edit">Seedream 5.0 Lite</option>
+                        <option value="fal-ai/flux-2-pro/edit">Flux 2 Pro</option>
                       </select>
                     </div>
 
@@ -559,11 +559,11 @@ export default function Page() {
                         {isAnalyzing ? (
                           <span className="flex items-center justify-center gap-2">
                             <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                            הסטודיו מנתח את המנה…
+                            Chef AI מנתח את המנה...
                           </span>
                         ) : (
                           <span className="flex items-center justify-center gap-2">
-                            <Sparkles size={16} /> ניתוח חכם למנה
+                            <Sparkles size={16} /> נתח את המנה (Gemini)
                           </span>
                         )}
                       </motion.button>
@@ -605,9 +605,9 @@ export default function Page() {
         )}
 
         {analysisResult && (
-            <div className="max-w-4xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto space-y-4">
             <h2 className="text-white text-lg font-semibold text-center">
-              ניתוח מנה חכם מהסטודיו
+              Chef AI – ניתוח מנה
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -660,7 +660,7 @@ export default function Page() {
 
         <footer className="text-center pt-4 pb-2">
           <p className="text-white/30 text-xs">
-            מופעל מאחורי הקלעים על‑ידי מודלי Nano Banana ו‑CodeFormer.
+            Powered by Nano Banana 2 + CodeFormer.
           </p>
         </footer>
       </div>
