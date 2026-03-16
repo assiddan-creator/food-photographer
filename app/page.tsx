@@ -1,65 +1,421 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, Camera, List, Rocket, Sparkles, Upload } from 'lucide-react';
+import { Assistant } from 'next/font/google';
+import CameraCapture from '@/components/CameraCapture';
+import { ImageUploader } from '@/components/ImageUploader';
+import { GenerationStatus } from '@/components/GenerationStatus';
+import { ResultViewer } from '@/components/ResultViewer';
+import { GlassCard } from '@/components/GlassCard';
+import { usePipeline } from '@/hooks/usePipeline';
+
+const assistant = Assistant({ subsets: ['latin', 'hebrew'], weight: ['400', '600', '700'] });
+
+const AUTHENTICITY_ANCHOR =
+  ' CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.';
+
+const HEBREW_TYPOGRAPHY =
+  ' Use clean, modern Hebrew typography for all text labels. Ensure letters are not reversed.';
+
+const PRESETS = [
+  {
+    id: 'auto',
+    title: 'שיפור חכם (אוטומטי)',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
+    prompt:
+      'Analyze the uploaded food image. Preserve everything exactly as photographed. Apply the most commercially effective food photography enhancement based on the dish type. Improve lighting, color balance, texture clarity, and depth. Natural, realistic, appetizing result. No artistic interpretation. Looks professionally photographed for selling food.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'marketing',
+    title: 'פיצוץ שיווקי',
+    image: '/Food_exploding_midair_ingredients_bdf383a9e6.jpeg',
+    prompt:
+      'Professional food advertising composition based on the uploaded image. Analyze the dish in the photo and transform it into a photorealistic action shot. The main dish dynamically explodes mid-air, with its key ingredients, textures, and garnishes bursting outward in multiple directions. Motion frozen at 1/8000 second shutter speed. Background is a cinematic dark studio setting with heavy bokeh. Apply ultra-detailed photorealistic textures, 8k UHD resolution, and razor-sharp focus. Professional advertising lighting with dramatic side-lighting. Everything must look natural, realistic, and appetizing for a high-end menu. No artistic interpretation, preserve the authentic identity of the food. Remove messy crumbs and clean plate edges.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'split',
+    title: 'תצוגה כפולה',
+    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    prompt:
+      'A professional food photography diptych, split screen. Left side: perfect overhead top-down view of the dish. Right side: extreme macro profile shot showing layers and texture. Studio lighting, cohesive background.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'menu',
+    title: 'תפריט יוקרתי',
+    image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
+    prompt:
+      'Michelin star fine dining presentation. Dark moody lighting, high contrast, side-lit shadows, rustic dark background. Elegant minimalist styling. Remove messy crumbs, clean plate edges, boost crispness and juicy textures, keep the core food authentic.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'delivery',
+    title: 'משלוחים (וולט)',
+    image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
+    prompt:
+      'Commercial delivery app food photography, square composition, centered dish, highly vibrant colors, bright even studio lighting, clean minimal background, ultra-sharp detail, mouth-watering appetizing look.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'ingredients',
+    title: 'פירוק מרכיבים',
+    image: '/Commercial_food_photography_infographic_style_anal_669a6beeec.jpeg',
+    prompt:
+      'Commercial food photography infographic style. Analyze the uploaded dish and visually highlight its key ingredients with elegant, minimalist text labels pointing to them. Studio lighting, dark premium background. High-end culinary magazine editorial aesthetic. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      HEBREW_TYPOGRAPHY,
+  },
+  {
+    id: 'nutrition',
+    title: 'ערכים תזונתיים',
+    image: '/Steak_with_nutritional_facts_ba0b2f7c78.jpeg',
+    prompt:
+      'High-end fitness and wellness food photography. Analyze the food and display a sleek, modern, floating digital text overlay with estimated macronutrients, calories, and nutritional facts next to the dish. Clean typography, premium dark athletic aesthetic, cinematic lighting. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.' +
+      HEBREW_TYPOGRAPHY,
+  },
+  {
+    id: 'classic',
+    title: 'קלאסי עילי',
+    image: '/Steak_with_fries_explosion_6b69564913.jpeg',
+    prompt:
+      'Professional overhead shot, soft studio lighting, marble surface, shallow depth of field, sharp focus, magazine style.' +
+      AUTHENTICITY_ANCHOR,
+  },
+] as const;
+
+function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
+  if (width > height) return '16:9';
+  if (height > width) return '9:16';
+  return '1:1';
+}
+
+export default function Page() {
+  const [base64, setBase64] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [inputMode, setInputMode] = useState<'upload' | 'camera'>('upload');
+  const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16' | '1:1'>('9:16');
+  const [selectedModel, setSelectedModel] = useState<
+    | 'fal-ai/nano-banana/edit'
+    | 'fal-ai/nano-banana-2/edit'
+    | 'fal-ai/nano-banana-pro/edit'
+    | 'fal-ai/bytedance/seedream/v5/lite/edit'
+    | 'fal-ai/flux-2-pro/edit'
+  >('fal-ai/nano-banana/edit');
+  const { stage, progress, statusMessage, outputUrl, error, latencyMs, run, reset } = usePipeline();
+
+  const isRunning = stage === 'generating';
+  const selectedPreset = PRESETS[selectedIndex];
+
+  const handleReset = () => {
+    // Back to style selection, keep uploaded image
+    reset();
+  };
+
+  const handleGenerate = () => {
+    if (base64 && selectedPreset) run(base64, selectedPreset.prompt, aspectRatio, selectedModel);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main
+      className={`min-h-screen relative p-4 md:p-8 ${assistant.className}`}
+      dir="rtl"
+    >
+      {/* Dynamic background: selected mode image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${selectedPreset.image}')` }}
+        aria-hidden
+      />
+      <div className="absolute inset-0 bg-black/80" aria-hidden />
+
+      <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+        <motion.header
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-3"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 text-white text-sm font-medium">
+            <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+            צלם מנה → קבל תמונה שמוכרת
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-white/40 text-sm md:text-base">
+            בלי צלם. בלי סטודיו. בלי שעות עבודה.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </motion.header>
+
+        <AnimatePresence mode="wait">
+          {stage === 'done' && outputUrl && preview ? (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <ResultViewer
+                outputUrl={outputUrl}
+                originalPreview={preview}
+                onReset={handleReset}
+                latencyMs={latencyMs}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-6"
+            >
+              <div className="space-y-3">
+                <p className="text-white/60 text-sm font-semibold uppercase tracking-wider">
+                  בחר סגנון / מצב עסקי
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[280px] overflow-y-auto pr-1">
+                  {PRESETS.map((preset, index) => {
+                    const isSelected = selectedIndex === index;
+                    const isAuto = preset.id === 'auto';
+                    const isMarketing = preset.id === 'marketing';
+                    const isIngredients = preset.id === 'ingredients';
+                    const isNutrition = preset.id === 'nutrition';
+                    const borderClass = isAuto && !isSelected
+                      ? 'border-amber-400/50'
+                      : isMarketing && !isSelected
+                        ? 'border-violet-400/60'
+                        : isSelected
+                          ? 'border-violet-400 shadow-[0_0_24px_rgba(139,92,246,0.35)] bg-white/10'
+                          : 'border-white/10 hover:border-white/20 hover:bg-white/10';
+                    return (
+                      <motion.button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => !isRunning && setSelectedIndex(index)}
+                        disabled={isRunning}
+                        whileHover={!isRunning ? { scale: 1.02 } : {}}
+                        whileTap={!isRunning ? { scale: 0.98 } : {}}
+                        className={`relative rounded-xl p-4 text-right border min-h-[88px] flex flex-col justify-center transition-all duration-200 text-white bg-white/5 backdrop-blur-lg overflow-hidden ${borderClass} ${isRunning ? 'opacity-60 pointer-events-none' : ''}`}
+                      >
+                        <div
+                          className="absolute inset-0 bg-cover bg-center opacity-30"
+                          style={{ backgroundImage: `url('${preset.image}')` }}
+                          aria-hidden
+                        />
+                        <span className="relative font-semibold text-sm line-clamp-2 flex items-center gap-1.5">
+                          {isAuto && <Sparkles size={14} className="shrink-0 text-amber-300" />}
+                          {isMarketing && <Rocket size={14} className="shrink-0 text-violet-300" />}
+                          {isIngredients && <List size={14} className="shrink-0 text-white/70" />}
+                          {isNutrition && <Activity size={14} className="shrink-0 text-white/70" />}
+                          {preset.title}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="flex rounded-xl overflow-hidden bg-white/5 backdrop-blur-lg border border-white/10 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setInputMode('upload')}
+                      disabled={isRunning}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm transition-all ${inputMode === 'upload' ? 'bg-white/15 text-white border border-white/20' : 'text-white/60 hover:text-white/80'} ${isRunning ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
+                      <Upload size={18} /> העלאה
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInputMode('camera')}
+                      disabled={isRunning}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm transition-all ${inputMode === 'camera' ? 'bg-white/15 text-white border border-white/20' : 'text-white/60 hover:text-white/80'} ${isRunning ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
+                      <Camera size={18} /> מצלמה
+                    </button>
+                  </div>
+                  <AnimatePresence mode="wait">
+                    {inputMode === 'upload' ? (
+                      <motion.div
+                        key="upload"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="min-h-[200px]"
+                      >
+                        <ImageUploader
+                          variant="dark"
+                          onImageReady={(b64, prev) => {
+                            setBase64(b64);
+                            setPreview(prev);
+
+                            // Detect aspect ratio from the compressed file URL
+                            const img = new Image();
+                            img.onload = () => {
+                              setAspectRatio(getAspectRatioFromDimensions(img.width, img.height));
+                            };
+                            img.src = prev;
+
+                            if (stage === 'error') reset();
+                          }}
+                          disabled={isRunning}
+                        />
+                      </motion.div>
+                    ) : preview ? (
+                      <motion.div
+                        key="camera-preview"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-lg border border-white/10"
+                      >
+                        <div className="relative aspect-square">
+                          <img
+                            src={preview}
+                            alt="תצוגה מקדימה"
+                            className="w-full h-full object-contain bg-black"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                          <div className="absolute bottom-3 left-3 right-3 flex justify-center">
+                            <motion.button
+                              type="button"
+                              onClick={() => {
+                                setBase64(null);
+                                setPreview(null);
+                              }}
+                              disabled={isRunning}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/15 border border-white/20 text-white font-semibold text-sm hover:bg-white/25 transition-colors disabled:opacity-50"
+                            >
+                              <Camera size={18} /> צילום מחדש
+                            </motion.button>
+                          </div>
+                        </div>
+                        <p className="text-white/50 text-xs text-center py-2 border-t border-white/10">
+                          תמונה מוכנה לסגנון
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="camera"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-lg border border-white/10 p-4"
+                      >
+                        <CameraCapture
+                          onCapture={(base64Image) => {
+                            setBase64(base64Image);
+                            setPreview(base64Image);
+
+                            const img = new Image();
+                            img.onload = () => {
+                              setAspectRatio(getAspectRatioFromDimensions(img.width, img.height));
+                            };
+                            img.src = base64Image;
+
+                            if (stage === 'error') reset();
+                          }}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Left column intentionally left focused on upload/camera controls;
+                      generation is handled by the primary button on the right. */}
+                </div>
+                <div className="space-y-4 flex flex-col">
+                  <div className="rounded-2xl p-5 flex-1 flex flex-col justify-center bg-white/5 backdrop-blur-lg border border-white/10 text-white">
+                    <p className="text-white/50 text-sm mb-1">נבחר</p>
+                    <p className="font-semibold">{selectedPreset.title}</p>
+                    <p className="text-white/40 text-xs mt-2 line-clamp-3">{selectedPreset.prompt}</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-white/70 text-xs font-semibold">
+                        מודל AI
+                      </label>
+                      <select
+                        value={selectedModel}
+                        onChange={e =>
+                          setSelectedModel(
+                            e.target.value as
+                              | 'fal-ai/nano-banana/edit'
+                              | 'fal-ai/nano-banana-2/edit'
+                              | 'fal-ai/nano-banana-pro/edit'
+                              | 'fal-ai/bytedance/seedream/v5/lite/edit'
+                              | 'fal-ai/flux-2-pro/edit'
+                          )
+                        }
+                        disabled={isRunning}
+                        className="w-full rounded-lg border border-white/20 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 disabled:opacity-50"
+                      >
+                        <option value="fal-ai/nano-banana/edit">Nano Banana (Original)</option>
+                        <option value="fal-ai/nano-banana-2/edit">Nano Banana 2 (Fast)</option>
+                        <option value="fal-ai/nano-banana-pro/edit">Nano Banana Pro (Quality)</option>
+                        <option value="fal-ai/bytedance/seedream/v5/lite/edit">Seedream 5.0 Lite</option>
+                        <option value="fal-ai/flux-2-pro/edit">Flux 2 Pro</option>
+                      </select>
+                    </div>
+
+                    <motion.button
+                    whileHover={!isRunning && base64 ? { scale: 1.02 } : {}}
+                    whileTap={!isRunning && base64 ? { scale: 0.97 } : {}}
+                    onClick={handleGenerate}
+                    disabled={isRunning || !base64}
+                    className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-base rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]"
+                  >
+                    {isRunning ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        מעבד…
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Sparkles size={18} /> {'צור תמונה משופרת'}
+                      </span>
+                    )}
+                    </motion.button>
+                  </div>
+
+                  <p className="text-center text-white/40 text-xs">
+                    ⏱️ 5–10 שניות | 💰 מוכן לתפריט ולוולט
+                  </p>
+
+                  <AnimatePresence>
+                    {(isRunning || stage === 'error') && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <GenerationStatus
+                          variant="dark"
+                          stage={stage}
+                          progress={progress}
+                          statusMessage={error ?? statusMessage}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <footer className="text-center pt-4 pb-2">
+          <p className="text-white/30 text-xs">
+            Powered by Nano Banana 2 + CodeFormer.
+          </p>
+        </footer>
+      </div>
+    </main>
   );
 }
