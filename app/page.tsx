@@ -260,32 +260,20 @@ export default function Page() {
   const renderValue = (value: unknown) => {
     if (value == null) return '';
 
-    let text = '';
+    // Prefer direct strings when available
     if (typeof value === 'string') {
-      text = value;
-    } else if (Array.isArray(value) || typeof value === 'object') {
-      try {
-        text = JSON.stringify(value);
-      } catch {
-        text = String(value);
-      }
-    } else {
-      text = String(value);
+      return value.trim();
     }
 
-    // strip JSON-y punctuation and common English labels that might leak through
-    text = text.replace(/[{}\[\]"]/g, '');
-    text = text
-      .replace(/caption\s*:/gi, '')
-      .replace(/shotList\s*:/gi, '')
-      .replace(/menuGenius\s*:/gi, '')
-      .replace(/healthScanner\s*:/gi, '')
-      .replace(/platingCritic\s*:/gi, '')
-      .replace(/recipeDetective\s*:/gi, '')
-      .replace(/key\s*:/gi, '')
-      .replace(/value\s*:/gi, '');
-
-    return text.trim();
+    // For objects/arrays/numbers/booleans, stringify once without aggressive stripping
+    try {
+      if (Array.isArray(value) || typeof value === 'object') {
+        return JSON.stringify(value, null, 2);
+      }
+      return String(value);
+    } catch {
+      return String(value);
+    }
   };
 
   return (
@@ -371,7 +359,14 @@ export default function Page() {
                       <motion.button
                         key={preset.id}
                         type="button"
-                        onClick={() => !isRunning && setSelectedIndex(index)}
+                        onClick={() => {
+                          if (isRunning) return;
+                          setSelectedIndex(index);
+                          // If a result is currently shown, return to the style view so the change is visible
+                          if (stage === 'done') {
+                            reset();
+                          }
+                        }}
                         disabled={isRunning}
                         whileHover={!isRunning ? { scale: 1.02 } : {}}
                         whileTap={!isRunning ? { scale: 0.98 } : {}}
