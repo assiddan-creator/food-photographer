@@ -142,6 +142,41 @@ const PRESETS = [
   },
 ] as const;
 
+const PRESET_DESCRIPTIONS: Record<string, string> = {
+  auto:
+    'שיפור חכם ואוטומטי שנראה כאילו צולם בסטודיו מקצועי – בלי לשנות את המנה עצמה.',
+  marketing:
+    'קומפוזיציית פרסום דרמטית ומוכרת, עם אנרגיה של קמפיין וידאו לברים ומסעדות.',
+  split:
+    'תצוגה כפולה של המנה – צילום עילי מושלם לצד קלוז-אפ טקסטורות מעורר תיאבון.',
+  menu:
+    'אסתטיקה של תפריט מסעדת מישלן – קומפוזיציה נקייה, תאורה דרמטית ותחושת יוקרה.',
+  delivery:
+    'ויז׳ואל אופטימלי לאפליקציות משלוחים – צבעים חזקים, מרכז חד וברור ורקע נקי.',
+  ingredients:
+    'פירוק מרכיבים אינפוגרפי – הדגשת רכיבים מרכזיים עם תחושת מגזין קולינרי.',
+  nutrition:
+    'לוק של בריאות וכושר – הצגת ערכים תזונתיים באופן אלגנטי ומקצועי.',
+  classic:
+    'צילום עילי קלאסי למנות עיקריות – זווית מוכרת שמדגישה צלחת יפה ופירוט עדין.',
+  'angle-45':
+    'זווית 45° למנות גבוהות – מושלם להמבורגרים, טוסטים ושכבות מרשימות.',
+  'macro-asmr':
+    'מאקרו טקסטורות ברמת ASMR – קריספיות, רטיבות, גלייזים וסטרצ׳ים של גבינה.',
+  'pov-social':
+    'זווית POV כאילו הצופה יושב מול הצלחת – מושלם לסטוריז וסרטוני אכילה.',
+  'flat-lay':
+    'פלאט-ליי עילי מושלם ללוחות, בראנצים ומנות מחולקות באופן אסתטי.',
+  'minimal-michelin':
+    'מינימליזם קפדני בסגנון מישלן – הרבה חלל ריק ופוקוס על אלמנט מרכזי אחד.',
+  rustic:
+    'סגנון ראסטיק כפרי – משטחים מחוספסים, תאורה חמימה וטקסטורות עמוקות.',
+  'brunch-morning':
+    'אור בוקר רך לבראנץ׳ – וייב קליל, זוהר, מושלם לרשתות חברתיות.',
+  'chef-table-dramatic':
+    'שולחן פס דרמטי של שף – תאורה ממוקדת, צללים עמוקים ואווירה מקצועית.',
+};
+
 function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
   if (width > height) return '16:9';
   if (height > width) return '9:16';
@@ -266,20 +301,21 @@ export default function Page() {
       />
       <div className="absolute inset-0 bg-black/80" aria-hidden />
 
-      <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+      <div className="relative z-10 max-w-5xl mx-auto space-y-10">
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-3"
+          className="text-center space-y-4"
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 text-white text-sm font-medium">
             <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
-            צלם מנה → קבל תמונה שמוכרת
+            סטודיו פרימיום לתמונות אוכל חכמות
           </h1>
-          <p className="text-white/40 text-sm md:text-base">
-            בלי צלם. בלי סטודיו. בלי שעות עבודה.
+          <p className="text-white/45 text-sm md:text-base max-w-2xl mx-auto">
+            העלה צילום אמיתי של המנה, בחר מצב יצירתי – וקבל תמונה שמוכרת + ניתוח חכם של שף, תזונאי
+            ויוצר תוכן, הכל במקום אחד.
           </p>
         </motion.header>
 
@@ -304,12 +340,19 @@ export default function Page() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-6"
+              className="space-y-10"
             >
-              <div className="space-y-3">
-                <p className="text-white/60 text-sm font-semibold uppercase tracking-wider">
-                  בחר סגנון / מצב עסקי
-                </p>
+              <section className="space-y-4">
+                <div className="flex items-baseline justify-between gap-4">
+                  <div>
+                    <p className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em]">
+                      שלב 1 · מצב יצירתי
+                    </p>
+                    <p className="text-white text-sm mt-1">
+                      בחר את המוד / סגנון הצילום שאתה רוצה לתת למנה.
+                    </p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[280px] overflow-y-auto pr-1">
                   {PRESETS.map((preset, index) => {
                     const isSelected = selectedIndex === index;
@@ -332,14 +375,15 @@ export default function Page() {
                         disabled={isRunning}
                         whileHover={!isRunning ? { scale: 1.02 } : {}}
                         whileTap={!isRunning ? { scale: 0.98 } : {}}
-                        className={`relative rounded-xl p-4 text-right border min-h-[88px] flex flex-col justify-center transition-all duration-200 text-white bg-white/5 backdrop-blur-lg overflow-hidden ${borderClass} ${isRunning ? 'opacity-60 pointer-events-none' : ''}`}
+                        aria-pressed={isSelected}
+                        className={`relative rounded-xl p-4 text-right border min-h-[96px] flex flex-col justify-center transition-all duration-200 text-white bg-white/5 backdrop-blur-lg overflow-hidden ${borderClass} ${isRunning ? 'opacity-60 pointer-events-none' : ''}`}
                       >
                         <div
                           className="absolute inset-0 bg-cover bg-center opacity-30"
                           style={{ backgroundImage: `url('${preset.image}')` }}
                           aria-hidden
                         />
-                        <span className="relative font-semibold text-sm line-clamp-2 flex items-center gap-1.5">
+                        <span className="relative font-semibold text-sm flex items-center gap-1.5">
                           {isAuto && <Sparkles size={14} className="shrink-0 text-amber-300" />}
                           {isMarketing && <Rocket size={14} className="shrink-0 text-violet-300" />}
                           {isIngredients && <List size={14} className="shrink-0 text-white/70" />}
@@ -350,9 +394,9 @@ export default function Page() {
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <section className="grid md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-3">
                   <div className="flex rounded-xl overflow-hidden bg-white/5 backdrop-blur-lg border border-white/10 p-1">
                     <button
@@ -466,10 +510,14 @@ export default function Page() {
                       generation is handled by the primary button on the right. */}
                 </div>
                 <div className="space-y-4 flex flex-col">
-                  <div className="rounded-2xl p-5 flex-1 flex flex-col justify-center bg-white/5 backdrop-blur-lg border border-white/10 text-white">
-                    <p className="text-white/50 text-sm mb-1">נבחר</p>
-                    <p className="font-semibold">{selectedPreset.title}</p>
-                    <p className="text-white/40 text-xs mt-2 line-clamp-3">{selectedPreset.prompt}</p>
+                  <div className="rounded-2xl p-5 flex-1 flex flex-col justify-center bg-white/5 backdrop-blur-lg border border-white/10 text-white text-right">
+                    <p className="text-white/50 text-[11px] mb-1 tracking-[0.2em] uppercase">
+                      מצב יצירתי נבחר
+                    </p>
+                    <p className="font-semibold text-sm">{selectedPreset.title}</p>
+                    <p className="text-white/50 text-xs mt-2">
+                      {PRESET_DESCRIPTIONS[selectedPreset.id] ?? selectedPreset.title}
+                    </p>
                   </div>
 
                   <div className="space-y-4">
@@ -506,7 +554,7 @@ export default function Page() {
                         whileTap={!isRunning && base64 ? { scale: 0.97 } : {}}
                         onClick={handleGenerate}
                         disabled={isRunning || !base64}
-                        className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]"
+                        className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/30 shadow-[0_0_24px_rgba(0,0,0,0.55)]"
                       >
                         {isRunning ? (
                           <span className="flex items-center justify-center gap-2">
@@ -525,7 +573,7 @@ export default function Page() {
                         whileTap={!isAnalyzing && selectedImage ? { scale: 0.97 } : {}}
                         onClick={handleAnalyze}
                         disabled={isAnalyzing || !selectedImage}
-                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-emerald-400/40 shadow-[0_0_18px_rgba(16,185,129,0.45)]"
                       >
                         {isAnalyzing ? (
                           <span className="flex items-center justify-center gap-2">
@@ -541,7 +589,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <p className="text-center text-white/40 text-xs">
+                  <p className="text-center text-white/45 text-xs">
                     ⏱️ 5–10 שניות | 💰 מוכן לתפריט ולוולט
                   </p>
 
@@ -562,7 +610,7 @@ export default function Page() {
                     )}
                   </AnimatePresence>
                 </div>
-              </div>
+              </section>
             </motion.div>
           )}
         </AnimatePresence>
