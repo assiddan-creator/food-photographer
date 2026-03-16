@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, RotateCcw, Share2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toBlob } from 'html-to-image';
 
 interface Props {
   outputUrl: string;
@@ -42,7 +42,7 @@ export function ResultViewer({
     setSignatureCard(null);
 
     try {
-      // Fetch image as blob to avoid CORS issues in html2canvas
+      // Fetch image as blob to avoid CORS issues when capturing
       const blob = await fetch(outputUrl).then(r => r.blob());
       const imageDataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -51,7 +51,7 @@ export function ResultViewer({
         reader.readAsDataURL(blob);
       });
 
-      // Inject content into the collage ref (render in DOM for html2canvas)
+      // Inject content into the collage ref (render in DOM for html-to-image)
       const container = collageRef.current;
       const titleEl = container.querySelector('[data-card-title]');
       const imgEl = container.querySelector('[data-card-image]') as HTMLImageElement;
@@ -81,32 +81,28 @@ export function ResultViewer({
         });
       }
 
-      const canvas = await html2canvas(container, {
-        useCORS: true,
-        allowTaint: false,
+      const cardBlob = await toBlob(container, {
+        cacheBust: true,
+        pixelRatio: 2,
         backgroundColor: '#18181b',
-        scale: 2,
-        logging: false,
       });
 
-      const cardBlob = await new Promise<Blob>((res, rej) => {
-        canvas.toBlob(b => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png', 0.95);
-      });
+      if (!cardBlob) throw new Error('toBlob failed');
 
       const cardUrl = URL.createObjectURL(cardBlob);
       setSignatureCard(cardUrl);
 
       if (typeof navigator !== 'undefined' && navigator.share) {
-        const file = new File([cardBlob], 'chef-signature-card.png', { type: 'image/png' });
+        const file = new File([cardBlob], 'chef-card.png', { type: 'image/png' });
         await navigator.share({
           files: [file],
-          title: 'כרטיס חתימת שף',
-          text: menuGenius || undefined,
+          title: 'Chef AI',
+          text: 'בדוק את המנה שלי!',
         });
       } else {
         const a = document.createElement('a');
         a.href = cardUrl;
-        a.download = 'chef-signature-card.png';
+        a.download = 'chef-card.png';
         a.click();
       }
     } catch (err) {
@@ -142,7 +138,7 @@ export function ResultViewer({
         ))}
       </div>
 
-      {/* Hidden collage template for html2canvas (off-screen, fixed size for consistent output) */}
+      {/* Hidden collage template for html-to-image (off-screen, fixed size for consistent output) */}
       <div
         ref={collageRef}
         aria-hidden
