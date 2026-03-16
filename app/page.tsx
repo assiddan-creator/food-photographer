@@ -267,13 +267,13 @@ export default function Page() {
       className={`min-h-screen relative p-4 md:p-8 ${assistant.className}`}
       dir="rtl"
     >
-      {/* Dynamic background: selected mode image, softened to atmosphere */}
+      {/* Dynamic background: selected mode image */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[3px] scale-105 opacity-35"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url('${selectedPreset.image}')` }}
         aria-hidden
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/90 to-black/96" aria-hidden />
+      <div className="absolute inset-0 bg-black/80" aria-hidden />
 
       <div className="relative z-10 max-w-5xl mx-auto space-y-10">
         <motion.header
