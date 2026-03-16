@@ -224,15 +224,33 @@ export default function Page() {
 
   const renderValue = (value: unknown) => {
     if (value == null) return '';
-    if (typeof value === 'string') return value;
-    if (Array.isArray(value) || typeof value === 'object') {
+
+    let text = '';
+    if (typeof value === 'string') {
+      text = value;
+    } else if (Array.isArray(value) || typeof value === 'object') {
       try {
-        return JSON.stringify(value, null, 2);
+        text = JSON.stringify(value);
       } catch {
-        return String(value);
+        text = String(value);
       }
+    } else {
+      text = String(value);
     }
-    return String(value);
+
+    // strip JSON-y punctuation and common English labels that might leak through
+    text = text.replace(/[{}\[\]"]/g, '');
+    text = text
+      .replace(/caption\s*:/gi, '')
+      .replace(/shotList\s*:/gi, '')
+      .replace(/menuGenius\s*:/gi, '')
+      .replace(/healthScanner\s*:/gi, '')
+      .replace(/platingCritic\s*:/gi, '')
+      .replace(/recipeDetective\s*:/gi, '')
+      .replace(/key\s*:/gi, '')
+      .replace(/value\s*:/gi, '');
+
+    return text.trim();
   };
 
   return (

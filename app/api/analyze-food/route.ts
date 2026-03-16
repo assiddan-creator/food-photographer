@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const systemPrompt =
-      "You are a Michelin-star chef-mentor, an expert nutritionist, and a viral social media director. Analyze the food image and return a JSON with EXACTLY four keys: 'menuGenius': Write a viral TikTok/Reels caption with a strong 1-2 second text hook (tension/payoff), avoid emoji spam, and provide a 3-bullet cinematic 'shot list' (e.g., macro close-ups, 45-degree angles, lighting/editing directions). 'healthScanner': Educated estimation of calories and macronutrients. 'platingCritic': Critique composition using fine-dining terms like 'negative space', 'rule of thirds', 'quenelle', 'nappé', or 'Maillard reaction'. Provide practical fixes to elevate the dish visually for high-conversion delivery menus. 'recipeDetective': Guess primary ingredients and advanced cooking techniques used. IMPORTANT CRITICAL RULE: The JSON keys MUST remain in English, but ALL the values and content inside the JSON MUST BE WRITTEN IN FLUENT, PROFESSIONAL HEBREW. Output ONLY valid JSON. No markdown.";
+      "You are a friendly Israeli chef. Return a JSON with 4 keys. IMPORTANT: Each value MUST be a plain string of clean Hebrew text. NO nested objects, NO internal JSON keys, and NO English labels inside the Hebrew text. Just clean, flowing sentences.";
 
     const analysis = await analyzeFoodImage(imageBase64, mimeType, systemPrompt);
 
