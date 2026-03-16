@@ -201,10 +201,10 @@ export default function Page() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<null | {
-    menuGenius: unknown;
-    healthScanner: unknown;
-    platingCritic: unknown;
-    recipeDetective: unknown;
+    menuGenius: string;
+    healthScanner: string;
+    platingCritic: string;
+    recipeDetective: string;
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -249,51 +249,17 @@ export default function Page() {
       }
 
       const data = await res.json();
-      setAnalysisResult(data);
+      setAnalysisResult(data as {
+        menuGenius: string;
+        healthScanner: string;
+        platingCritic: string;
+        recipeDetective: string;
+      });
     } catch (err) {
       setErrorMessage((err as Error).message);
     } finally {
       setIsAnalyzing(false);
     }
-  };
-
-  const renderValue = (value: unknown) => {
-    if (value == null) return '';
-
-    // Prefer direct strings when available
-    if (typeof value === 'string') {
-      return value.trim();
-    }
-
-    // For objects/arrays/numbers/booleans, stringify once without aggressive stripping
-    try {
-      if (Array.isArray(value) || typeof value === 'object') {
-        return JSON.stringify(value, null, 2);
-      }
-      return String(value);
-    } catch {
-      return String(value);
-    }
-  };
-
-  const getSectionText = (
-    result: {
-      menuGenius: unknown;
-      healthScanner: unknown;
-      platingCritic: unknown;
-      recipeDetective: unknown;
-    },
-    key: 'menuGenius' | 'healthScanner' | 'platingCritic' | 'recipeDetective',
-  ) => {
-    // Primary: try the expected key
-    const direct = (result as Record<string, unknown>)[key];
-    if (direct != null && direct !== '') {
-      return renderValue(direct);
-    }
-
-    // Fallback: if Gemini returned a different but still useful shape,
-    // show the full object so the user sees content instead of empty cards.
-    return renderValue(result);
   };
 
   return (
@@ -652,7 +618,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {getSectionText(analysisResult, 'menuGenius')}
+                  {analysisResult.menuGenius}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -663,7 +629,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {getSectionText(analysisResult, 'healthScanner')}
+                  {analysisResult.healthScanner}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -674,7 +640,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {getSectionText(analysisResult, 'platingCritic')}
+                  {analysisResult.platingCritic}
                 </p>
               </GlassCard>
               <GlassCard className="p-4 bg-white/5 border border-white/10 text-white space-y-2">
@@ -685,7 +651,7 @@ export default function Page() {
                   className="text-sm text-white/80 whitespace-pre-wrap font-sans text-right"
                   dir="rtl"
                 >
-                  {getSectionText(analysisResult, 'recipeDetective')}
+                  {analysisResult.recipeDetective}
                 </p>
               </GlassCard>
             </div>

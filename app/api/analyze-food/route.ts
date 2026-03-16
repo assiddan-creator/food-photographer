@@ -19,7 +19,24 @@ export async function POST(request: NextRequest) {
 
     const analysis = await analyzeFoodImage(imageBase64, mimeType, systemPrompt);
 
-    return NextResponse.json(analysis);
+    const raw =
+      analysis && typeof analysis === 'object'
+        ? (analysis as Record<string, unknown>)
+        : {};
+
+    const getString = (key: string): string => {
+      const value = raw[key];
+      return typeof value === 'string' ? value.trim() : '';
+    };
+
+    const normalized = {
+      menuGenius: getString('menuGenius'),
+      healthScanner: getString('healthScanner'),
+      platingCritic: getString('platingCritic'),
+      recipeDetective: getString('recipeDetective'),
+    };
+
+    return NextResponse.json(normalized);
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message || 'Failed to analyze food image' },
