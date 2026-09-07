@@ -4,16 +4,16 @@ Hebrew RTL food-photo studio for a solo creator (Assi). Phone snap in → commer
 
 ## Live product
 
-- **Single-dish create (simplified):** empty state is upload-only (step 1) with a cyan hint and a disabled sticky «צור תמונה משופרת». After upload (step 2), six tagged photo-first styles — «מוכן לוולט» (משלוחים), «מוכן לסטורי» (סטורי), «תפריט מסעדה» (תפריט), «פרסום דרמטי» (פרסום), «גריל ועשן» (גריל), «שיפור אוטומטי» (אוטומטי) — plus chips הכל / משלוחים / סושיאל / מסעדה. Remaining presets sit under «עוד סגנונות»; Fal models (Hebrew: מהיר / מאוזן / איכות) and free-text sit under «הגדרות מתקדמות». Gemini «נתח את המנה» is a ghost secondary sticky action, not a competing green CTA.
+- **Single-dish create (camera-first):** empty state is a big «צלם מנה» CTA that opens the rear camera; «העלאה מהגלריה» is a secondary link. After capture/upload, Gemini photo QA (`/api/analyze-photo`) checks focus / lighting / full dish. Pass shows «התמונה בסדר» and the six locked primary styles; fail shows «צלם שוב: …» with a short Hebrew tip and an easy retake. Sticky generate appears only after QA passes. Gemini «נתח את המנה» stays a ghost secondary sticky action.
+- **Six primary styles (after QA):** «מוכן לוולט» (משלוחים), «מוכן לסטורי» (סטורי), «תפריט מסעדה» (תפריט), «פרסום דרמטי» (פרסום), «גריל ועשן» (גריל), «שיפור אוטומטי» (אוטומטי) — plus chips הכל / משלוחים / סושיאל / מסעדה. Remaining presets sit under «עוד סגנונות»; Fal models (Hebrew: מהיר / מאוזן / איכות) and free-text sit under «הגדרות מתקדמות».
 - Style presets (classics / creators / studio / cinema / social-AI) + optional free-text prompt
 - **Preset brain:** classics = honest enhance; studio = commercial composition; cinema = look/grade; social-AI = viral / experimental; creators = TikTok 9:16. Custom text on classics/studio/social-AI appends authenticity only — the ARRI cinema suffix is cinema-category only (Wolt/TikTok still get their own rules).
 - **Wolt-ready pack:** preset «מוכן לוולט» forces 16:9 + enhance-only prompt; result screen has «הורדה לוולט (16:9)» (client-side center crop → clean JPG) and a Hebrew checklist
 - **TikTok / story pack:** preset «מוכן לסטורי» forces 9:16 + enhance-only prompt (Stories, Reels, TikTok — home bakers and food creators, not only restaurants); result screen has «הורדה לטיקטוק (9:16)» (client-side center crop → clean 9:16 JPG) and a short Hebrew checklist (אנכי 9:16, מתאים לסטורי/ריל, מנה במרכז)
 - **Batch menu («תפריט שלם»):** up to 10 uploads, one style for the run (default Wolt 16:9; TikTok 9:16 is an option), sequential Fal enhance, skip/retry, gallery + «הורד הכל (ZIP)» of Wolt 16:9 or TikTok 9:16 JPGs
-- Upload or rear camera
 - Fal.ai image edit (`FAL_KEY` via `/api/fal/proxy`)
-- Optional Gemini dish analysis (“נתח את המנה”)
-- Result: before/after, Wolt 16:9 export, TikTok 9:16 export, download, share-with-signature, restaurant WhatsApp stub
+- Gemini photo QA (`GEMINI_API_KEY`, model `GEMINI_ANALYZE_MODEL` or `gemini-3-flash-preview` with `gemini-2.5-flash` fallback) plus optional dish analysis (“נתח את המנה”)
+- Result kitchen actions: «הורדה לוולט», «שלח ללקוח» (Web Share / WhatsApp via `NEXT_PUBLIC_WHATSAPP`), «הורדה», «שתף». Signature card, Wolt/TikTok checklists, and restaurant lead CTA stay below.
 
 ## Text overlays are unreliable
 
@@ -27,4 +27,4 @@ Auth, billing, rate limits, CRM, watermarks.
 
 1. **Restaurant lead CTA** — real `NEXT_PUBLIC_WHATSAPP` (or form) and click tracking. The result-screen button is the stub.
 2. **Watermark free tier** — unpaid downloads get a light mark; restaurants pay for clean files.
-3. **Camera for batch** — shoot dishes into the queue without leaving the phone.
+3. **Camera + photo QA for batch** — shoot dishes into the menu queue and reuse the same kitchen photo check.

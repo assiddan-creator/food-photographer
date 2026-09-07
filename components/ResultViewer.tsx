@@ -2,11 +2,12 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, MessageCircle, RotateCcw, Share2 } from 'lucide-react';
+import { Download, MessageCircle, RotateCcw, Share2, Truck } from 'lucide-react';
 import { toBlob } from 'html-to-image';
-import { getWhatsAppHref } from '@/lib/whatsapp';
+import { CUSTOMER_SHARE_TEXT, getCustomerWhatsAppHref, getWhatsAppHref } from '@/lib/whatsapp';
 import { TikTokExportPanel } from '@/components/TikTokExportPanel';
 import { WoltExportPanel } from '@/components/WoltExportPanel';
+import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
 
 interface Props {
   outputUrl: string;
@@ -28,15 +29,87 @@ export function ResultViewer({
   const [chefName, setChefName] = useState('');
   const [signatureCard, setSignatureCard] = useState<string | null>(null);
   const [isBuildingCard, setIsBuildingCard] = useState(false);
+  const [isExportingWolt, setIsExportingWolt] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const collageRef = useRef<HTMLDivElement>(null);
+
+  const fetchOutputFile = async (filename: string) => {
+    const blob = await fetch(outputUrl).then(r => r.blob());
+    return new File([blob], filename, { type: blob.type || 'image/jpeg' });
+  };
 
   const download = async () => {
     const blob = await fetch(outputUrl).then(r => r.blob());
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(blob),
-      download: `food-photo-${Date.now()}.jpg`,
-    });
-    a.click();
+    triggerDownload(blob, `food-photo-${Date.now()}.jpg`);
+  };
+
+  const downloadWolt = async () => {
+    setIsExportingWolt(true);
+    setActionError(null);
+    try {
+      const jpeg = await exportWoltJpeg(outputUrl);
+      triggerDownload(jpeg, `wolt-16x9-${Date.now()}.jpg`);
+    } catch (err) {
+      console.error('Wolt export failed:', err);
+      setActionError('לא הצלחנו להכין את קובץ הוולט. נסו שוב.');
+    } finally {
+      setIsExportingWolt(false);
+    }
+  };
+
+  const openCustomerWhatsApp = () => {
+    window.open(getCustomerWhatsAppHref(), '_blank', 'noopener,noreferrer');
+  };
+
+  const shareToCustomer = async () => {
+    setIsSharing(true);
+    setActionError(null);
+    try {
+      const file = await fetchOutputFile(`dish-${Date.now()}.jpg`);
+      if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'שלח ללקוח',
+          text: CUSTOMER_SHARE_TEXT,
+        });
+        return;
+      }
+      openCustomerWhatsApp();
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      console.error('Customer share failed:', err);
+      openCustomerWhatsApp();
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const shareImage = async () => {
+    setIsSharing(true);
+    setActionError(null);
+    try {
+      const file = await fetchOutputFile(`food-photo-${Date.now()}.jpg`);
+      if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'תמונת מנה',
+          text: 'המנה מוכנה',
+        });
+        return;
+      }
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ title: 'תמונת מנה', text: 'המנה מוכנה', url: outputUrl });
+        return;
+      }
+      await download();
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      console.error('Share failed:', err);
+      setActionError('השיתוף לא הצליח. אפשר להוריד ולשלוח ידנית.');
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   const buildAndShareCard = async () => {
@@ -168,6 +241,62 @@ export function ResultViewer({
           className="text-sm font-semibold text-violet-300 hidden"
         />
       </div>
+
+      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <motion.button
+          type="button"
+          whileHover={!isExportingWolt ? { scale: 1.02 } : {}}
+          whileTap={!isExportingWolt ? { scale: 0.97 } : {}}
+          onClick={downloadWolt}
+          disabled={isExportingWolt}
+          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl bg-cyan-400 px-3 py-3 text-sm font-bold text-zinc-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] disabled:opacity-50"
+        >
+          {isExportingWolt ? (
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />
+          ) : (
+            <Truck size={20} />
+          )}
+          הורדה לוולט
+        </motion.button>
+        <motion.button
+          type="button"
+          whileHover={!isSharing ? { scale: 1.02 } : {}}
+          whileTap={!isSharing ? { scale: 0.97 } : {}}
+          onClick={shareToCustomer}
+          disabled={isSharing}
+          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl bg-emerald-600 px-3 py-3 text-sm font-bold text-white disabled:opacity-50"
+        >
+          <MessageCircle size={20} />
+          שלח ללקוח
+        </motion.button>
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={download}
+          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white hover:bg-white/15"
+        >
+          <Download size={20} />
+          הורדה
+        </motion.button>
+        <motion.button
+          type="button"
+          whileHover={!isSharing ? { scale: 1.02 } : {}}
+          whileTap={!isSharing ? { scale: 0.97 } : {}}
+          onClick={shareImage}
+          disabled={isSharing}
+          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white hover:bg-white/15 disabled:opacity-50"
+        >
+          <Share2 size={20} />
+          שתף
+        </motion.button>
+      </div>
+
+      {actionError ? (
+        <p className="mx-auto max-w-3xl rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+          {actionError}
+        </p>
+      ) : null}
 
       <WoltExportPanel outputUrl={outputUrl} />
       <TikTokExportPanel outputUrl={outputUrl} />
