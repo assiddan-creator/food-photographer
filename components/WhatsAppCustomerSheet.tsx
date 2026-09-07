@@ -196,14 +196,14 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack, onOpenSettings }: Pro
       <div className="space-y-2">
         <div className="flex justify-start">
           <div className="card-gold max-w-[90%] overflow-hidden rounded-2xl rounded-tl-sm text-cream shadow-lg">
-            {templateId === 'bridge' ? (
-              <div className="flex justify-start px-3 pb-2 pt-2.5">
-                <span className="rounded-full bg-cta px-2.5 py-1 text-[10px] font-semibold leading-none text-cta-ink">
+            <div className="relative">
+              <img src={outputUrl} alt="" className="aspect-[4/3] w-full object-cover" />
+              {templateId === 'bridge' ? (
+                <span className="absolute top-2 start-2 rounded-full bg-cta px-2.5 py-1 text-[10px] font-semibold leading-none text-cta-ink shadow">
                   {loyaltyBridgeBadge(loyaltyKind)}
                 </span>
-              </div>
-            ) : null}
-            <img src={outputUrl} alt="" className="aspect-[4/3] w-full object-cover" />
+              ) : null}
+            </div>
             <textarea
               dir="rtl"
               value={message}
