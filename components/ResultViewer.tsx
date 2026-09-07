@@ -2,12 +2,14 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, MessageCircle, RotateCcw, Share2, Truck } from 'lucide-react';
+import { MessageCircle, RotateCcw, Share2, Smartphone, Truck } from 'lucide-react';
 import { toBlob } from 'html-to-image';
 import { CUSTOMER_SHARE_TEXT, getCustomerWhatsAppHref, getWhatsAppHref } from '@/lib/whatsapp';
 import { TikTokExportPanel } from '@/components/TikTokExportPanel';
 import { WoltExportPanel } from '@/components/WoltExportPanel';
 import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
+import { exportTikTokJpeg } from '@/lib/tiktok-export';
+import type { PresetId } from '@/lib/presets';
 
 interface Props {
   outputUrl: string;
@@ -17,6 +19,8 @@ interface Props {
   latencyMs?: number | null;
   /** AI-generated caption for Chef's Signature Card (e.g. menuGenius) */
   menuGenius?: string | null;
+  /** Selected style — Story/TikTok swaps the primary export to 9:16 */
+  presetId?: PresetId;
 }
 
 export function ResultViewer({
@@ -25,11 +29,12 @@ export function ResultViewer({
   onReset,
   latencyMs,
   menuGenius,
+  presetId = 'delivery',
 }: Props) {
   const [chefName, setChefName] = useState('');
   const [signatureCard, setSignatureCard] = useState<string | null>(null);
   const [isBuildingCard, setIsBuildingCard] = useState(false);
-  const [isExportingWolt, setIsExportingWolt] = useState(false);
+  const [isExportingPrimary, setIsExportingPrimary] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const collageRef = useRef<HTMLDivElement>(null);
@@ -44,17 +49,25 @@ export function ResultViewer({
     triggerDownload(blob, `food-photo-${Date.now()}.jpg`);
   };
 
-  const downloadWolt = async () => {
-    setIsExportingWolt(true);
+  const isStory = presetId === 'tiktok';
+  const readyLabel = isStory ? 'מוכן לסטורי' : 'מוכן לוולט';
+
+  const downloadPrimary = async () => {
+    setIsExportingPrimary(true);
     setActionError(null);
     try {
-      const jpeg = await exportWoltJpeg(outputUrl);
-      triggerDownload(jpeg, `wolt-16x9-${Date.now()}.jpg`);
+      if (isStory) {
+        const jpeg = await exportTikTokJpeg(outputUrl);
+        triggerDownload(jpeg, `story-9x16-${Date.now()}.jpg`);
+      } else {
+        const jpeg = await exportWoltJpeg(outputUrl);
+        triggerDownload(jpeg, `wolt-16x9-${Date.now()}.jpg`);
+      }
     } catch (err) {
-      console.error('Wolt export failed:', err);
-      setActionError('לא הצלחנו להכין את קובץ הוולט. נסו שוב.');
+      console.error('Primary export failed:', err);
+      setActionError(isStory ? 'לא הצלחנו להכין את קובץ הסטורי. נסו שוב.' : 'לא הצלחנו להכין את קובץ הוולט. נסו שוב.');
     } finally {
-      setIsExportingWolt(false);
+      setIsExportingPrimary(false);
     }
   };
 
@@ -189,8 +202,8 @@ export function ResultViewer({
   };
 
   const cards = [
-    { src: originalPreview, label: 'מקור' },
-    { src: outputUrl, label: 'AI פרימיום' },
+    { src: originalPreview, label: 'לפני' },
+    { src: outputUrl, label: 'אחרי' },
   ];
 
   return (
@@ -200,21 +213,6 @@ export function ResultViewer({
       className="space-y-4"
       dir="rtl"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-        {cards.map(({ src, label }) => (
-          <div
-            key={label}
-            className="rounded-2xl overflow-hidden bg-zinc-900 border border-white/10"
-          >
-            <p className="text-white/50 text-xs font-medium uppercase tracking-wider px-3 py-2 border-b border-white/10">
-              {label}
-            </p>
-            <img src={src} alt={label} className="w-full aspect-square object-contain bg-black" />
-          </div>
-        ))}
-      </div>
-
-      {/* Hidden collage template for html-to-image (off-screen, fixed size for consistent output) */}
       <div
         ref={collageRef}
         aria-hidden
@@ -242,54 +240,78 @@ export function ResultViewer({
         />
       </div>
 
-      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mx-auto max-w-3xl space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4">
+        <div className="space-y-1">
+          <p className="font-semibold text-white">התמונה מוכנה · {readyLabel}</p>
+          <p className="text-xs text-white/50">לפני / אחרי · מוכן לשליחה</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {cards.map(({ src, label }) => (
+            <div key={label} className="relative overflow-hidden rounded-2xl bg-zinc-900">
+              <img src={src} alt={label} className="aspect-[3/4] w-full object-cover" />
+              <span className="absolute bottom-2 right-2 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white">
+                {label}
+              </span>
+            </div>
+          ))}
+        </div>
+
         <motion.button
           type="button"
-          whileHover={!isExportingWolt ? { scale: 1.02 } : {}}
-          whileTap={!isExportingWolt ? { scale: 0.97 } : {}}
-          onClick={downloadWolt}
-          disabled={isExportingWolt}
-          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl bg-cyan-400 px-3 py-3 text-sm font-bold text-zinc-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] disabled:opacity-50"
+          whileHover={!isExportingPrimary ? { scale: 1.01 } : {}}
+          whileTap={!isExportingPrimary ? { scale: 0.98 } : {}}
+          onClick={downloadPrimary}
+          disabled={isExportingPrimary}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 disabled:opacity-50"
         >
-          {isExportingWolt ? (
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />
+          {isExportingPrimary ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />
+          ) : isStory ? (
+            <Smartphone size={18} />
           ) : (
-            <Truck size={20} />
+            <Truck size={18} />
           )}
-          הורדה לוולט
+          {isStory ? 'הורדה לסטורי · 9:16' : 'הורדה לוולט · 16:9'}
         </motion.button>
+
         <motion.button
           type="button"
-          whileHover={!isSharing ? { scale: 1.02 } : {}}
-          whileTap={!isSharing ? { scale: 0.97 } : {}}
+          whileHover={!isSharing ? { scale: 1.01 } : {}}
+          whileTap={!isSharing ? { scale: 0.98 } : {}}
           onClick={shareToCustomer}
           disabled={isSharing}
-          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl bg-emerald-600 px-3 py-3 text-sm font-bold text-white disabled:opacity-50"
+          className="w-full rounded-2xl border border-white/20 bg-white/5 py-3.5 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50"
         >
-          <MessageCircle size={20} />
-          שלח ללקוח
+          שליחה ללקוח (וואטסאפ)
         </motion.button>
-        <motion.button
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={download}
+            className="rounded-2xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            הורדה
+          </button>
+          <button
+            type="button"
+            onClick={shareImage}
+            disabled={isSharing}
+            className="rounded-2xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50"
+          >
+            שיתוף
+          </button>
+        </div>
+
+        <button
           type="button"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={download}
-          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white hover:bg-white/15"
+          onClick={onReset}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white/70 hover:text-white"
         >
-          <Download size={20} />
-          הורדה
-        </motion.button>
-        <motion.button
-          type="button"
-          whileHover={!isSharing ? { scale: 1.02 } : {}}
-          whileTap={!isSharing ? { scale: 0.97 } : {}}
-          onClick={shareImage}
-          disabled={isSharing}
-          className="flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-2xl border border-white/20 bg-white/10 px-3 py-3 text-sm font-bold text-white hover:bg-white/15 disabled:opacity-50"
-        >
-          <Share2 size={20} />
-          שתף
-        </motion.button>
+          <RotateCcw size={16} />
+          נסה סגנון אחר
+        </button>
       </div>
 
       {actionError ? (
@@ -323,14 +345,6 @@ export function ResultViewer({
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          onClick={download}
-          className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl"
-        >
-          <Download size={17} /> הורדת תמונה
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
           onClick={buildAndShareCard}
           disabled={isBuildingCard}
           className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 bg-zinc-800/90 hover:bg-zinc-700/90 border border-white/20 text-white font-semibold rounded-xl shadow-lg hover:shadow-violet-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -345,14 +359,6 @@ export function ResultViewer({
               <Share2 size={17} /> שתף עם חתימה אישית
             </>
           )}
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onReset}
-          className="flex-1 sm:flex-none flex items-center justify-center gap-2 py-3 px-5 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/15 transition-colors"
-        >
-          <RotateCcw size={17} /> נסה סגנון אחר
         </motion.button>
         <a
           href={getWhatsAppHref()}

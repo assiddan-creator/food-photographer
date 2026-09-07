@@ -24,7 +24,7 @@ export function StickyCreateBar({
           type="button"
           onClick={onGenerate}
           disabled={waitingForImage || isRunning}
-          className={`w-full rounded-xl py-3.5 text-sm font-bold transition-all ${
+            className={`w-full rounded-2xl py-3.5 text-sm font-bold transition-all ${
             waitingForImage
               ? 'cursor-not-allowed bg-zinc-700/90 text-white/35'
               : 'bg-cyan-400 text-zinc-950 hover:bg-cyan-300 disabled:hover:bg-cyan-400'
@@ -45,7 +45,7 @@ export function StickyCreateBar({
             type="button"
             onClick={onAnalyze}
             disabled={isAnalyzing || isRunning}
-            className="w-full rounded-xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isAnalyzing ? (
               <span className="flex items-center justify-center gap-2">

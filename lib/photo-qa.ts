@@ -5,9 +5,21 @@ export type PhotoQaResult = {
   focusOk: boolean;
   lightingOk: boolean;
   framingOk: boolean;
+  focusNoteHe: string;
+  lightingNoteHe: string;
+  framingNoteHe: string;
 };
 
 export const PHOTO_QA_PASS_TIP = 'התמונה בסדר';
+
+const DEFAULT_NOTES = {
+  focusOk: 'חד מספיק',
+  focusWarn: 'מטושטש — החזק יציב וצלם שוב',
+  lightingOk: 'תאורה טובה',
+  lightingWarn: 'קצת חשוך — אפשר להמשיך או לצלם ליד חלון',
+  framingOk: 'כל המנה בפריים',
+  framingWarn: 'המנה חתוכה — הרחק קצת כדי לראות את כל הצלחת',
+} as const;
 
 export function splitImagePayload(image: string): { mimeType: string; base64: string } {
   if (image.startsWith('data:')) {
@@ -32,6 +44,10 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
 }
 
+function asNote(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
 export function normalizePhotoQa(raw: unknown): PhotoQaResult {
   const obj = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
   const focusOk = asBoolean(obj.focusOk);
@@ -44,8 +60,24 @@ export function normalizePhotoQa(raw: unknown): PhotoQaResult {
   if (ok) {
     tipHe = PHOTO_QA_PASS_TIP;
   } else if (!tipHe) {
-    tipHe = issues[0] ?? 'קרב למנה, החזק יציב, ותן אור טבעי.';
+    tipHe = issues[0] ?? 'אפשר להמשיך, או לצלם שוב ליד חלון.';
   }
 
-  return { ok, issues, tipHe, focusOk, lightingOk, framingOk };
+  return {
+    ok,
+    issues,
+    tipHe,
+    focusOk,
+    lightingOk,
+    framingOk,
+    focusNoteHe: asNote(obj.focusNoteHe, focusOk ? DEFAULT_NOTES.focusOk : DEFAULT_NOTES.focusWarn),
+    lightingNoteHe: asNote(
+      obj.lightingNoteHe,
+      lightingOk ? DEFAULT_NOTES.lightingOk : DEFAULT_NOTES.lightingWarn,
+    ),
+    framingNoteHe: asNote(
+      obj.framingNoteHe,
+      framingOk ? DEFAULT_NOTES.framingOk : DEFAULT_NOTES.framingWarn,
+    ),
+  };
 }

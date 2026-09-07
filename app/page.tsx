@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Sparkles, Truck, UtensilsCrossed } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { Assistant } from 'next/font/google';
 import CameraCapture from '@/components/CameraCapture';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -14,8 +14,8 @@ import { PrimaryStyleCards } from '@/components/PrimaryStyleCards';
 import { MoreStylesPanel } from '@/components/MoreStylesPanel';
 import { AdvancedSettings } from '@/components/AdvancedSettings';
 import { StickyCreateBar } from '@/components/StickyCreateBar';
-import { CameraFirstEmpty } from '@/components/CameraFirstEmpty';
 import { PhotoQaCard } from '@/components/PhotoQaCard';
+import { KitchenStepper, type KitchenStepId } from '@/components/KitchenStepper';
 import { usePipeline } from '@/hooks/usePipeline';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
 import { normalizePhotoQa, splitImagePayload, type PhotoQaResult } from '@/lib/photo-qa';
@@ -40,8 +40,8 @@ const DEFAULT_PRESET_INDEX = Math.max(
   PRESETS.findIndex(preset => preset.id === WOLT_PRESET_ID),
 );
 
-type InputMode = 'idle' | 'camera' | 'upload';
-type PhotoQaStatus = 'idle' | 'checking' | 'pass' | 'fail' | 'error';
+type InputMode = 'camera' | 'upload';
+type PhotoQaStatus = 'idle' | 'checking' | 'done' | 'error';
 
 function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
   if (width > height) return '16:9';
@@ -58,7 +58,7 @@ export default function Page() {
   const [base64, setBase64] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(DEFAULT_PRESET_INDEX);
-  const [inputMode, setInputMode] = useState<InputMode>('idle');
+  const [inputMode, setInputMode] = useState<InputMode>('camera');
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16' | '1:1'>('9:16');
   const [selectedModel, setSelectedModel] = useState(DEFAULT_FAL_MODEL);
   const [studioMode, setStudioMode] = useState<'single' | 'batch'>('single');
@@ -79,17 +79,26 @@ export default function Page() {
   const [photoQaStatus, setPhotoQaStatus] = useState<PhotoQaStatus>('idle');
   const [photoQa, setPhotoQa] = useState<PhotoQaResult | null>(null);
   const [photoQaError, setPhotoQaError] = useState<string | null>(null);
+  const [checkAcknowledged, setCheckAcknowledged] = useState(false);
   const qaRequestId = useRef(0);
 
   const isRunning = stage === 'generating';
   const selectedPreset = PRESETS[selectedIndex] ?? getPresetById(WOLT_PRESET_ID);
   const hasImage = Boolean(base64 && preview);
   const showResult = stage === 'done' && Boolean(outputUrl && preview);
-  const qaReady = photoQaStatus === 'pass';
-  const showSticky = studioMode === 'single' && !showResult && qaReady;
-  const showQaStep = hasImage && (photoQaStatus === 'checking' || photoQaStatus === 'fail' || photoQaStatus === 'error');
+  const showStyles = hasImage && checkAcknowledged && !showResult;
+  const showCheck = hasImage && !checkAcknowledged && !showResult;
+  const showSticky = studioMode === 'single' && showStyles;
 
-  const clearImage = (nextMode: InputMode = 'idle') => {
+  const kitchenStep: KitchenStepId = showResult
+    ? 'actions'
+    : showStyles
+      ? 'style'
+      : showCheck
+        ? 'check'
+        : 'camera';
+
+  const clearImage = (nextMode: InputMode = 'camera') => {
     qaRequestId.current += 1;
     setBase64(null);
     setPreview(null);
@@ -97,6 +106,7 @@ export default function Page() {
     setPhotoQa(null);
     setPhotoQaStatus('idle');
     setPhotoQaError(null);
+    setCheckAcknowledged(false);
     setInputMode(nextMode);
   };
 
@@ -121,12 +131,24 @@ export default function Page() {
         throw new Error(typeof data.error === 'string' ? data.error : 'Failed to analyze photo');
       }
 
-      const result = normalizePhotoQa(data);
-      setPhotoQa(result);
-      setPhotoQaStatus(result.ok ? 'pass' : 'fail');
+      setPhotoQa(normalizePhotoQa(data));
+      setPhotoQaStatus('done');
     } catch (err) {
       if (requestId !== qaRequestId.current) return;
       setPhotoQaError((err as Error).message);
+      setPhotoQa(
+        normalizePhotoQa({
+          ok: true,
+          focusOk: false,
+          lightingOk: false,
+          framingOk: false,
+          issues: [],
+          tipHe: 'אפשר להמשיך או לצלם שוב.',
+          focusNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+          lightingNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+          framingNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+        }),
+      );
       setPhotoQaStatus('error');
     }
   };
@@ -135,7 +157,8 @@ export default function Page() {
     setBase64(imageBase64);
     setPreview(previewUrl);
     setSelectedImage(imageBase64);
-    setInputMode('idle');
+    setCheckAcknowledged(false);
+    setInputMode('camera');
 
     const img = new Image();
     img.onload = () => {
@@ -152,7 +175,7 @@ export default function Page() {
   };
 
   const handleGenerate = () => {
-    if (!base64 || !selectedPreset || !qaReady) return;
+    if (!base64 || !selectedPreset || !checkAcknowledged) return;
 
     const prompt = buildGeneratePrompt(selectedPreset, customPrompt, analysisResult?.platingCritic);
     const generateAspect = forcedAspectForPreset(selectedPreset.id) ?? aspectRatio;
@@ -200,21 +223,22 @@ export default function Page() {
       />
       <div className="absolute inset-0 bg-black/80" aria-hidden />
 
-      <div className="relative z-10 mx-auto max-w-4xl space-y-6">
+      <div className="relative z-10 mx-auto max-w-4xl space-y-5">
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-2 text-center"
+          className="space-y-3 text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-lg">
-            <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
+            Assi &amp; Johnny · זרימת מסעדה
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
-            צלם מנה → קבל תמונה שמוכרת
+            צלם מנה ← קבל תמונה שמוכרת
           </h1>
-          <p className="text-sm text-white/40 md:text-base">
-            בלי צלם. בלי סטודיו. בלי שעות עבודה.
+          <p className="text-sm text-white/45 md:text-base">
+            במסעדה מצלמים עכשיו — לא מחפשים קובץ
           </p>
+          {studioMode === 'single' ? <KitchenStepper current={kitchenStep} /> : null}
         </motion.header>
 
         <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-lg">
@@ -224,11 +248,10 @@ export default function Page() {
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
               studioMode === 'single'
-                ? 'border border-white/20 bg-white/15 text-white'
+                ? 'bg-white text-zinc-950'
                 : 'text-white/60 hover:text-white/80'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
-            <UtensilsCrossed size={18} />
             מנה אחת
           </button>
           <button
@@ -237,11 +260,10 @@ export default function Page() {
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
               studioMode === 'batch'
-                ? 'border border-cyan-300 bg-cyan-400 text-zinc-950'
+                ? 'bg-white text-zinc-950'
                 : 'text-white/60 hover:text-white/80'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
-            <Truck size={18} />
             תפריט שלם
           </button>
         </div>
@@ -261,6 +283,7 @@ export default function Page() {
                   onReset={handleReset}
                   latencyMs={latencyMs}
                   menuGenius={analysisResult?.menuGenius ?? undefined}
+                  presetId={selectedPreset.id}
                 />
               </motion.div>
             ) : (
@@ -272,35 +295,8 @@ export default function Page() {
                 className="space-y-6"
               >
                 <div className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 backdrop-blur-xl md:p-5">
-                  {qaReady && preview ? (
+                  {showStyles && preview ? (
                     <>
-                      <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 p-3">
-                        <img
-                          src={preview}
-                          alt="תמונה שהועלתה"
-                          className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-white">התמונה בסדר</p>
-                          <p className="text-xs text-emerald-300">✓ פוקוס · תאורה · כל המנה · בחר סגנון</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => clearImage('camera')}
-                          disabled={isRunning}
-                          className="shrink-0 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 disabled:opacity-40"
-                        >
-                          צלם שוב
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-cyan-400 text-sm font-bold text-zinc-950">
-                          2
-                        </span>
-                        <span className="font-semibold text-white">בחר סגנון</span>
-                      </div>
-
                       <PrimaryStyleCards
                         selectedId={selectedPreset.id}
                         filter={styleFilter}
@@ -351,67 +347,38 @@ export default function Page() {
                         onCustomPromptChange={setCustomPrompt}
                       />
                     </>
-                  ) : showQaStep && preview ? (
-                    <>
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-cyan-400 text-sm font-bold text-zinc-950">
-                          1
-                        </span>
-                        <span className="font-semibold text-white">
-                          {photoQaStatus === 'checking' ? 'בודקים את התמונה' : 'תיקון צילום'}
-                        </span>
-                      </div>
-                      <PhotoQaCard
-                        preview={preview}
-                        status={photoQaStatus === 'checking' ? 'checking' : photoQaStatus === 'fail' ? 'fail' : 'error'}
-                        result={photoQa}
-                        errorMessage={photoQaError}
-                        onRetake={() => clearImage('camera')}
-                        onGallery={() => clearImage('upload')}
-                        onContinueAnyway={() => setPhotoQaStatus('pass')}
+                  ) : showCheck && preview ? (
+                    <PhotoQaCard
+                      preview={preview}
+                      isChecking={photoQaStatus === 'checking'}
+                      result={photoQa}
+                      errorMessage={photoQaError}
+                      onContinue={() => setCheckAcknowledged(true)}
+                      onRetake={() => clearImage('camera')}
+                    />
+                  ) : inputMode === 'upload' ? (
+                    <div className="space-y-3">
+                      <ImageUploader
+                        variant="dark"
+                        onClear={() => clearImage('camera')}
+                        onImageReady={applyImage}
+                        disabled={isRunning}
                       />
-                    </>
+                      <button
+                        type="button"
+                        onClick={() => setInputMode('camera')}
+                        className="mx-auto flex items-center gap-2 text-sm text-white/45 hover:text-white/75"
+                      >
+                        <Camera size={16} />
+                        חזרה למצלמה
+                      </button>
+                    </div>
                   ) : (
-                    <>
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-cyan-400 text-sm font-bold text-zinc-950">
-                          1
-                        </span>
-                        <span className="font-semibold text-white">צלם מנה</span>
-                      </div>
-
-                      {inputMode === 'camera' ? (
-                        <CameraCapture
-                          autoStart
-                          onCapture={base64Image => applyImage(base64Image, base64Image)}
-                          onCancel={() => setInputMode('idle')}
-                          onOpenGallery={() => setInputMode('upload')}
-                        />
-                      ) : inputMode === 'upload' ? (
-                        <div className="space-y-3">
-                          <ImageUploader
-                            variant="dark"
-                            onClear={() => clearImage('idle')}
-                            onImageReady={applyImage}
-                            disabled={isRunning}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setInputMode('camera')}
-                            className="mx-auto flex items-center gap-2 text-sm text-white/45 hover:text-white/75"
-                          >
-                            <Camera size={16} />
-                            חזרה למצלמה
-                          </button>
-                        </div>
-                      ) : (
-                        <CameraFirstEmpty
-                          disabled={isRunning}
-                          onOpenCamera={() => setInputMode('camera')}
-                          onOpenGallery={() => setInputMode('upload')}
-                        />
-                      )}
-                    </>
+                    <CameraCapture
+                      autoStart
+                      onCapture={base64Image => applyImage(base64Image, base64Image)}
+                      onOpenGallery={() => setInputMode('upload')}
+                    />
                   )}
 
                   <AnimatePresence>

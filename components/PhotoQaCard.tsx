@@ -1,107 +1,120 @@
 'use client';
 
-import { Camera, Check, Upload, X } from 'lucide-react';
+import { AlertTriangle, Check } from 'lucide-react';
 import type { PhotoQaResult } from '@/lib/photo-qa';
-
-type QaStatus = 'checking' | 'fail' | 'error';
 
 interface Props {
   preview: string;
-  status: QaStatus;
+  isChecking: boolean;
   result: PhotoQaResult | null;
   errorMessage?: string | null;
+  onContinue: () => void;
   onRetake: () => void;
-  onGallery: () => void;
-  onContinueAnyway: () => void;
 }
 
-function CheckRow({ ok, label }: { ok: boolean; label: string }) {
+function StatusIcon({ ok, checking }: { ok: boolean; checking: boolean }) {
+  if (checking) {
+    return <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-white/25 border-t-cyan-300" />;
+  }
+  if (ok) {
+    return (
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-zinc-950">
+        <Check size={16} strokeWidth={3} />
+      </span>
+    );
+  }
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-        ok ? 'bg-emerald-500/15 text-emerald-200' : 'bg-amber-500/15 text-amber-100'
-      }`}
-    >
-      {ok ? <Check size={12} /> : <X size={12} />}
-      {label}
+    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-zinc-950">
+      <AlertTriangle size={14} strokeWidth={2.5} />
     </span>
+  );
+}
+
+function CheckRow({
+  label,
+  note,
+  ok,
+  checking,
+}: {
+  label: string;
+  note: string;
+  ok: boolean;
+  checking: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-black/30 px-3 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold text-white">{label}</p>
+        <p className="text-xs leading-relaxed text-white/60">
+          {checking ? 'בודקים…' : note}
+        </p>
+      </div>
+      <StatusIcon ok={ok} checking={checking} />
+    </div>
   );
 }
 
 export function PhotoQaCard({
   preview,
-  status,
+  isChecking,
   result,
   errorMessage,
+  onContinue,
   onRetake,
-  onGallery,
-  onContinueAnyway,
 }: Props) {
-  const isChecking = status === 'checking';
+  const focusOk = result?.focusOk ?? false;
+  const lightingOk = result?.lightingOk ?? false;
+  const framingOk = result?.framingOk ?? false;
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-        <img src={preview} alt="התמונה שצולמה" className="aspect-square w-full object-contain" />
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-black">
+        <img src={preview} alt="התמונה שצולמה" className="aspect-[3/4] w-full object-cover sm:aspect-[4/5]" />
       </div>
 
-      {isChecking ? (
-        <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">
-          <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
-          בודקים פוקוס, תאורה והאם כל המנה בפריים…
-        </div>
+      {errorMessage && !result ? (
+        <p className="text-xs text-white/45">לא הצלחנו לבדוק אוטומטית — אפשר להמשיך או לצלם שוב.</p>
       ) : null}
 
-      {status === 'fail' && result ? (
-        <div className="space-y-3 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4">
-          <p className="text-base font-bold text-amber-50">צלם שוב: {result.tipHe}</p>
-          <div className="flex flex-wrap gap-2">
-            <CheckRow ok={result.focusOk} label="פוקוס" />
-            <CheckRow ok={result.lightingOk} label="תאורה" />
-            <CheckRow ok={result.framingOk} label="כל המנה" />
-          </div>
-          {result.issues.length > 0 ? (
-            <p className="text-xs text-amber-100/80">{result.issues.join(' · ')}</p>
-          ) : null}
-        </div>
-      ) : null}
+      <div className="space-y-2">
+        <CheckRow
+          label="פוקוס"
+          note={result?.focusNoteHe ?? ''}
+          ok={focusOk}
+          checking={isChecking}
+        />
+        <CheckRow
+          label="תאורה"
+          note={result?.lightingNoteHe ?? ''}
+          ok={lightingOk}
+          checking={isChecking}
+        />
+        <CheckRow
+          label="מנה שלמה"
+          note={result?.framingNoteHe ?? ''}
+          ok={framingOk}
+          checking={isChecking}
+        />
+      </div>
 
-      {status === 'error' ? (
-        <div className="space-y-2 rounded-xl border border-white/15 bg-white/5 p-4">
-          <p className="font-semibold text-white">לא הצלחנו לבדוק את התמונה</p>
-          <p className="text-sm text-white/60">
-            {errorMessage || 'אפשר לצלם שוב, או להמשיך לבחירת סגנון.'}
-          </p>
-        </div>
-      ) : null}
-
-      {!isChecking ? (
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={onRetake}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 py-3.5 text-base font-bold text-zinc-950 hover:bg-cyan-300"
-          >
-            <Camera size={18} />
-            צלם שוב
-          </button>
-          <button
-            type="button"
-            onClick={onGallery}
-            className="mx-auto flex items-center gap-1.5 text-sm text-white/45 hover:text-white/80"
-          >
-            <Upload size={14} />
-            העלאה מהגלריה
-          </button>
-          <button
-            type="button"
-            onClick={onContinueAnyway}
-            className="mx-auto block text-xs text-white/35 hover:text-white/60"
-          >
-            המנה נראית בסדר — המשך
-          </button>
-        </div>
-      ) : null}
+      <button
+        type="button"
+        onClick={onContinue}
+        disabled={isChecking}
+        className="w-full rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 hover:bg-cyan-300 disabled:opacity-40"
+      >
+        הצילום טוב — המשך לסגנון
+      </button>
+      <button
+        type="button"
+        onClick={onRetake}
+        className="w-full rounded-2xl border border-white/20 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10"
+      >
+        צלם שוב
+      </button>
+      <p className="text-center text-[11px] text-white/35">
+        לא חוסמים על אזהרה קלה — רק מדריכים. «צלם שוב» תמיד זמין.
+      </p>
     </div>
   );
 }

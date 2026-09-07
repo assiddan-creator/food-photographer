@@ -109,6 +109,7 @@ Check:
 3. framingOk — the full dish / plate is in frame, not cropped, not a tiny speck far away
 
 ok is true only when focusOk, lightingOk, and framingOk are all true.
+Warnings are SOFT — never treat a kitchen photo as a hard fail. Prefer yellow guidance over blocking.
 
 Return JSON with EXACTLY these keys:
 - ok (boolean)
@@ -117,9 +118,12 @@ Return JSON with EXACTLY these keys:
 - framingOk (boolean)
 - issues (array of short Hebrew labels, e.g. "מטושטש", "חשוך", "המנה חתוכה")
 - tipHe (string, spoken Hebrew only)
+- focusNoteHe (short Hebrew, e.g. "חד מספיק" or a soft warning)
+- lightingNoteHe (short Hebrew, e.g. "קצת חשוך — אפשר להמשיך או לצלם ליד חלון")
+- framingNoteHe (short Hebrew, e.g. "כל המנה בפריים")
 
 If ok is true, tipHe MUST be exactly: התמונה בסדר
-If ok is false, tipHe is ONE short kitchen tip (what to do now). No English, no markdown.`;
+If ok is false, tipHe is ONE short kitchen tip. Soft warnings still allow continue. No English, no markdown.`;
 
 export async function analyzePhotoQuality(
   imageBase64: string,
