@@ -22,7 +22,7 @@ const AI_DIRECTOR_FALLBACK_CRITIQUE =
 export const PRESETS = [
   {
     id: 'auto',
-    title: 'שיפור חכם (אוטומטי)',
+    title: 'שיפור אוטומטי',
     image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Analyze the uploaded food image. Preserve everything exactly as photographed. Apply the most commercially effective food photography enhancement based on the dish type. Improve lighting, color balance, texture clarity, and depth. Natural, realistic, appetizing result. No artistic interpretation. Looks professionally photographed for selling food.' +
@@ -30,8 +30,8 @@ export const PRESETS = [
   },
   {
     id: 'marketing',
-    title: 'פיצוץ שיווקי',
-    image: '/Food_exploding_midair_ingredients_bdf383a9e6.jpeg',
+    title: 'פרסום דרמטי',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Professional food advertising composition based on the uploaded image. Transform the real dish into a photorealistic action shot: the main dish dynamically explodes mid-air, with its key ingredients, textures, and garnishes bursting outward. Motion frozen at 1/8000 second shutter speed. Cinematic dark studio background with heavy bokeh. Ultra-detailed photorealistic textures, 8k UHD, razor-sharp focus. Dramatic side-lighting. Keep the result appetizing for a high-end menu. Remove messy crumbs and clean plate edges. The exploded pieces must still be the same dish from the photo.' +
       STYLIZED_IDENTITY_ANCHOR,
@@ -46,24 +46,24 @@ export const PRESETS = [
   },
   {
     id: 'menu',
-    title: 'תפריט יוקרתי',
-    image: '/Fine_dining_food_presentation_b4749bb336.jpeg',
+    title: 'תפריט מסעדה',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Michelin star fine dining presentation. Dark moody lighting, high contrast, side-lit shadows, rustic dark background. Elegant minimalist styling. Remove messy crumbs, clean plate edges, boost crispness and juicy textures, keep the core food authentic.' +
       AUTHENTICITY_ANCHOR,
   },
   {
     id: 'delivery',
-    title: 'משלוחים (וולט) / מוכן לוולט',
-    image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
+    title: 'מוכן לוולט',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Enhance this real photographed dish for a Wolt / delivery-app listing. Horizontal 16:9 landscape only. Keep the entire dish fully visible and centered — do not crop plate or food edges. Bright, even, natural daylight. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail.' +
       AUTHENTICITY_ANCHOR,
   },
   {
     id: 'tiktok',
-    title: 'ליוצרים / טיקטוק',
-    image: '/Closeup_street_food_money_shot_45degree_angle_extr_011a4690a6.jpeg',
+    title: 'מוכן לסטורי',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Enhance this real photographed dish for TikTok, Instagram Stories, and Reels. Vertical 9:16 portrait only. Keep the entire dish, cake, or bake fully visible and centered — do not crop plate, cake, or food edges. Bright, even, natural daylight that suits a home kitchen or bakery. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table or counter, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, stickers, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail. Ready for a food creator, home baker, or cake maker.' +
       AUTHENTICITY_ANCHOR,
@@ -118,8 +118,8 @@ export const PRESETS = [
   },
   {
     id: 'live-fire',
-    title: 'אש חיה',
-    image: '/Steak_with_fries_explosion_6b69564913.jpeg',
+    title: 'גריל ועשן',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Dynamic live-fire cooking aesthetic. Flying embers, thick smoke, intense Maillard reaction visible. Dramatic warm backlighting.' +
       AUTHENTICITY_ANCHOR,
@@ -179,7 +179,7 @@ export const CATEGORY_PRESETS: Record<CategoryId, readonly PresetId[]> = {
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
   classics: 'הקלאסיים',
-  creators: 'ליוצרים / טיקטוק',
+  creators: 'סטורי / טיקטוק',
   studio: 'סטודיו ופרסום',
   cinema: 'סינמטוגרפיה',
   'social-ai': 'סושיאל ו-AI',

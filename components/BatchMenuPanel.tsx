@@ -175,7 +175,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
           </button>
         ) : null}
         <p className="text-white/40 text-xs leading-relaxed">
-          ברירת מחדל: משלוחים (וולט) — יחס 16:9. ליוצרים / טיקטוק כופה 9:16. סגנונות פיצוץ / קולנוע לא זמינים כאן כדי לשמור על תפריט אמין.
+          ברירת מחדל: מוכן לוולט — יחס 16:9. מוכן לסטורי כופה 9:16. סגנונות פרסום דרמטי / קולנוע לא זמינים כאן כדי לשמור על תפריט אמין.
         </p>
       </div>
 

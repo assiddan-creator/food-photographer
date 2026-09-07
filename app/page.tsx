@@ -280,12 +280,12 @@ export default function Page() {
 
                       {selectedPreset.id === 'delivery' ? (
                         <p className="text-xs leading-relaxed text-cyan-200/80">
-                          יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פיצוץ שיווקי.
+                          יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פרסום דרמטי.
                         </p>
                       ) : null}
                       {selectedPreset.id === 'tiktok' ? (
                         <p className="text-xs leading-relaxed text-rose-200/80">
-                          יחס 9:16 נכפה לטיקטוק / סטורי / ריל. מנה במרכז — שיפור עדין של תמונה אמיתית.
+                          יחס 9:16 נכפה לסטורי / ריל / טיקטוק. מנה במרכז — שיפור עדין של תמונה אמיתית.
                         </p>
                       ) : null}
                       {isExperimentalPreset(selectedPreset.id) ? (

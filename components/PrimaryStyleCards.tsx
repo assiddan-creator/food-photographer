@@ -12,8 +12,7 @@ import {
 const PRIMARY_CARDS = [
   {
     id: 'delivery' as const,
-    title: 'מוכן לוולט',
-    subtitle: '16:9 · שיפור עדין',
+    subtitle: 'שיפור עדין · 16:9',
     Icon: Truck,
     selected: 'border-cyan-400 shadow-[0_0_28px_rgba(34,211,238,0.4)]',
     idle: 'border-cyan-400/50',
@@ -21,8 +20,7 @@ const PRIMARY_CARDS = [
   },
   {
     id: 'tiktok' as const,
-    title: 'לטיקטוק',
-    subtitle: '9:16 · ריל / סטורי',
+    subtitle: 'טיקטוק / ריל · 9:16',
     Icon: Smartphone,
     selected: 'border-rose-400 shadow-[0_0_28px_rgba(251,113,133,0.4)]',
     idle: 'border-rose-400/50',
@@ -30,8 +28,7 @@ const PRIMARY_CARDS = [
   },
   {
     id: 'menu' as const,
-    title: 'תפריט יוקרתי',
-    subtitle: 'מראה מסעדה',
+    subtitle: 'מראה יוקרתי',
     Icon: UtensilsCrossed,
     selected: 'border-amber-400 shadow-[0_0_28px_rgba(251,191,36,0.4)]',
     idle: 'border-amber-400/50',
@@ -39,8 +36,7 @@ const PRIMARY_CARDS = [
   },
   {
     id: 'marketing' as const,
-    title: 'פיצוץ שיווקי',
-    subtitle: 'צבעים חזקים · מודעה',
+    subtitle: 'תנועה · מודעה',
     Icon: Rocket,
     selected: 'border-orange-400 shadow-[0_0_28px_rgba(251,146,60,0.4)]',
     idle: 'border-orange-400/50',
@@ -48,8 +44,7 @@ const PRIMARY_CARDS = [
   },
   {
     id: 'live-fire' as const,
-    title: 'אש חיה',
-    subtitle: 'גריל · עשן · דרמה',
+    subtitle: 'אש · דרמה',
     Icon: Flame,
     selected: 'border-red-500 shadow-[0_0_28px_rgba(239,68,68,0.4)]',
     idle: 'border-red-500/50',
@@ -57,8 +52,7 @@ const PRIMARY_CARDS = [
   },
   {
     id: 'auto' as const,
-    title: 'שיפור חכם',
-    subtitle: 'אוטומטי · בטוח',
+    subtitle: 'תאורה וצבע',
     Icon: Sparkles,
     selected: 'border-violet-400 shadow-[0_0_28px_rgba(167,139,250,0.4)]',
     idle: 'border-violet-400/50',
@@ -142,7 +136,7 @@ export function PrimaryStyleCards({
               <span className="relative flex h-full flex-col justify-end gap-0.5">
                 <span className="flex items-center gap-1.5 text-sm font-bold text-white drop-shadow">
                   <Icon size={14} className={`shrink-0 ${card.iconClass}`} />
-                  {card.title}
+                  {preset.title}
                 </span>
                 <span className="text-[11px] text-white/75">{card.subtitle}</span>
               </span>

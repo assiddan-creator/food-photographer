@@ -43,7 +43,7 @@ export function TikTokExportPanel({ outputUrl }: Props) {
           <Smartphone size={18} />
         </span>
         <div className="space-y-1">
-          <p className="text-white font-semibold text-base">ליוצרים / טיקטוק</p>
+          <p className="text-white font-semibold text-base">מוכן לסטורי</p>
           <p className="text-white/55 text-xs leading-relaxed">
             הורדה אחת ליחס 9:16 אנכי, מוכן לסטורי או ריל. מתאים לאופים ביתיים, עוגות ויוצרי אוכל —
             לא רק למסעדות.
