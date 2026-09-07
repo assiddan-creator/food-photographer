@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Camera, List, Rocket, Sparkles, Truck, Upload, UtensilsCrossed } from 'lucide-react';
+import { Activity, Camera, List, Rocket, Smartphone, Sparkles, Truck, Upload, UtensilsCrossed } from 'lucide-react';
 import { Assistant } from 'next/font/google';
 import CameraCapture from '@/components/CameraCapture';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -16,6 +16,7 @@ import {
   buildGeneratePrompt,
   CATEGORY_LABELS,
   CATEGORY_PRESETS,
+  forcedAspectForPreset,
   PRESETS,
   type CategoryId,
 } from '@/lib/presets';
@@ -64,7 +65,7 @@ export default function Page() {
 
     const prompt = buildGeneratePrompt(selectedPreset, customPrompt, analysisResult?.platingCritic);
 
-    const generateAspect = selectedPreset.id === 'delivery' ? '16:9' : aspectRatio;
+    const generateAspect = forcedAspectForPreset(selectedPreset.id) ?? aspectRatio;
     run(base64, prompt, generateAspect, selectedModel);
   };
 
@@ -194,17 +195,28 @@ export default function Page() {
                   בחר סגנון / מצב עסקי
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {(['classics', 'studio', 'cinema', 'social-ai'] as CategoryId[]).map(category => {
+                  {(['classics', 'creators', 'studio', 'cinema', 'social-ai'] as CategoryId[]).map(category => {
                     const isActive = selectedCategory === category;
                     return (
                       <button
                         key={category}
                         type="button"
-                        onClick={() => !isRunning && setSelectedCategory(category)}
+                        onClick={() => {
+                          if (isRunning) return;
+                          setSelectedCategory(category);
+                          if (category === 'creators') {
+                            const tiktokIndex = PRESETS.findIndex(p => p.id === 'tiktok');
+                            if (tiktokIndex !== -1) setSelectedIndex(tiktokIndex);
+                          }
+                        }}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                           isActive
-                            ? 'bg-white text-black border-white'
-                            : 'bg-white/5 text-white/70 border-white/20 hover:bg-white/10'
+                            ? category === 'creators'
+                              ? 'bg-rose-400 text-zinc-950 border-rose-300'
+                              : 'bg-white text-black border-white'
+                            : category === 'creators'
+                              ? 'bg-rose-500/10 text-rose-100 border-rose-400/30 hover:bg-rose-500/20'
+                              : 'bg-white/5 text-white/70 border-white/20 hover:bg-white/10'
                         }`}
                       >
                         {CATEGORY_LABELS[category]}
@@ -221,17 +233,22 @@ export default function Page() {
                     const isIngredients = preset.id === 'ingredients';
                     const isNutrition = preset.id === 'nutrition';
                     const isWolt = preset.id === 'delivery';
+                    const isTikTok = preset.id === 'tiktok';
                     const borderClass = isAuto && !isSelected
                       ? 'border-amber-400/50'
                       : isWolt && !isSelected
                         ? 'border-cyan-400/50'
-                        : isMarketing && !isSelected
-                          ? 'border-violet-400/60'
-                          : isSelected
-                            ? isWolt
-                              ? 'border-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.35)] bg-white/10'
-                              : 'border-violet-400 shadow-[0_0_24px_rgba(139,92,246,0.35)] bg-white/10'
-                            : 'border-white/10 hover:border-white/20 hover:bg-white/10';
+                        : isTikTok && !isSelected
+                          ? 'border-rose-400/50'
+                          : isMarketing && !isSelected
+                            ? 'border-violet-400/60'
+                            : isSelected
+                              ? isWolt
+                                ? 'border-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.35)] bg-white/10'
+                                : isTikTok
+                                  ? 'border-rose-400 shadow-[0_0_24px_rgba(251,113,133,0.35)] bg-white/10'
+                                  : 'border-violet-400 shadow-[0_0_24px_rgba(139,92,246,0.35)] bg-white/10'
+                              : 'border-white/10 hover:border-white/20 hover:bg-white/10';
                     return (
                       <motion.button
                         key={preset.id}
@@ -250,6 +267,7 @@ export default function Page() {
                         <span className="relative font-semibold text-sm line-clamp-2 flex items-center gap-1.5">
                           {isAuto && <Sparkles size={14} className="shrink-0 text-amber-300" />}
                           {isWolt && <Truck size={14} className="shrink-0 text-cyan-300" />}
+                          {isTikTok && <Smartphone size={14} className="shrink-0 text-rose-300" />}
                           {isMarketing && <Rocket size={14} className="shrink-0 text-violet-300" />}
                           {isIngredients && <List size={14} className="shrink-0 text-white/70" />}
                           {isNutrition && <Activity size={14} className="shrink-0 text-white/70" />}
@@ -389,6 +407,11 @@ export default function Page() {
                         יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פיצוץ שיווקי.
                       </p>
                     ) : null}
+                    {selectedPreset.id === 'tiktok' ? (
+                      <p className="text-rose-200/80 text-xs mt-2 leading-relaxed">
+                        יחס 9:16 נכפה לטיקטוק / סטורי / ריל. מנה במרכז — שיפור עדין של תמונה אמיתית.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-4">
@@ -461,7 +484,7 @@ export default function Page() {
                   </div>
 
                   <p className="text-center text-white/40 text-xs">
-                    ⏱️ 5–10 שניות | 💰 מוכן לתפריט ולוולט
+                    ⏱️ 5–10 שניות | 💰 מוכן לתפריט, וולט וטיקטוק
                   </p>
 
                   <AnimatePresence>

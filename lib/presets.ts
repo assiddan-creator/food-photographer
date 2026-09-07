@@ -4,6 +4,9 @@ export const AUTHENTICITY_ANCHOR =
 export const WOLT_ENHANCE_RULES =
   ' Horizontal 16:9 landscape. Entire dish visible and centered — do not crop plate edges. Bright natural daylight. Realistic portion size. Food only, no people. No text, logos, graphics, borders, or watermarks. Enhance the real photo only — do not invent a cinematic or fully AI-generated look.';
 
+export const TIKTOK_ENHANCE_RULES =
+  ' Vertical 9:16 portrait only. Entire dish visible and centered — do not crop plate or cake edges. Bright natural daylight. Realistic home-kitchen portion. Food only, no people. No text, logos, graphics, borders, or watermarks. Enhance the real photo only — do not invent a cinematic or fully AI-generated look.';
+
 const HEBREW_TYPOGRAPHY =
   ' Use clean, modern Hebrew typography for all text labels. Ensure letters are not reversed.';
 
@@ -49,6 +52,14 @@ export const PRESETS = [
     image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
     prompt:
       'Enhance this real photographed dish for a Wolt / delivery-app listing. Horizontal 16:9 landscape only. Keep the entire dish fully visible and centered — do not crop plate or food edges. Bright, even, natural daylight. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail.' +
+      AUTHENTICITY_ANCHOR,
+  },
+  {
+    id: 'tiktok',
+    title: 'ליוצרים / טיקטוק',
+    image: '/Closeup_street_food_money_shot_45degree_angle_extr_011a4690a6.jpeg',
+    prompt:
+      'Enhance this real photographed dish for TikTok, Instagram Stories, and Reels. Vertical 9:16 portrait only. Keep the entire dish, cake, or bake fully visible and centered — do not crop plate, cake, or food edges. Bright, even, natural daylight that suits a home kitchen or bakery. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table or counter, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, stickers, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail. Ready for a food creator, home baker, or cake maker.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -143,10 +154,11 @@ export const PRESETS = [
 
 export type Preset = (typeof PRESETS)[number];
 export type PresetId = Preset['id'];
-export type CategoryId = 'classics' | 'studio' | 'cinema' | 'social-ai';
+export type CategoryId = 'classics' | 'creators' | 'studio' | 'cinema' | 'social-ai';
 
 export const CATEGORY_PRESETS: Record<CategoryId, readonly PresetId[]> = {
   classics: ['auto', 'menu', 'delivery', 'classic'],
+  creators: ['tiktok'],
   studio: ['marketing', 'split', 'ingredients', 'nutrition'],
   cinema: ['cinematic-cut', 'cyberpunk', 'retro-film', 'live-fire'],
   'social-ai': ['paparazzi-flash', 'zero-gravity', 'pov-action', 'ai-director'],
@@ -154,16 +166,18 @@ export const CATEGORY_PRESETS: Record<CategoryId, readonly PresetId[]> = {
 
 export const CATEGORY_LABELS: Record<CategoryId, string> = {
   classics: 'הקלאסיים',
+  creators: 'ליוצרים / טיקטוק',
   studio: 'סטודיו ופרסום',
   cinema: 'סינמטוגרפיה',
   'social-ai': 'סושיאל ו-AI',
 };
 
-/** Enhance-only classics that stay honest for a restaurant menu pack. */
-export const SAFE_BATCH_PRESET_IDS = ['auto', 'delivery', 'menu', 'classic'] as const;
+/** Enhance-only styles that stay honest for a restaurant or creator pack. */
+export const SAFE_BATCH_PRESET_IDS = ['auto', 'delivery', 'tiktok', 'menu', 'classic'] as const;
 export type SafeBatchPresetId = (typeof SAFE_BATCH_PRESET_IDS)[number];
 
 export const WOLT_PRESET_ID = 'delivery' satisfies PresetId;
+export const TIKTOK_PRESET_ID = 'tiktok' satisfies PresetId;
 export const BATCH_MAX_IMAGES = 10;
 export const BATCH_SECONDS_PER_IMAGE_MIN = 5;
 export const BATCH_SECONDS_PER_IMAGE_MAX = 10;
@@ -180,15 +194,26 @@ export function isSafeBatchPreset(id: PresetId): id is SafeBatchPresetId {
   return (SAFE_BATCH_PRESET_IDS as readonly string[]).includes(id);
 }
 
+/** Business / creator packs that force a Fal aspect instead of the source photo. */
+export function forcedAspectForPreset(id: PresetId): '16:9' | '9:16' | null {
+  if (id === WOLT_PRESET_ID) return '16:9';
+  if (id === TIKTOK_PRESET_ID) return '9:16';
+  return null;
+}
+
 export function buildGeneratePrompt(
   preset: Preset,
   customPrompt: string,
   platingCritic?: string | null,
 ): string {
   if (customPrompt.trim() !== '') {
-    return preset.id === 'delivery'
-      ? customPrompt.trim() + '.' + WOLT_ENHANCE_RULES + AUTHENTICITY_ANCHOR
-      : customPrompt.trim() + CINEMA_CAMERA_SUFFIX;
+    if (preset.id === 'delivery') {
+      return customPrompt.trim() + '.' + WOLT_ENHANCE_RULES + AUTHENTICITY_ANCHOR;
+    }
+    if (preset.id === 'tiktok') {
+      return customPrompt.trim() + '.' + TIKTOK_ENHANCE_RULES + AUTHENTICITY_ANCHOR;
+    }
+    return customPrompt.trim() + CINEMA_CAMERA_SUFFIX;
   }
 
   let prompt = preset.prompt;

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Download, MessageCircle, RotateCcw, Share2 } from 'lucide-react';
 import { toBlob } from 'html-to-image';
 import { getWhatsAppHref } from '@/lib/whatsapp';
+import { TikTokExportPanel } from '@/components/TikTokExportPanel';
 import { WoltExportPanel } from '@/components/WoltExportPanel';
 
 interface Props {
@@ -169,6 +170,7 @@ export function ResultViewer({
       </div>
 
       <WoltExportPanel outputUrl={outputUrl} />
+      <TikTokExportPanel outputUrl={outputUrl} />
 
       {/* Signature input */}
       <div className="max-w-3xl mx-auto space-y-2">
