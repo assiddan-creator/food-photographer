@@ -55,14 +55,14 @@ export function ImageUploader({ onImageReady, onClear, disabled }: Props) {
             {...dropHandlers}
           >
             <div className="relative aspect-square">
-              <img src={preview} alt="תצוגה מקדימה" className="h-full w-full rounded-2xl bg-black object-contain" />
+              <img src={preview} alt="תצוגה מקדימה" className="h-full w-full rounded-2xl bg-bg object-contain" />
               <button
                 type="button"
                 onClick={() => {
                   setPreview(null);
                   onClear?.();
                 }}
-                className="absolute top-3 right-3 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
+                className="absolute top-3 right-3 rounded-full bg-bg/80 p-1.5 text-cream transition-colors hover:bg-bg"
               >
                 <X size={14} />
               </button>
@@ -77,19 +77,19 @@ export function ImageUploader({ onImageReady, onClear, disabled }: Props) {
           animate={{ opacity: 1 }}
           {...dropHandlers}
           className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-14 shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-colors ${
-            isDragging ? 'border-cyan-400 bg-cyan-400/10' : 'border-white/25 bg-white/5'
+            isDragging ? 'border-cta bg-cta/10' : 'border-cta/50 bg-surface'
           } ${disabled ? 'pointer-events-none opacity-50' : ''}`}
         >
           {isCompressing ? (
-            <Loader2 size={44} className="animate-spin text-cyan-400" />
+            <Loader2 size={44} className="animate-spin text-cta" />
           ) : (
-            <Upload size={44} className="text-white/45" />
+            <Upload size={44} className="text-muted" />
           )}
           <div className="text-center">
-            <p className="text-lg font-bold text-white">
+            <p className="text-lg font-bold text-cream">
               {isCompressing ? 'מכווץ תמונה...' : 'העלה מתמונות'}
             </p>
-            <p className="mt-1 text-sm text-white/40">לחצו לבחירה מהגלריה · רק אם אי אפשר לצלם עכשיו</p>
+            <p className="mt-1 text-sm text-muted">לחצו לבחירה מהגלריה · רק אם אי אפשר לצלם עכשיו</p>
           </div>
           <input
             id="file-upload"

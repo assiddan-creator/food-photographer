@@ -100,9 +100,7 @@ export function SocialPostSheet({ outputUrl, isStory, onBack }: Props) {
             type="button"
             onClick={() => setCaptionId(chip.id)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              captionId === chip.id
-                ? 'bg-white text-zinc-950'
-                : 'border border-white/20 bg-white/5 text-white/75'
+              captionId === chip.id ? 'chip-on' : 'chip-off'
             }`}
           >
             {chip.label}
@@ -111,52 +109,47 @@ export function SocialPostSheet({ outputUrl, isStory, onBack }: Props) {
       </div>
 
       <label className="block space-y-1">
-        <span className="text-xs text-white/55">שם מנה (לא חובה)</span>
+        <span className="text-xs text-muted">שם מנה (לא חובה)</span>
         <input
           type="text"
           dir="rtl"
           value={dishName}
           onChange={e => setDishName(e.target.value)}
           placeholder="שניצל / אנטריקוט / המבורגר"
-          className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 focus:border-cyan-400"
+          className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
         />
       </label>
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+      <div className="card-gold overflow-hidden rounded-2xl">
         <img src={outputUrl} alt="" className="aspect-video w-full object-cover" />
         <div className="space-y-1 px-3 py-3">
-          <p className="text-[11px] text-white/40">העמוד שלך · טיוטה</p>
+          <p className="text-[11px] text-muted">העמוד שלך · טיוטה</p>
           <textarea
             dir="rtl"
             value={caption}
             onChange={e => setCaption(e.target.value)}
             rows={4}
-            className="w-full resize-y bg-transparent text-sm leading-relaxed text-white outline-none"
+            className="w-full resize-y bg-transparent text-sm leading-relaxed text-cream outline-none"
           />
         </div>
       </div>
 
       {isStory ? (
-        <p className="text-[11px] text-rose-200/80">נבחר סטורי · שמירת התמונה היא 9:16.</p>
+        <p className="text-[11px] text-muted">נבחר סטורי · שמירת התמונה היא 9:16.</p>
       ) : null}
 
-      <button
-        type="button"
-        onClick={handleCopyAndSave}
-        disabled={busy}
-        className="w-full rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 disabled:opacity-40"
-      >
+      <button type="button" onClick={handleCopyAndSave} disabled={busy} className="btn-cta w-full">
         העתק טקסט + שמור תמונה
       </button>
       <button
         type="button"
         onClick={handleSystemShare}
         disabled={busy}
-        className="w-full rounded-2xl border border-white/20 py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-40"
+        className="btn-ghost w-full"
       >
         שיתוף (מערכת)
       </button>
-      {status ? <p className="text-center text-xs text-cyan-200">{status}</p> : null}
+      {status ? <p className="text-center text-xs text-cream">{status}</p> : null}
     </OwnerSheet>
   );
 }

@@ -11,7 +11,7 @@ export function BackToCameraButton({ onClick, disabled }: Props) {
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center rounded-2xl border border-white/20 bg-transparent px-3 py-2 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+      className="btn-ghost px-3 py-2 text-cream/90"
     >
       ← חזרה למצלמה
     </button>

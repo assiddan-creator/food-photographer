@@ -35,17 +35,14 @@ export function WoltExportPanel({ outputUrl }: Props) {
   };
 
   return (
-    <div
-      className="max-w-3xl mx-auto rounded-2xl border border-cyan-400/30 bg-cyan-950/40 p-4 md:p-5 space-y-4"
-      dir="rtl"
-    >
+    <div className="panel-gold mx-auto max-w-3xl space-y-4 rounded-2xl p-4 md:p-5" dir="rtl">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cta/15 text-cta">
           <Truck size={18} />
         </span>
         <div className="space-y-1">
-          <p className="text-white font-semibold text-base">מוכן לוולט</p>
-          <p className="text-white/55 text-xs leading-relaxed">
+          <p className="text-base font-semibold text-cream">מוכן לוולט</p>
+          <p className="text-xs leading-relaxed text-muted">
             הורדה אחת ליחס 16:9 נקי, בלי טקסט או מסגרת. וולט דוחה תמונות שנוצרו לגמרי ב־AI —
             הנתיב הזה משפר תמונה אמיתית בלבד.
           </p>
@@ -58,11 +55,11 @@ export function WoltExportPanel({ outputUrl }: Props) {
         whileTap={!isExporting ? { scale: 0.98 } : {}}
         onClick={downloadWolt}
         disabled={isExporting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-sm shadow-[0_0_24px_rgba(6,182,212,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-cta w-full"
       >
         {isExporting ? (
           <>
-            <span className="w-4 h-4 border-2 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" />
+            <span className="spinner-ink h-4 w-4 animate-spin rounded-full" />
             מכין קובץ 16:9…
           </>
         ) : (
@@ -77,27 +74,25 @@ export function WoltExportPanel({ outputUrl }: Props) {
         {GUARANTEED.map(item => (
           <li
             key={item.label}
-            className="flex items-start gap-2 rounded-xl bg-black/25 px-3 py-2"
+            className="flex items-start gap-2 rounded-xl bg-bg px-3 py-2"
           >
-            <Check size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden />
+            <Check size={16} className="mt-0.5 shrink-0 text-cta" aria-hidden />
             <div>
-              <p className="text-white text-sm font-semibold">{item.label}</p>
-              <p className="text-white/50 text-xs leading-relaxed">{item.note}</p>
+              <p className="text-sm font-semibold text-cream">{item.label}</p>
+              <p className="text-xs leading-relaxed text-muted">{item.note}</p>
             </div>
           </li>
         ))}
       </ul>
 
-      <p className="text-white/45 text-xs leading-relaxed">
+      <p className="text-xs leading-relaxed text-muted">
         באחריותכם לפני העלאה לוולט:{' '}
-        <span className="text-white/70">מנה בגודל אמיתי</span>
+        <span className="text-cream/80">מנה בגודל אמיתי</span>
         {' '}(בלי הגדלה מטעה), ללא אנשים בתמונה, ותאורה טבעית בהירה.
       </p>
 
       {error ? (
-        <p className="text-red-200 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
-          {error}
-        </p>
+        <p className="alert-error rounded-lg px-3 py-2 text-xs">{error}</p>
       ) : null}
     </div>
   );

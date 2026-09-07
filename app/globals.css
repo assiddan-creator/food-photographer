@@ -1,15 +1,164 @@
 @import "tailwindcss";
 
+/* Locked Designer palette v2.1 Black & Gold — quiet luxury. Tweak here only. */
+:root {
+  --bg: #030303;
+  --surface: #0c0c0c;
+  --text: #f7f4ee;
+  --muted: #8f8a82;
+  --cta: #d4af37;
+  --frame: #141414;
+  --cta-ink: #030303;
+  --cta-shine: #f0d878;
+  --cta-deep: #b8941f;
+  --gold-border: color-mix(in srgb, var(--cta) 72%, transparent);
+  --gold-glow: 0 0 28px color-mix(in srgb, var(--cta) 42%, transparent);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-cream: var(--text);
+  --color-muted: var(--muted);
+  --color-cta: var(--cta);
+  --color-frame: var(--frame);
+  --color-cta-ink: var(--cta-ink);
+}
+
 html,
 body {
-  background-color: #000;
+  background-color: var(--bg);
+  color: var(--text);
   min-height: 100%;
+  color-scheme: dark;
+}
+
+@layer components {
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 1rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--cta-ink);
+    background: linear-gradient(180deg, var(--cta-shine) 0%, var(--cta) 42%, var(--cta-deep) 100%);
+    box-shadow: var(--gold-glow);
+    transition: filter 0.15s ease, opacity 0.15s ease;
+  }
+
+  .btn-cta:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  .btn-cta:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--gold-border);
+    background: transparent;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text);
+    transition: background-color 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--cta) 10%, transparent);
+  }
+
+  .btn-ghost:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  .panel-gold {
+    border: 1px solid var(--gold-border);
+    background: var(--frame);
+  }
+
+  .card-gold {
+    border: 1px solid var(--cta);
+    background: var(--bg);
+  }
+
+  .chip-on {
+    border: 1px solid var(--cta);
+    background: var(--cta);
+    color: var(--cta-ink);
+  }
+
+  .chip-off {
+    border: 1px solid var(--gold-border);
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .chip-off:hover:not(:disabled) {
+    color: var(--text);
+    background: color-mix(in srgb, var(--cta) 10%, transparent);
+  }
+
+  .field-gold {
+    border: 1px solid var(--gold-border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+
+  .field-gold::placeholder {
+    color: color-mix(in srgb, var(--muted) 80%, transparent);
+  }
+
+  .field-gold:focus {
+    border-color: var(--cta);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--cta) 28%, transparent);
+  }
+
+  .alert-error {
+    border: 1px solid color-mix(in srgb, #9a3b32 55%, transparent);
+    background: color-mix(in srgb, #9a3b32 12%, transparent);
+    color: #f3d6d2;
+  }
+
+  .spinner-ink {
+    border: 2px solid color-mix(in srgb, var(--cta-ink) 30%, transparent);
+    border-top-color: var(--cta-ink);
+  }
+
+  .spinner-gold {
+    border: 2px solid color-mix(in srgb, var(--cta) 28%, transparent);
+    border-top-color: var(--cta);
+  }
+
+  .glow-gold {
+    box-shadow: var(--gold-glow);
+  }
+
+  .shutter-cta {
+    border: 5px solid var(--text);
+    background: var(--cta);
+    box-shadow: var(--gold-glow);
+  }
 }
 
 @layer utilities {
   .glass {
-    background-color: rgb(255 255 255 / 0.1);
+    background-color: var(--frame);
     backdrop-filter: blur(12px);
-    border: 1px solid rgb(255 255 255 / 0.2);
+    border: 1px solid var(--gold-border);
   }
 }

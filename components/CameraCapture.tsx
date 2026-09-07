@@ -105,11 +105,11 @@ export default function CameraCapture({
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="space-y-1 text-center">
-        <h2 className="text-xl font-bold text-white">צלמו את המנה עכשיו</h2>
-        <p className="text-sm text-white/50">במטבח מצלמים — לא מחפשים קובץ</p>
+        <h2 className="text-xl font-bold text-cream">צלמו את המנה עכשיו</h2>
+        <p className="text-sm text-muted">במטבח מצלמים — לא מחפשים קובץ</p>
       </div>
 
-      <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-black sm:aspect-[4/5]">
+      <div className="card-gold relative aspect-[3/4] overflow-hidden rounded-3xl bg-bg sm:aspect-[4/5]">
         <video
           ref={videoRef}
           autoPlay
@@ -119,36 +119,32 @@ export default function CameraCapture({
         />
 
         {isStarting && !isCameraOpen ? (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-white/70">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted">
             פותח מצלמה…
           </div>
         ) : null}
 
         {isCameraOpen ? (
-          <span className="absolute top-3 right-3 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white">
+          <span className="absolute top-3 right-3 rounded-full bg-cta px-2.5 py-1 text-[10px] font-bold tracking-wide text-cta-ink">
             ● LIVE
           </span>
         ) : null}
 
         {cameraFailed ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black px-5 text-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-cyan-400 text-zinc-950 shadow-[0_0_32px_rgba(34,211,238,0.35)]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-bg px-5 text-center">
+            <div className="glow-gold flex size-16 items-center justify-center rounded-full bg-cta text-cta-ink">
               <Camera size={30} strokeWidth={2.25} />
             </div>
-            <p className="max-w-sm text-sm font-medium text-amber-100">{errorMsg}</p>
+            <p className="max-w-sm text-sm font-medium text-cream">{errorMsg}</p>
             <button
               type="button"
               onClick={() => void startCamera(facingMode)}
-              className="w-full max-w-xs rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 hover:bg-cyan-300"
+              className="btn-cta w-full max-w-xs"
             >
               נסה מצלמה שוב
             </button>
             {onOpenGallery ? (
-              <button
-                type="button"
-                onClick={onOpenGallery}
-                className="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10"
-              >
+              <button type="button" onClick={onOpenGallery} className="btn-ghost w-full max-w-xs">
                 <Images size={16} />
                 העלה מתמונות
               </button>
@@ -156,7 +152,7 @@ export default function CameraCapture({
           </div>
         ) : (
           <>
-            <p className="absolute inset-x-0 bottom-24 bg-black/55 px-4 py-2 text-center text-xs font-medium text-white/90">
+            <p className="absolute inset-x-0 bottom-24 bg-bg/70 px-4 py-2 text-center text-xs font-medium text-cream">
               מקם את כל המנה בתוך המסגרת · אור טבעי עדיף
             </p>
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-center px-4 pb-5 pt-8">
@@ -164,7 +160,7 @@ export default function CameraCapture({
                 type="button"
                 onClick={handleCapture}
                 disabled={!isCameraOpen}
-                className="size-[72px] rounded-full border-[5px] border-white bg-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.45)] disabled:opacity-40"
+                className="shutter-cta size-[72px] rounded-full disabled:opacity-40"
                 aria-label="צלם מנה"
               />
             </div>
@@ -176,19 +172,11 @@ export default function CameraCapture({
 
       {cameraFailed ? null : (
         <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={switchCamera}
-            className="rounded-2xl border border-white/20 bg-white/5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white"
-          >
+          <button type="button" onClick={switchCamera} className="btn-ghost py-2.5">
             החלף מצלמה
           </button>
           {onOpenGallery ? (
-            <button
-              type="button"
-              onClick={onOpenGallery}
-              className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-white/5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white"
-            >
+            <button type="button" onClick={onOpenGallery} className="btn-ghost py-2.5">
               <Images size={16} />
               העלה מתמונות
             </button>

@@ -6,15 +6,15 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 const intensityMap = {
-  low: 'bg-white/5 backdrop-blur-sm',
-  medium: 'bg-white/10 backdrop-blur-md',
-  high: 'bg-white/20 backdrop-blur-xl',
+  low: 'bg-surface',
+  medium: 'bg-frame',
+  high: 'bg-surface',
 };
 
 export function GlassCard({ children, className, intensity = 'medium', ...props }: Props) {
   return (
     <div
-      className={cn('rounded-2xl border border-white/20 shadow-xl', intensityMap[intensity], className)}
+      className={cn('rounded-2xl border border-cta/70 shadow-[0_0_24px_rgba(0,0,0,0.35)]', intensityMap[intensity], className)}
       {...props}
     >
       {children}

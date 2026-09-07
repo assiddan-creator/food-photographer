@@ -11,6 +11,7 @@ import {
 } from '@/lib/owner-templates';
 import { getCustomerWhatsAppHref } from '@/lib/whatsapp';
 import { triggerDownload } from '@/lib/wolt-export';
+import { WhatsAppMark } from '@/components/WhatsAppMark';
 
 interface Props {
   outputUrl: string;
@@ -89,9 +90,7 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
             type="button"
             onClick={() => pickTemplate(chip.id)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              templateId === chip.id
-                ? 'bg-white text-zinc-950'
-                : 'border border-white/20 bg-white/5 text-white/75'
+              templateId === chip.id ? 'chip-on' : 'chip-off'
             }`}
           >
             {chip.label}
@@ -101,64 +100,61 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
 
       {templateId === 'next' ? (
         <label className="block space-y-1">
-          <span className="text-xs text-white/55">שם מנה (לא חובה)</span>
+          <span className="text-xs text-muted">שם מנה (לא חובה)</span>
           <input
             type="text"
             dir="rtl"
             value={dishName}
             onChange={e => setDishName(e.target.value)}
             placeholder="שניצל / אנטריקוט / המבורגר"
-            className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 focus:border-cyan-400"
+            className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
         </label>
       ) : null}
 
       {templateId === 'promo' ? (
         <label className="block space-y-1">
-          <span className="text-xs text-white/55">טקסט מבצע — אפשר לערוך</span>
+          <span className="text-xs text-muted">טקסט מבצע — אפשר לערוך</span>
           <input
             type="text"
             dir="rtl"
             value={promoText}
             onChange={e => setPromoText(e.target.value)}
-            className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400"
+            className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
         </label>
       ) : null}
 
       <div className="space-y-2">
         <div className="flex justify-start">
-          <div className="max-w-[90%] overflow-hidden rounded-2xl rounded-tl-sm bg-[#005c4b] text-white shadow-lg">
+          <div className="card-gold max-w-[90%] overflow-hidden rounded-2xl rounded-tl-sm text-cream shadow-lg">
             <img src={outputUrl} alt="" className="aspect-[4/3] w-full object-cover" />
             <textarea
               dir="rtl"
               value={message}
               onChange={e => setMessage(e.target.value)}
               rows={4}
-              className="w-full resize-y bg-transparent px-3 py-2.5 text-sm leading-relaxed text-white outline-none"
+              className="w-full resize-y bg-transparent px-3 py-2.5 text-sm leading-relaxed text-cream outline-none"
             />
           </div>
         </div>
-        <p className="text-[11px] text-white/35">התמונה מצורפת / נשמרת כדי לשתף בוואטסאפ.</p>
+        <p className="text-[11px] text-muted">התמונה מצורפת / נשמרת כדי לשתף בוואטסאפ.</p>
       </div>
 
       <button
         type="button"
         onClick={handleOpenWhatsApp}
         disabled={busy || !message.trim()}
-        className="w-full rounded-2xl bg-[#22c55e] py-3.5 text-sm font-bold text-zinc-950 disabled:opacity-40"
+        className="btn-cta w-full"
       >
+        <WhatsAppMark size={16} />
         {busy ? 'פותח…' : 'פתח בוואטסאפ'}
       </button>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="w-full rounded-2xl border border-white/20 py-3 text-sm font-semibold text-white hover:bg-white/10"
-      >
+      <button type="button" onClick={handleCopy} className="btn-ghost w-full">
         העתק טקסט
       </button>
-      {status ? <p className="text-center text-xs text-cyan-200">{status}</p> : null}
-      <p className="text-center text-[11px] text-cyan-200/80">
+      {status ? <p className="text-center text-xs text-cream">{status}</p> : null}
+      <p className="text-center text-[11px] text-muted">
         טיפ: דירוג גוגל = קישור קבוע של המסעדה + בקשה קצרה
       </p>
     </OwnerSheet>

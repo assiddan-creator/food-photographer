@@ -12,17 +12,16 @@ const LABELS: Record<PipelineStage, string> = {
 };
 
 const BAR_COLORS: Record<PipelineStage, string> = {
-  idle: 'from-slate-500 to-slate-600',
-  generating: 'from-violet-500 to-purple-600',
-  done: 'from-emerald-500 to-green-500',
-  error: 'from-red-500 to-rose-600',
+  idle: 'from-muted to-muted',
+  generating: 'from-cta to-cta',
+  done: 'from-cta to-cta',
+  error: 'from-[#9a3b32] to-[#7a2e28]',
 };
 
 export function GenerationStatus({
   stage,
   progress,
   statusMessage,
-  variant = 'dark',
 }: {
   stage: PipelineStage;
   progress: number;
@@ -32,10 +31,10 @@ export function GenerationStatus({
   return (
     <GlassCard className="p-5 space-y-3">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-semibold text-white">{LABELS[stage]}</span>
-        <span className="text-xs tabular-nums text-white/50">{progress}%</span>
+        <span className="text-sm font-semibold text-cream">{LABELS[stage]}</span>
+        <span className="text-xs tabular-nums text-muted">{progress}%</span>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden bg-white/10">
+      <div className="h-1.5 overflow-hidden rounded-full bg-bg">
         <motion.div
           className={`h-full bg-gradient-to-r ${BAR_COLORS[stage]} rounded-full`}
           animate={{ width: `${progress}%` }}
@@ -53,7 +52,7 @@ function AnimatedMessage({ message }: { message: string }) {
       key={message}
       initial={{ opacity: 0, y: 3 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-xs text-white/50"
+      className="text-xs text-muted"
     >
       {message}
     </motion.p>
