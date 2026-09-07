@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera } from 'lucide-react';
+import { Camera, Settings } from 'lucide-react';
 import { Assistant } from 'next/font/google';
 import CameraCapture from '@/components/CameraCapture';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -17,7 +17,9 @@ import { StickyCreateBar } from '@/components/StickyCreateBar';
 import { PhotoQaCard } from '@/components/PhotoQaCard';
 import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { KitchenStepper, type KitchenStepId } from '@/components/KitchenStepper';
+import { RestaurantSettingsPanel } from '@/components/RestaurantSettingsPanel';
 import { usePipeline } from '@/hooks/usePipeline';
+import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
 import { normalizePhotoQa, splitImagePayload, type PhotoQaResult } from '@/lib/photo-qa';
 import {
@@ -65,6 +67,8 @@ export default function Page() {
   const [studioMode, setStudioMode] = useState<'single' | 'batch'>('single');
   const [batchRunning, setBatchRunning] = useState(false);
   const { stage, progress, statusMessage, outputUrl, error, latencyMs, run, reset } = usePipeline();
+  const { stored: restaurant } = useRestaurantSettings();
+  const [showSettings, setShowSettings] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -227,11 +231,26 @@ export default function Page() {
       dir="rtl"
     >
       <div className="relative z-10 mx-auto max-w-4xl space-y-5">
+        {showSettings ? (
+          <RestaurantSettingsPanel onClose={() => setShowSettings(false)} />
+        ) : (
+          <>
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-3 text-center"
         >
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setShowSettings(true)}
+              className="chip-off inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold"
+              aria-label="הגדרות מסעדה"
+            >
+              <Settings size={16} />
+              הגדרות מסעדה
+            </button>
+          </div>
           <h1 className="text-3xl font-bold tracking-tight text-cream md:text-5xl">
             {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
@@ -240,6 +259,9 @@ export default function Page() {
               ? 'בלי קלוריות · רק מה שמוכר במסעדה'
               : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
           </p>
+          {restaurant.name ? (
+            <p className="text-xs font-semibold text-cta">{restaurant.name}</p>
+          ) : null}
           {studioMode === 'single' && kitchenStep !== 'actions' ? (
             <KitchenStepper current={kitchenStep} />
           ) : null}
@@ -282,6 +304,7 @@ export default function Page() {
                   originalPreview={preview}
                   onReset={handleReset}
                   onBackToCamera={returnToCamera}
+                  onOpenSettings={() => setShowSettings(true)}
                   latencyMs={latencyMs}
                   menuGenius={analysisResult?.menuGenius ?? undefined}
                   presetId={selectedPreset.id}
@@ -466,9 +489,11 @@ export default function Page() {
             onRunningChange={setBatchRunning}
           />
         </div>
+          </>
+        )}
       </div>
 
-      {showSticky ? (
+      {showSticky && !showSettings ? (
         <StickyCreateBar
           hasImage
           isRunning={isRunning}

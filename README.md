@@ -29,8 +29,8 @@ Copy `.env.example` to `.env.local`:
 | `FAL_KEY` | Yes (generate) | `/api/fal/proxy` — Fal storage + image edit |
 | `GEMINI_API_KEY` | Photo QA + optional analyze | `/api/analyze-photo`, `/api/analyze-food` |
 | `GEMINI_ANALYZE_MODEL` | Optional | Vision model override (default `gemini-3-flash-preview`) |
-| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen customer WhatsApp templates + restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
-| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | Optional | Appended to the «דירוג בגוגל» WhatsApp template when set |
+| `NEXT_PUBLIC_WHATSAPP` | Optional | Fallback restaurant WhatsApp (`9725…` or `https://wa.me/…`). Owner settings in the app override this per device. |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | Optional | Fallback Google review link for the «דירוג בגוגל» template. Owner settings override this per device. |
 
 Do not commit real keys. `.gitignore` ignores `.env*` except `.env.example`.
 
@@ -55,7 +55,7 @@ npm run lint    # eslint
 1. Import [assiddan-creator/food-photographer](https://github.com/assiddan-creator/food-photographer).
 2. Set `FAL_KEY` in the Vercel project (Production + Preview).
 3. Set `GEMINI_API_KEY` if analyze should work in that environment.
-4. Optionally set `NEXT_PUBLIC_WHATSAPP` so “למסעדות — דברו איתנו” opens your WhatsApp.
+4. Optionally set `NEXT_PUBLIC_WHATSAPP` as a fallback number. Owners can also save WhatsApp + Google review URL in **הגדרות מסעדה** (stored in the browser).
 5. Redeploy after changing `NEXT_PUBLIC_*` vars (they are inlined at build time).
 
 The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed site can spend that key — add rate limiting / auth before paid traffic.
@@ -73,9 +73,9 @@ The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed sit
 
 ## Roadmap (next 3)
 
-1. **Restaurant lead CTA** — wire `NEXT_PUBLIC_WHATSAPP` to a real number / CRM and track clicks.
-2. **Watermark free tier** — mark unpaid exports so restaurants can upgrade to clean files.
-3. **Camera + photo QA for batch** — shoot dishes into the menu queue with the same kitchen photo check.
+1. **Watermark free tier** — mark unpaid exports so restaurants can upgrade to clean files.
+2. **Camera + photo QA for batch** — shoot dishes into the menu queue with the same kitchen photo check.
+3. **Cloud settings** — sync restaurant WhatsApp / review URL beyond this device when auth exists.
 
 See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
@@ -108,8 +108,8 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 | `FAL_KEY` | כן (יצירה) | פרוקסי Fal |
 | `GEMINI_API_KEY` | בדיקת תמונה + ניתוח מנה | `/api/analyze-photo`, `/api/analyze-food` |
 | `GEMINI_ANALYZE_MODEL` | לא חובה | מודל Gemini (ברירת מחדל `gemini-3-flash-preview`) |
-| `NEXT_PUBLIC_WHATSAPP` | לא חובה | תבניות וואטסאפ ללקוח + «למסעדות — דברו איתנו» |
-| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | לא חובה | קישור לדירוג בגוגל בתבנית וואטסאפ |
+| `NEXT_PUBLIC_WHATSAPP` | לא חובה | מספר וואטסאפ גיבוי. אפשר גם לשמור ב«הגדרות מסעדה» במכשיר |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | לא חובה | קישור דירוג גוגל גיבוי. אפשר גם לשמור בהגדרות |
 
 העתיקו `.env.example` ל־`.env.local`. אל תעלו מפתחות אמיתיים לגיט.
 
@@ -127,6 +127,6 @@ npm run dev
 
 ## מפת דרכים (3 הבאים)
 
-1. **ליד למסעדות** — לחבר מספר וואטסאפ אמיתי ולמדוד קליקים.
-2. **שכבת חינם עם ווטרמרק** — ייצוא מסומן עד שמשלמים.
-3. **מצלמה ובדיקת תמונה לתפריט שלם** — לצלם מנות לתור עם אותה בדיקת איכות.
+1. **שכבת חינם עם ווטרמרק** — ייצוא מסומן עד שמשלמים.
+2. **מצלמה ובדיקת תמונה לתפריט שלם** — לצלם מנות לתור עם אותה בדיקת איכות.
+3. **הגדרות בענן** — לסנכרן וואטסאפ / דירוג גוגל מעבר למכשיר הזה.

@@ -35,6 +35,9 @@ export function getWhatsAppHref(raw = process.env.NEXT_PUBLIC_WHATSAPP): string 
 }
 
 /** Kitchen "send this dish to a customer" — wa.me with optional custom text. */
-export function getCustomerWhatsAppHref(text = CUSTOMER_SHARE_TEXT): string {
-  return buildWhatsAppHref(text);
+export function getCustomerWhatsAppHref(
+  text = CUSTOMER_SHARE_TEXT,
+  raw?: string | null,
+): string {
+  return buildWhatsAppHref(text, raw ?? process.env.NEXT_PUBLIC_WHATSAPP);
 }

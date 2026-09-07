@@ -1,6 +1,14 @@
+import {
+  DEFAULT_FIRST_CUSTOMER_TEXT,
+  DEFAULT_RETURNING_CUSTOMER_TEXT,
+  LOYALTY_PERCENT,
+  defaultLoyaltyKind,
+  envGoogleReviewUrl,
+  type LoyaltyKind,
+} from '@/lib/restaurant-settings';
+
 export function getGoogleReviewUrl(): string | null {
-  const value = process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL?.trim();
-  return value || null;
+  return envGoogleReviewUrl() || null;
 }
 
 export type WhatsAppTemplateId = 'ready' | 'promo' | 'next' | 'google';
@@ -12,27 +20,79 @@ export const WHATSAPP_TEMPLATE_CHIPS: { id: WhatsAppTemplateId; label: string }[
   { id: 'google', label: 'דירוג בגוגל' },
 ];
 
+export const LOYALTY_CHIPS: { id: LoyaltyKind; label: string }[] = [
+  { id: 'first', label: `לקוח ראשון · ${LOYALTY_PERCENT.first}%` },
+  { id: 'returning', label: `לקוח חוזר · ${LOYALTY_PERCENT.returning}%` },
+];
+
+export function defaultLoyaltyCopy(kind: LoyaltyKind): string {
+  return kind === 'first' ? DEFAULT_FIRST_CUSTOMER_TEXT : DEFAULT_RETURNING_CUSTOMER_TEXT;
+}
+
+export function buildLoyaltyCopy(kind: LoyaltyKind, customText?: string): string {
+  return customText?.trim() || defaultLoyaltyCopy(kind);
+}
+
+export function buildLoyaltyPromoMessage(kind: LoyaltyKind, customText?: string): string {
+  return buildLoyaltyCopy(kind, customText);
+}
+
+export function buildLoyaltyNextMessage(
+  kind: LoyaltyKind,
+  dishName?: string,
+  customText?: string,
+): string {
+  const body = buildLoyaltyCopy(kind, customText);
+  const dish = dishName?.trim();
+  if (!dish) return body;
+  return `${body}${/[.!?…]$/.test(body) ? ' ' : '. '}כדאי לנסות גם את ה${dish}.`;
+}
+
+function withBusinessSignOff(body: string, businessName?: string): string {
+  const name = businessName?.trim();
+  return name ? `${body}\n— ${name}` : body;
+}
+
+/** Neutral review request + link only. Never mention a discount (Google policy). */
+export function buildGoogleReviewMessage(reviewUrl?: string | null): string {
+  const url = reviewUrl?.trim();
+  return url
+    ? `אם נהנית, נשמח לביקורת בגוגל 🙏\n${url}`
+    : 'אם נהנית, נשמח לביקורת בגוגל 🙏';
+}
+
 export function buildWhatsAppMessage(options: {
   templateId: WhatsAppTemplateId;
   dishName?: string;
-  promoText?: string;
+  loyaltyKind?: LoyaltyKind;
   reviewUrl?: string | null;
+  businessName?: string;
+  firstCustomerText?: string;
+  returningCustomerText?: string;
 }): string {
-  const dish = options.dishName?.trim();
-  const promo = options.promoText?.trim();
-  const reviewUrl = options.reviewUrl?.trim();
+  const loyaltyKind =
+    options.loyaltyKind ??
+    (options.templateId === 'promo' || options.templateId === 'next'
+      ? defaultLoyaltyKind(options.templateId)
+      : 'first');
+  const name = options.businessName?.trim();
+  const customText =
+    loyaltyKind === 'first' ? options.firstCustomerText : options.returningCustomerText;
 
   switch (options.templateId) {
     case 'ready':
-      return 'היי! המנה שלך מוכנה 🍽️ נשמח שתהנו — אפשר לאסוף / אנחנו בדרך.';
+      return name
+        ? `היי! המנה שלך מוכנה 🍽️ נשמח שתהנו אצל ${name} — אפשר לאסוף / אנחנו בדרך.`
+        : 'היי! המנה שלך מוכנה 🍽️ נשמח שתהנו — אפשר לאסוף / אנחנו בדרך.';
     case 'promo':
-      return promo || 'הבא עם ההודעה הזו וקבל הנחה על קינוח / שתייה';
+      return withBusinessSignOff(buildLoyaltyPromoMessage(loyaltyKind, customText), name);
     case 'next':
-      return dish ? `בפעם הבאה תנסה גם את ה${dish}` : 'בפעם הבאה תנסה גם את ה…';
+      return withBusinessSignOff(
+        buildLoyaltyNextMessage(loyaltyKind, options.dishName, customText),
+        name,
+      );
     case 'google':
-      return reviewUrl
-        ? `אם נהנית, כוכב בגוגל עוזר לנו מאוד 🙏\n${reviewUrl}`
-        : 'אם נהנית, כוכב בגוגל עוזר לנו מאוד 🙏';
+      return buildGoogleReviewMessage(options.reviewUrl);
   }
 }
 

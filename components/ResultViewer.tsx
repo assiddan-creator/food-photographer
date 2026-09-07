@@ -24,6 +24,7 @@ interface Props {
   originalPreview: string;
   onReset: () => void;
   onBackToCamera: () => void;
+  onOpenSettings?: () => void;
   latencyMs?: number | null;
   menuGenius?: string | null;
   presetId?: PresetId;
@@ -34,6 +35,7 @@ export function ResultViewer({
   originalPreview,
   onReset,
   onBackToCamera,
+  onOpenSettings,
   latencyMs,
   presetId = 'delivery',
 }: Props) {
@@ -144,7 +146,11 @@ export function ResultViewer({
       <p className="text-center text-xs text-muted">{tabHint}</p>
 
       {ownerTab === 'whatsapp' ? (
-        <WhatsAppCustomerSheet outputUrl={outputUrl} onBack={() => setOwnerTab('hub')} />
+        <WhatsAppCustomerSheet
+          outputUrl={outputUrl}
+          onBack={() => setOwnerTab('hub')}
+          onOpenSettings={onOpenSettings}
+        />
       ) : ownerTab === 'page' ? (
         <SocialPostSheet
           outputUrl={outputUrl}

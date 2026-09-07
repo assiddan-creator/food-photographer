@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { OwnerSheet } from '@/components/OwnerSheet';
 import { copyText, fetchImageFile, shareImageWithText } from '@/lib/owner-share';
 import {
+  LOYALTY_CHIPS,
   WHATSAPP_TEMPLATE_CHIPS,
   buildWhatsAppMessage,
-  getGoogleReviewUrl,
   type WhatsAppTemplateId,
 } from '@/lib/owner-templates';
+import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
+import { defaultLoyaltyKind, type LoyaltyKind } from '@/lib/restaurant-settings';
 import { getCustomerWhatsAppHref } from '@/lib/whatsapp';
 import { triggerDownload } from '@/lib/wolt-export';
 import { WhatsAppMark } from '@/components/WhatsAppMark';
@@ -16,30 +18,48 @@ import { WhatsAppMark } from '@/components/WhatsAppMark';
 interface Props {
   outputUrl: string;
   onBack: () => void;
+  onOpenSettings?: () => void;
 }
 
-export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
-  const reviewUrl = getGoogleReviewUrl();
+export function WhatsAppCustomerSheet({ outputUrl, onBack, onOpenSettings }: Props) {
+  const { resolved } = useRestaurantSettings();
+  const reviewUrl = resolved.googleReviewUrl;
   const [templateId, setTemplateId] = useState<WhatsAppTemplateId>('ready');
+  const [loyaltyKind, setLoyaltyKind] = useState<LoyaltyKind>('first');
   const [dishName, setDishName] = useState('');
-  const [promoText, setPromoText] = useState('הבא עם ההודעה הזו וקבל הנחה על קינוח / שתייה');
   const [message, setMessage] = useState(() => buildWhatsAppMessage({ templateId: 'ready' }));
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const usesLoyalty = templateId === 'promo' || templateId === 'next';
 
   useEffect(() => {
     setMessage(
       buildWhatsAppMessage({
         templateId,
         dishName,
-        promoText,
+        loyaltyKind,
         reviewUrl,
+        businessName: resolved.name,
+        firstCustomerText: resolved.firstCustomerText,
+        returningCustomerText: resolved.returningCustomerText,
       }),
     );
-  }, [templateId, dishName, promoText, reviewUrl]);
+  }, [
+    templateId,
+    dishName,
+    loyaltyKind,
+    reviewUrl,
+    resolved.name,
+    resolved.firstCustomerText,
+    resolved.returningCustomerText,
+  ]);
 
   const pickTemplate = (id: WhatsAppTemplateId) => {
     setTemplateId(id);
+    if (id === 'promo' || id === 'next') {
+      setLoyaltyKind(defaultLoyaltyKind(id));
+    }
     setStatus(null);
   };
 
@@ -68,10 +88,10 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
         if (result === 'shared') setStatus('התמונה והטקסט מוכנים לשליחה');
         return;
       }
-      window.open(getCustomerWhatsAppHref(message), '_blank', 'noopener,noreferrer');
+      window.open(getCustomerWhatsAppHref(message, resolved.whatsapp), '_blank', 'noopener,noreferrer');
       setStatus('התמונה נשמרה. הדביקו את הטקסט וצרפו את התמונה בוואטסאפ.');
     } catch {
-      window.open(getCustomerWhatsAppHref(message), '_blank', 'noopener,noreferrer');
+      window.open(getCustomerWhatsAppHref(message, resolved.whatsapp), '_blank', 'noopener,noreferrer');
     } finally {
       setBusy(false);
     }
@@ -98,6 +118,29 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
         ))}
       </div>
 
+      {usesLoyalty ? (
+        <div className="space-y-2">
+          <p className="text-xs text-muted">איזו הנחה לשלוח</p>
+          <div className="flex flex-wrap gap-2">
+            {LOYALTY_CHIPS.map(chip => (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => {
+                  setLoyaltyKind(chip.id);
+                  setStatus(null);
+                }}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                  loyaltyKind === chip.id ? 'chip-on' : 'chip-off'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {templateId === 'next' ? (
         <label className="block space-y-1">
           <span className="text-xs text-muted">שם מנה (לא חובה)</span>
@@ -112,17 +155,15 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
         </label>
       ) : null}
 
-      {templateId === 'promo' ? (
-        <label className="block space-y-1">
-          <span className="text-xs text-muted">טקסט מבצע — אפשר לערוך</span>
-          <input
-            type="text"
-            dir="rtl"
-            value={promoText}
-            onChange={e => setPromoText(e.target.value)}
-            className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
-          />
-        </label>
+      {templateId === 'next' &&
+      (resolved.firstCustomerText || resolved.returningCustomerText) ? (
+        <p className="text-[11px] leading-relaxed text-muted">משתמש בטקסט מ«הגדרות מסעדה».</p>
+      ) : null}
+
+      {templateId === 'google' ? (
+        <p className="text-[11px] leading-relaxed text-muted">
+          בקשה לדירוג + קישור בלבד. בלי הנחה — מדיניות גוגל.
+        </p>
       ) : null}
 
       <div className="space-y-2">
@@ -141,6 +182,22 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
         <p className="text-[11px] text-muted">התמונה מצורפת / נשמרת כדי לשתף בוואטסאפ.</p>
       </div>
 
+      {!resolved.whatsapp || (templateId === 'google' && !reviewUrl) ? (
+        <div className="rounded-xl border border-[color:var(--gold-border)] px-3 py-2.5 text-[11px] leading-relaxed text-muted">
+          {!resolved.whatsapp ? <p>אין מספר וואטסאפ. אפשר עדיין לפתוח שיתוף כללי.</p> : null}
+          {templateId === 'google' && !reviewUrl ? <p>אין קישור דירוג — ההודעה תישלח בלי קישור.</p> : null}
+          {onOpenSettings ? (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="mt-2 text-xs font-semibold text-cta"
+            >
+              להגדרות מסעדה
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       <button
         type="button"
         onClick={handleOpenWhatsApp}
@@ -154,9 +211,6 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
         העתק טקסט
       </button>
       {status ? <p className="text-center text-xs text-cream">{status}</p> : null}
-      <p className="text-center text-[11px] text-muted">
-        טיפ: דירוג גוגל = קישור קבוע של המסעדה + בקשה קצרה
-      </p>
     </OwnerSheet>
   );
 }

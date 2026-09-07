@@ -13,6 +13,7 @@ Hebrew RTL food-photo studio for a solo creator (Assi). Phone snap in → commer
 - Fal.ai image edit (`FAL_KEY` via `/api/fal/proxy`)
 - Gemini photo QA (`GEMINI_API_KEY`, model `GEMINI_ANALYZE_MODEL` or `gemini-3-flash-preview` with `gemini-2.5-flash` fallback) plus optional dish analysis (“נתח את המנה”)
 - Result kitchen stack (Mock v3.1): «הורדה לוולט · 16:9» (or «הורדה לסטורי · 9:16»), green «שליחה ללקוח בוואטסאפ ▶» (templates: המנה מוכנה / מבצע היום / לפעם הבאה / דירוג בגוגל), outlined «פרסום מוכן לעמוד ▶» (preview + copy/save + system share — no Facebook OAuth), «הורדה | שיתוף», «נסה סגנון אחר».
+- **Restaurant settings («הגדרות מסעדה»):** header entry from the kitchen. Mock chrome: חזרה, title, subtitle «וואטסאפ · גוגל · נאמנות — בלי קלוריות», WhatsApp (number + business name), Google review link + «בדיקת קישור», locked loyalty info cards **הזמנה ראשונה ישירה · 10%** and **לקוח חוזר · 12%** with «נעול» (subtitle «קבוע במערכת · אין בחירת אחוז»; helper «בלי בחירה בין השניים · בלי 15%»), optional first-order and «לפעם הבאה»/returning copy. Saved in `localStorage` (env fallbacks). WhatsApp templates pull 10% first / 12% returning. Google review template is request + link only — **no discount**.
 
 ## Text overlays are unreliable
 
@@ -20,10 +21,10 @@ Fal image-edit often garbles letters — especially Hebrew. «פירוק מרכ�
 
 ## Not in scope yet
 
-Auth, billing, rate limits, CRM, watermarks.
+Auth, billing, rate limits, CRM, watermarks, multi-tenant cloud settings.
 
 ## Next 3
 
-1. **Restaurant lead CTA** — real `NEXT_PUBLIC_WHATSAPP` (or form) and click tracking. The result-screen button is the stub.
-2. **Watermark free tier** — unpaid downloads get a light mark; restaurants pay for clean files.
-3. **Camera + photo QA for batch** — shoot dishes into the menu queue and reuse the same kitchen photo check.
+1. **Watermark free tier** — unpaid downloads get a light mark; restaurants pay for clean files.
+2. **Camera + photo QA for batch** — shoot dishes into the menu queue and reuse the same kitchen photo check.
+3. **Cloud settings** — sync restaurant WhatsApp / review URL beyond this device when auth exists.
