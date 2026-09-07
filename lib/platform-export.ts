@@ -1,7 +1,7 @@
+import JSZip from 'jszip';
 import {
   exportCoverJpegFromImage,
   loadImageFromUrl,
-  sleep,
   triggerDownload,
 } from '@/lib/aspect-export';
 
@@ -108,13 +108,20 @@ export async function exportPlatformFiles(
 }
 
 export async function downloadFiles(files: readonly File[]) {
-  for (let index = 0; index < files.length; index++) {
-    const file = files[index];
-    triggerDownload(file, file.name);
-    if (index < files.length - 1) {
-      await sleep(400);
-    }
+  if (files.length === 1) {
+    triggerDownload(files[0], files[0].name);
+    return;
   }
+
+  const zip = new JSZip();
+  for (const file of files) {
+    zip.file(file.name, file);
+  }
+  const archive = await zip.generateAsync({ type: 'blob' });
+  const names = files.map(file => file.name);
+  const isDeliveryPair =
+    names.length === 2 && names.includes('wolt-16x9.jpg') && names.includes('tenbis-16x9.jpg');
+  triggerDownload(archive, isDeliveryPair ? 'wolt-tenbis.zip' : 'export-selected.zip');
 }
 
 export async function shareFiles(files: readonly File[]): Promise<'shared' | 'aborted' | 'unavailable'> {

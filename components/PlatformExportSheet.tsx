@@ -58,7 +58,7 @@ export function PlatformExportSheet({ outputUrl, isStory = false, onBack }: Prop
     try {
       const files = await runExport(selectedIds);
       await downloadFiles(files);
-      setStatus(selectedCount === 1 ? 'הקובץ ירד' : 'הקבצים ירדו');
+      setStatus(selectedCount === 1 ? 'הקובץ ירד' : 'ירד קובץ ZIP עם התמונות');
     } catch (err) {
       console.error('Platform export failed:', err);
       setError('לא הצלחנו להכין את הקבצים. נסו שוב.');
@@ -81,7 +81,7 @@ export function PlatformExportSheet({ outputUrl, isStory = false, onBack }: Prop
       }
       if (result === 'aborted') return;
       await downloadFiles(files);
-      setStatus('השיתוף לא זמין במכשיר — הקבצים ירדו');
+      setStatus('השיתוף לא זמין במכשיר — ירד קובץ');
     } catch (err) {
       console.error('Platform share failed:', err);
       setError('לא הצלחנו לשתף. אפשר להוריד ולשלוח ידנית.');
@@ -98,7 +98,7 @@ export function PlatformExportSheet({ outputUrl, isStory = false, onBack }: Prop
     try {
       const files = await runExport(DELIVERY_TARGET_IDS);
       await downloadFiles(files);
-      setStatus('ירדו שני קבצים: וולט ותן ביס');
+      setStatus('ירד ZIP: וולט ותן ביס');
     } catch (err) {
       console.error('Delivery pair export failed:', err);
       setError('לא הצלחנו להכין את קבצי הוולט ותן-ביס. נסו שוב.');
@@ -127,7 +127,7 @@ export function PlatformExportSheet({ outputUrl, isStory = false, onBack }: Prop
         <img
           src={outputUrl}
           alt="התמונה המוכנה"
-          className="size-16 shrink-0 rounded-xl object-cover"
+          className="size-16 shrink-0 rounded-lg object-cover"
         />
         <div className="min-w-0 space-y-0.5">
           <p className="font-semibold text-cream">התמונה מוכנה</p>
