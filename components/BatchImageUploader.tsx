@@ -8,14 +8,21 @@ import type { BatchItem } from '@/hooks/useBatchPipeline';
 interface Props {
   items: BatchItem[];
   disabled?: boolean;
-  onAddFiles: (files: File[]) => Promise<void>;
+  maxImages?: number;
+  onAddFiles: (files: File[]) => Promise<unknown>;
   onRemove: (id: string) => void;
 }
 
-export function BatchImageUploader({ items, disabled, onAddFiles, onRemove }: Props) {
+export function BatchImageUploader({
+  items,
+  disabled,
+  maxImages = BATCH_MAX_IMAGES,
+  onAddFiles,
+  onRemove,
+}: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
-  const remaining = BATCH_MAX_IMAGES - items.length;
+  const remaining = maxImages - items.length;
 
   const processFiles = useCallback(async (fileList: FileList | File[]) => {
     if (disabled) return;
@@ -59,7 +66,7 @@ export function BatchImageUploader({ items, disabled, onAddFiles, onRemove }: Pr
             {isCompressing ? 'מכווץ תמונות...' : 'העלו כמה תמונות מנות'}
           </p>
           <p className="text-sm text-muted">
-            גרירה או לחיצה · עד {BATCH_MAX_IMAGES} תמונות · נשארו {Math.max(remaining, 0)}
+            גרירה או לחיצה · עד {maxImages} תמונות · נשארו {Math.max(remaining, 0)}
           </p>
         </div>
         <input
