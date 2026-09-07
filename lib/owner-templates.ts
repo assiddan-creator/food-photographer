@@ -11,13 +11,23 @@ export function getGoogleReviewUrl(): string | null {
   return envGoogleReviewUrl() || null;
 }
 
-export type WhatsAppTemplateId = 'ready' | 'promo' | 'next' | 'google';
+export type WhatsAppTemplateId = 'ready' | 'promo' | 'next' | 'bridge' | 'google';
 
 export const WHATSAPP_TEMPLATE_CHIPS: { id: WhatsAppTemplateId; label: string }[] = [
   { id: 'ready', label: 'המנה מוכנה' },
   { id: 'promo', label: 'מבצע היום' },
   { id: 'next', label: 'לפעם הבאה' },
+  { id: 'bridge', label: 'הזמנה ישירה · הטבה' },
   { id: 'google', label: 'דירוג בגוגל' },
+];
+
+/** Owner helper — never sent to the customer. Complements «לפעם הבאה»; never bash apps. */
+export const LOYALTY_BRIDGE_OWNER_HINT =
+  "צ'יפ זהב חדש · לא מחליף את «לפעם הבאה» · משלים אותו. בלי «עזוב תן-ביס/וולט» — הזמנה ישירה + הטבה.";
+
+export const BRIDGE_LOYALTY_CHIPS: { id: LoyaltyKind; label: string }[] = [
+  { id: 'first', label: `ראשון ${LOYALTY_PERCENT.first}%` },
+  { id: 'returning', label: `חוזר ${LOYALTY_PERCENT.returning}%` },
 ];
 
 export const LOYALTY_CHIPS: { id: LoyaltyKind; label: string }[] = [
@@ -48,6 +58,39 @@ export function buildLoyaltyNextMessage(
   return `${body}${/[.!?…]$/.test(body) ? ' ' : '. '}כדאי לנסות גם את ה${dish}.`;
 }
 
+export function loyaltyBridgeBadge(kind: LoyaltyKind): string {
+  return kind === 'first'
+    ? `לקוח ראשון · ${LOYALTY_PERCENT.first}% קבוע`
+    : `לקוח חוזר · ${LOYALTY_PERCENT.returning}% קבוע`;
+}
+
+function defaultBridgeCopy(kind: LoyaltyKind): string {
+  if (kind === 'first') {
+    return [
+      '🙌 שמחים להכיר',
+      `הזמנה ראשונה ישירה מאיתנו — ${LOYALTY_PERCENT.first}% עלינו.`,
+      'רק לכתוב «אני» ונשלח פרטים.',
+    ].join('\n');
+  }
+  return [
+    'כיף שחזרתם 💛',
+    `לחברים של הבית — ${LOYALTY_PERCENT.returning}% על הזמנה ישירה.`,
+    'נשמח לשלוח תפריט / לינק מהיר.',
+  ].join('\n');
+}
+
+/**
+ * Soft deliveries → direct loyalty. Never bash Ten Bis / Wolt and never mention a Google review.
+ * Optional restaurant-settings copy replaces the default body when set.
+ */
+export function buildLoyaltyBridgeMessage(kind: LoyaltyKind, customText?: string): string {
+  return customText?.trim() || defaultBridgeCopy(kind);
+}
+
+export function templateUsesLoyaltyToggle(templateId: WhatsAppTemplateId): boolean {
+  return templateId === 'promo' || templateId === 'next' || templateId === 'bridge';
+}
+
 function withBusinessSignOff(body: string, businessName?: string): string {
   const name = businessName?.trim();
   return name ? `${body}\n— ${name}` : body;
@@ -72,7 +115,9 @@ export function buildWhatsAppMessage(options: {
 }): string {
   const loyaltyKind =
     options.loyaltyKind ??
-    (options.templateId === 'promo' || options.templateId === 'next'
+    (options.templateId === 'promo' ||
+    options.templateId === 'next' ||
+    options.templateId === 'bridge'
       ? defaultLoyaltyKind(options.templateId)
       : 'first');
   const name = options.businessName?.trim();
@@ -91,6 +136,8 @@ export function buildWhatsAppMessage(options: {
         buildLoyaltyNextMessage(loyaltyKind, options.dishName, customText),
         name,
       );
+    case 'bridge':
+      return withBusinessSignOff(buildLoyaltyBridgeMessage(loyaltyKind, customText), name);
     case 'google':
       return buildGoogleReviewMessage(options.reviewUrl);
   }

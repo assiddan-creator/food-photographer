@@ -222,7 +222,7 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
           />
         </label>
         <label className="block space-y-1.5">
-          <FieldLabel>טקסט ל«לפעם הבאה» / חוזר (אופציונלי)</FieldLabel>
+          <FieldLabel>טקסט ללקוח חוזר (אופציונלי)</FieldLabel>
           <input
             type="text"
             dir="rtl"
@@ -235,6 +235,9 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
             className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
         </label>
+        <FieldHint>
+          נכנס ל«מבצע היום», «לפעם הבאה» ו«הזמנה ישירה · הטבה». אם ריק — 10% ראשונה / 12% חוזר.
+        </FieldHint>
       </SettingsCard>
 
       {error ? <p className="alert-error rounded-xl px-3 py-2 text-xs">{error}</p> : null}
