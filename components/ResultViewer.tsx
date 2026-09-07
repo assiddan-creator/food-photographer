@@ -153,7 +153,7 @@ export function ResultViewer({
           onBack={() => setOwnerTab('hub')}
         />
       ) : (
-        <div className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 md:p-5">
+        <div className="space-y-4 rounded-2xl border border-white/10 bg-black p-4 md:p-5">
           <div className="space-y-1">
             <p className="font-semibold text-white">{readyLabel}</p>
             <p className="text-xs text-white/50">לפני / אחרי · מוכן לשליחה</p>

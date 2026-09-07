@@ -226,13 +226,6 @@ export default function Page() {
       className={`relative min-h-dvh bg-black p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
       dir="rtl"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${selectedPreset.image}')` }}
-        aria-hidden
-      />
-      <div className="absolute inset-0 bg-black/92" aria-hidden />
-
       <div className="relative z-10 mx-auto max-w-4xl space-y-5">
         <motion.header
           initial={{ opacity: 0, y: -16 }}
@@ -306,7 +299,7 @@ export default function Page() {
                 exit={{ opacity: 0 }}
                 className="space-y-6"
               >
-                <div className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 backdrop-blur-xl md:p-5">
+                <div className="space-y-4 rounded-2xl border border-white/10 bg-black p-4 md:p-5">
                   {showStyles && preview ? (
                     <>
                       <BackToCameraButton onClick={returnToCamera} disabled={isRunning} />
