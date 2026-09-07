@@ -18,7 +18,7 @@ export function OwnerSheet({ open, title, onClose, children }: Props) {
         type="button"
         className="absolute inset-0 bg-black/70"
         onClick={onClose}
-        aria-label="סגור"
+        aria-label="סגירת חלון"
       />
       <div className="absolute inset-x-0 bottom-0 max-h-[90vh] overflow-y-auto rounded-t-3xl border-t border-white/15 bg-zinc-950 px-4 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[0_-12px_40px_rgba(0,0,0,0.45)]">
         <div className="mx-auto max-w-lg space-y-4">

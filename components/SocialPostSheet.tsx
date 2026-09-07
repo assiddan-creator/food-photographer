@@ -125,7 +125,7 @@ export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
         <img
           src={outputUrl}
           alt=""
-          className={isStory ? 'aspect-[9/16] w-full object-cover' : 'aspect-[4/5] w-full object-cover'}
+          className="h-44 w-full object-cover"
         />
         <textarea
           dir="rtl"
