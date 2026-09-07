@@ -15,7 +15,7 @@ export function StickyCreateBar({
   onGenerate,
   onAnalyze,
 }: Props) {
-  const waitingForImage = !hasImage;
+  if (!hasImage) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/85 backdrop-blur-xl">
@@ -23,12 +23,8 @@ export function StickyCreateBar({
         <button
           type="button"
           onClick={onGenerate}
-          disabled={waitingForImage || isRunning}
-          className={`w-full rounded-xl py-3.5 text-sm font-bold transition-all ${
-            waitingForImage
-              ? 'cursor-not-allowed bg-zinc-700/90 text-white/35'
-              : 'bg-cyan-400 text-zinc-950 hover:bg-cyan-300 disabled:hover:bg-cyan-400'
-          }`}
+          disabled={isRunning}
+          className="w-full rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 transition-all hover:bg-cyan-300 disabled:opacity-50"
         >
           {isRunning ? (
             <span className="flex items-center justify-center gap-2">
@@ -40,23 +36,21 @@ export function StickyCreateBar({
           )}
         </button>
 
-        {hasImage ? (
-          <button
-            type="button"
-            onClick={onAnalyze}
-            disabled={isAnalyzing || isRunning}
-            className="w-full rounded-xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {isAnalyzing ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                מנתח את המנה…
-              </span>
-            ) : (
-              'נתח את המנה'
-            )}
-          </button>
-        ) : null}
+        <button
+          type="button"
+          onClick={onAnalyze}
+          disabled={isAnalyzing || isRunning}
+          className="w-full rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {isAnalyzing ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              מנתח את המנה…
+            </span>
+          ) : (
+            'נתח את המנה'
+          )}
+        </button>
       </div>
     </div>
   );

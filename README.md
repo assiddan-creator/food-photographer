@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks, bakers, and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9** or **TikTok 9:16** export, share with a personal signature, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL kitchen UI: tap **צלם מנה**, get a photo-quality check, pick a style, generate, then **הורדה לוולט / שלח ללקוח / הורדה / שתף**. Also one-tap **Wolt 16:9** or **TikTok 9:16** export, signature share, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -10,7 +10,7 @@ Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
 A Next.js App Router product. The **live generate path** is client-side Fal.ai (`hooks/usePipeline.ts`) through `/api/fal/proxy` (`FAL_KEY`). Images are uploaded with `fal.storage.upload`, then the selected edit model runs via `fal.subscribe`.
 
-Optional **“נתח את המנה”** (analyze the dish) uses Gemini (`/api/analyze-food` + `lib/gemini.ts`, `GEMINI_API_KEY`).
+After capture, **photo QA** (`/api/analyze-photo`) uses Gemini vision to check focus, lighting, and whether the full dish is in frame. Optional **“נתח את המנה”** still uses `/api/analyze-food`. Both share `lib/gemini.ts` (`GEMINI_API_KEY`, optional `GEMINI_ANALYZE_MODEL`, default `gemini-3-flash-preview` with `gemini-2.5-flash` fallback).
 
 **Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and an enhance-only prompt (real photo, entire dish, no text/people/cinema explosion). After generate, **«הורדה לוולט (16:9)»** center-crops the output in the browser to a clean JPG (long edge ≥1000px when a local canvas upscale is enough). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
 
@@ -27,8 +27,10 @@ Copy `.env.example` to `.env.local`:
 | Variable | Required | Used by |
 | --- | --- | --- |
 | `FAL_KEY` | Yes (generate) | `/api/fal/proxy` — Fal storage + image edit |
-| `GEMINI_API_KEY` | Only for analyze | `/api/analyze-food` |
-| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
+| `GEMINI_API_KEY` | Photo QA + optional analyze | `/api/analyze-photo`, `/api/analyze-food` |
+| `GEMINI_ANALYZE_MODEL` | Optional | Vision model override (default `gemini-3-flash-preview`) |
+| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen customer WhatsApp templates + restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | Optional | Appended to the «דירוג בגוגל» WhatsApp template when set |
 
 Do not commit real keys. `.gitignore` ignores `.env*` except `.env.example`.
 
@@ -63,6 +65,7 @@ The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed sit
 | Path | Status |
 | --- | --- |
 | `usePipeline` / `useBatchPipeline` → `/api/fal/proxy` → Fal edit models | **Live** generate (single + sequential batch) |
+| `/api/analyze-photo` → Gemini | **Live** kitchen photo QA (focus / light / framing) |
 | `/api/analyze-food` → Gemini | **Live** optional analyze |
 | Replicate (`/api/generate`, `/api/poll`, `/api/restore`) | **Removed** — unused by UI |
 | Cloudinary (`/api/upload`) | **Removed** — UI uploads via Fal storage |
@@ -72,7 +75,7 @@ The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed sit
 
 1. **Restaurant lead CTA** — wire `NEXT_PUBLIC_WHATSAPP` to a real number / CRM and track clicks.
 2. **Watermark free tier** — mark unpaid exports so restaurants can upgrade to clean files.
-3. **Camera for batch** — add dishes to the menu queue from the phone camera.
+3. **Camera + photo QA for batch** — shoot dishes into the menu queue with the same kitchen photo check.
 
 See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
@@ -80,7 +83,7 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 # צלם מנות וירטואלי — Assi & Johnny Photobooth AI
 
-מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה, **ייצוא 16:9 לוולט** או **9:16 לטיקטוק**, ושיתוף עם חתימה אישית.
+מעלים או מצלמים מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL למטבח: **צלם מנה**, בדיקת איכות, בחירת סגנון, יצירה, ואז **הורדה לוולט / שלח ללקוח / הורדה / שתף**.
 
 דמו חי: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -103,8 +106,10 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 | משתנה | חובה | שימוש |
 | --- | --- | --- |
 | `FAL_KEY` | כן (יצירה) | פרוקסי Fal |
-| `GEMINI_API_KEY` | רק לניתוח מנה | `/api/analyze-food` |
-| `NEXT_PUBLIC_WHATSAPP` | לא חובה | כפתור «למסעדות — דברו איתנו» |
+| `GEMINI_API_KEY` | בדיקת תמונה + ניתוח מנה | `/api/analyze-photo`, `/api/analyze-food` |
+| `GEMINI_ANALYZE_MODEL` | לא חובה | מודל Gemini (ברירת מחדל `gemini-3-flash-preview`) |
+| `NEXT_PUBLIC_WHATSAPP` | לא חובה | תבניות וואטסאפ ללקוח + «למסעדות — דברו איתנו» |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | לא חובה | קישור לדירוג בגוגל בתבנית וואטסאפ |
 
 העתיקו `.env.example` ל־`.env.local`. אל תעלו מפתחות אמיתיים לגיט.
 
@@ -124,4 +129,4 @@ npm run dev
 
 1. **ליד למסעדות** — לחבר מספר וואטסאפ אמיתי ולמדוד קליקים.
 2. **שכבת חינם עם ווטרמרק** — ייצוא מסומן עד שמשלמים.
-3. **מצלמה לתפריט שלם** — לצלם מנות ישירות לתור.
+3. **מצלמה ובדיקת תמונה לתפריט שלם** — לצלם מנות לתור עם אותה בדיקת איכות.

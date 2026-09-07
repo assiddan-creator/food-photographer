@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Sparkles, Truck, Upload, UtensilsCrossed } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { Assistant } from 'next/font/google';
 import CameraCapture from '@/components/CameraCapture';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -14,8 +14,11 @@ import { PrimaryStyleCards } from '@/components/PrimaryStyleCards';
 import { MoreStylesPanel } from '@/components/MoreStylesPanel';
 import { AdvancedSettings } from '@/components/AdvancedSettings';
 import { StickyCreateBar } from '@/components/StickyCreateBar';
+import { PhotoQaCard } from '@/components/PhotoQaCard';
+import { KitchenStepper, type KitchenStepId } from '@/components/KitchenStepper';
 import { usePipeline } from '@/hooks/usePipeline';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
+import { normalizePhotoQa, splitImagePayload, type PhotoQaResult } from '@/lib/photo-qa';
 import {
   buildGeneratePrompt,
   forcedAspectForPreset,
@@ -37,6 +40,9 @@ const DEFAULT_PRESET_INDEX = Math.max(
   PRESETS.findIndex(preset => preset.id === WOLT_PRESET_ID),
 );
 
+type InputMode = 'camera' | 'upload';
+type PhotoQaStatus = 'idle' | 'checking' | 'done' | 'error';
+
 function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
   if (width > height) return '16:9';
   if (height > width) return '9:16';
@@ -52,7 +58,7 @@ export default function Page() {
   const [base64, setBase64] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(DEFAULT_PRESET_INDEX);
-  const [inputMode, setInputMode] = useState<'upload' | 'camera'>('upload');
+  const [inputMode, setInputMode] = useState<InputMode>('camera');
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16' | '1:1'>('9:16');
   const [selectedModel, setSelectedModel] = useState(DEFAULT_FAL_MODEL);
   const [studioMode, setStudioMode] = useState<'single' | 'batch'>('single');
@@ -70,24 +76,90 @@ export default function Page() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
   const [styleFilter, setStyleFilter] = useState<StyleFilterId>('all');
+  const [photoQaStatus, setPhotoQaStatus] = useState<PhotoQaStatus>('idle');
+  const [photoQa, setPhotoQa] = useState<PhotoQaResult | null>(null);
+  const [photoQaError, setPhotoQaError] = useState<string | null>(null);
+  const [checkAcknowledged, setCheckAcknowledged] = useState(false);
+  const qaRequestId = useRef(0);
 
   const isRunning = stage === 'generating';
   const selectedPreset = PRESETS[selectedIndex] ?? getPresetById(WOLT_PRESET_ID);
   const hasImage = Boolean(base64 && preview);
   const showResult = stage === 'done' && Boolean(outputUrl && preview);
-  const showSticky = studioMode === 'single' && !showResult;
+  const showStyles = hasImage && checkAcknowledged && !showResult;
+  const showCheck = hasImage && !checkAcknowledged && !showResult;
 
-  const clearImage = () => {
+  const kitchenStep: KitchenStepId = showResult
+    ? 'actions'
+    : showStyles
+      ? 'style'
+      : showCheck
+        ? 'check'
+        : 'camera';
+
+  const showSticky = studioMode === 'single' && kitchenStep === 'style' && hasImage;
+
+  const clearImage = (nextMode: InputMode = 'camera') => {
+    qaRequestId.current += 1;
     setBase64(null);
     setPreview(null);
     setSelectedImage(null);
-    setInputMode('upload');
+    setPhotoQa(null);
+    setPhotoQaStatus('idle');
+    setPhotoQaError(null);
+    setCheckAcknowledged(false);
+    setInputMode(nextMode);
+  };
+
+  const runPhotoQa = async (imageBase64: string) => {
+    const requestId = ++qaRequestId.current;
+    setPhotoQaStatus('checking');
+    setPhotoQa(null);
+    setPhotoQaError(null);
+
+    try {
+      const { mimeType, base64: imageData } = splitImagePayload(imageBase64);
+      const res = await fetch('/api/analyze-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: imageData, mimeType }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (requestId !== qaRequestId.current) return;
+
+      if (!res.ok) {
+        throw new Error(typeof data.error === 'string' ? data.error : 'Failed to analyze photo');
+      }
+
+      setPhotoQa(normalizePhotoQa(data));
+      setPhotoQaStatus('done');
+    } catch (err) {
+      if (requestId !== qaRequestId.current) return;
+      setPhotoQaError((err as Error).message);
+      setPhotoQa(
+        normalizePhotoQa({
+          ok: true,
+          focusOk: false,
+          lightingOk: false,
+          framingOk: false,
+          issues: [],
+          tipHe: 'אפשר להמשיך או לצלם שוב.',
+          focusNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+          lightingNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+          framingNoteHe: 'לא נבדק אוטומטית — אפשר להמשיך',
+        }),
+      );
+      setPhotoQaStatus('error');
+    }
   };
 
   const applyImage = (imageBase64: string, previewUrl: string) => {
     setBase64(imageBase64);
     setPreview(previewUrl);
     setSelectedImage(imageBase64);
+    setCheckAcknowledged(false);
+    setInputMode('camera');
 
     const img = new Image();
     img.onload = () => {
@@ -96,6 +168,7 @@ export default function Page() {
     img.src = previewUrl;
 
     if (stage === 'error') reset();
+    void runPhotoQa(imageBase64);
   };
 
   const handleReset = () => {
@@ -103,7 +176,7 @@ export default function Page() {
   };
 
   const handleGenerate = () => {
-    if (!base64 || !selectedPreset) return;
+    if (!base64 || !selectedPreset || !checkAcknowledged) return;
 
     const prompt = buildGeneratePrompt(selectedPreset, customPrompt, analysisResult?.platingCritic);
     const generateAspect = forcedAspectForPreset(selectedPreset.id) ?? aspectRatio;
@@ -117,15 +190,7 @@ export default function Page() {
     setAnalysisResult(null);
 
     try {
-      const base64Data = selectedImage.includes(',')
-        ? selectedImage.split(',')[1]
-        : selectedImage;
-
-      let mimeType = 'image/jpeg';
-      if (selectedImage.startsWith('data:')) {
-        const match = selectedImage.match(/^data:(.*?);base64,/);
-        if (match?.[1]) mimeType = match[1];
-      }
+      const { mimeType, base64: base64Data } = splitImagePayload(selectedImage);
 
       const res = await fetch('/api/analyze-food', {
         method: 'POST',
@@ -159,21 +224,26 @@ export default function Page() {
       />
       <div className="absolute inset-0 bg-black/80" aria-hidden />
 
-      <div className="relative z-10 mx-auto max-w-4xl space-y-6">
+      <div className="relative z-10 mx-auto max-w-4xl space-y-5">
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-2 text-center"
+          className="space-y-3 text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-lg">
-            <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
+            Assi &amp; Johnny · {kitchenStep === 'actions' ? 'פעולות מסעדה' : 'זרימת מסעדה'}
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
-            צלם מנה → קבל תמונה שמוכרת
+            {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
-          <p className="text-sm text-white/40 md:text-base">
-            בלי צלם. בלי סטודיו. בלי שעות עבודה.
+          <p className="text-sm text-white/45 md:text-base">
+            {kitchenStep === 'actions'
+              ? 'בלי קלוריות · רק מה שמוכר במסעדה'
+              : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
           </p>
+          {studioMode === 'single' && kitchenStep !== 'actions' ? (
+            <KitchenStepper current={kitchenStep} />
+          ) : null}
         </motion.header>
 
         <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-lg">
@@ -183,11 +253,10 @@ export default function Page() {
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
               studioMode === 'single'
-                ? 'border border-white/20 bg-white/15 text-white'
+                ? 'bg-white text-zinc-950'
                 : 'text-white/60 hover:text-white/80'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
-            <UtensilsCrossed size={18} />
             מנה אחת
           </button>
           <button
@@ -196,11 +265,10 @@ export default function Page() {
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
               studioMode === 'batch'
-                ? 'border border-cyan-300 bg-cyan-400 text-zinc-950'
+                ? 'bg-white text-zinc-950'
                 : 'text-white/60 hover:text-white/80'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
-            <Truck size={18} />
             תפריט שלם
           </button>
         </div>
@@ -220,6 +288,7 @@ export default function Page() {
                   onReset={handleReset}
                   latencyMs={latencyMs}
                   menuGenius={analysisResult?.menuGenius ?? undefined}
+                  presetId={selectedPreset.id}
                 />
               </motion.div>
             ) : (
@@ -231,35 +300,8 @@ export default function Page() {
                 className="space-y-6"
               >
                 <div className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 backdrop-blur-xl md:p-5">
-                  {hasImage && preview ? (
+                  {showStyles && preview ? (
                     <>
-                      <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 p-3">
-                        <img
-                          src={preview}
-                          alt="תמונה שהועלתה"
-                          className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-white">תמונה מוכנה</p>
-                          <p className="text-xs text-emerald-300">✓ הועלתה · בחר סגנון</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={clearImage}
-                          disabled={isRunning}
-                          className="shrink-0 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 disabled:opacity-40"
-                        >
-                          החלף
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-cyan-400 text-sm font-bold text-zinc-950">
-                          2
-                        </span>
-                        <span className="font-semibold text-white">בחר סגנון</span>
-                      </div>
-
                       <PrimaryStyleCards
                         selectedId={selectedPreset.id}
                         filter={styleFilter}
@@ -310,54 +352,42 @@ export default function Page() {
                         onCustomPromptChange={setCustomPrompt}
                       />
                     </>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-cyan-400 text-sm font-bold text-zinc-950">
-                          1
-                        </span>
-                        <span className="font-semibold text-white">העלה תמונת מנה</span>
+                  ) : showCheck && preview ? (
+                    <PhotoQaCard
+                      preview={preview}
+                      isChecking={photoQaStatus === 'checking'}
+                      result={photoQa}
+                      errorMessage={photoQaError}
+                      onContinue={() => setCheckAcknowledged(true)}
+                      onRetake={() => clearImage('camera')}
+                    />
+                  ) : inputMode === 'upload' ? (
+                    <div className="space-y-3">
+                      <div className="space-y-1 text-center">
+                        <h2 className="text-lg font-bold text-white">העלה מתמונות</h2>
+                        <p className="text-sm text-white/45">משני בלבד — עדיף לצלם את המנה עכשיו</p>
                       </div>
-
-                      {inputMode === 'upload' ? (
-                        <ImageUploader
-                          variant="dark"
-                          onClear={clearImage}
-                          onImageReady={applyImage}
-                          disabled={isRunning}
-                        />
-                      ) : (
-                        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-lg">
-                          <CameraCapture
-                            onCapture={base64Image => {
-                              applyImage(base64Image, base64Image);
-                            }}
-                          />
-                        </div>
-                      )}
-
-                      <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-center text-sm font-semibold text-cyan-200">
-                        העלה תמונה כדי להמשיך לבחירת סגנון וליצירה
-                      </div>
-
                       <button
                         type="button"
-                        onClick={() => setInputMode(inputMode === 'upload' ? 'camera' : 'upload')}
-                        className="mx-auto flex items-center gap-2 text-sm text-white/45 hover:text-white/75"
+                        onClick={() => setInputMode('camera')}
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10"
                       >
-                        {inputMode === 'upload' ? (
-                          <>
-                            <Camera size={16} />
-                            או צלם במצלמה
-                          </>
-                        ) : (
-                          <>
-                            <Upload size={16} />
-                            חזרה להעלאה
-                          </>
-                        )}
+                        <Camera size={16} />
+                        חזרה למצלמה
                       </button>
-                    </>
+                      <ImageUploader
+                        variant="dark"
+                        onClear={() => clearImage('camera')}
+                        onImageReady={applyImage}
+                        disabled={isRunning}
+                      />
+                    </div>
+                  ) : (
+                    <CameraCapture
+                      autoStart
+                      onCapture={base64Image => applyImage(base64Image, base64Image)}
+                      onOpenGallery={() => setInputMode('upload')}
+                    />
                   )}
 
                   <AnimatePresence>
@@ -449,7 +479,7 @@ export default function Page() {
 
       {showSticky ? (
         <StickyCreateBar
-          hasImage={hasImage}
+          hasImage
           isRunning={isRunning}
           isAnalyzing={isAnalyzing}
           onGenerate={handleGenerate}
