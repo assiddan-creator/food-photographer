@@ -205,10 +205,9 @@ export default function Page() {
                         onClick={() => {
                           if (isRunning) return;
                           setSelectedCategory(category);
-                          if (category === 'creators') {
-                            const tiktokIndex = PRESETS.findIndex(p => p.id === 'tiktok');
-                            if (tiktokIndex !== -1) setSelectedIndex(tiktokIndex);
-                          }
+                          const firstId = CATEGORY_PRESETS[category][0];
+                          const firstIndex = PRESETS.findIndex(p => p.id === firstId);
+                          if (firstIndex !== -1) setSelectedIndex(firstIndex);
                         }}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                           isActive
