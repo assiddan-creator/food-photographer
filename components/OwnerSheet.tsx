@@ -12,7 +12,7 @@ interface Props {
 export function OwnerSheet({ title, subtitle, onBack, children }: Props) {
   return (
     <div
-      className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 md:p-5"
+      className="space-y-4 rounded-2xl border border-white/10 bg-black p-4 md:p-5"
       dir="rtl"
     >
       <div className="space-y-1">

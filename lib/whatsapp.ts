@@ -29,7 +29,7 @@ function buildWhatsAppHref(text: string, raw = process.env.NEXT_PUBLIC_WHATSAPP)
  */
 export function getWhatsAppHref(raw = process.env.NEXT_PUBLIC_WHATSAPP): string {
   return buildWhatsAppHref(
-    'היי, אני בעל/ת מסעדה ומעוניין/ת בצלם מנות AI (Assi & Johnny Photobooth).',
+    'היי, אני בעל/ת מסעדה ומעוניין/ת בצלם מנות AI.',
     raw,
   );
 }
