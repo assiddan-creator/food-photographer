@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Smartphone, Truck } from 'lucide-react';
+import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { WhatsAppCustomerSheet } from '@/components/WhatsAppCustomerSheet';
 import { SocialPostSheet } from '@/components/SocialPostSheet';
 import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
@@ -21,6 +22,7 @@ interface Props {
   outputUrl: string;
   originalPreview: string;
   onReset: () => void;
+  onBackToCamera: () => void;
   latencyMs?: number | null;
   menuGenius?: string | null;
   presetId?: PresetId;
@@ -30,6 +32,7 @@ export function ResultViewer({
   outputUrl,
   originalPreview,
   onReset,
+  onBackToCamera,
   latencyMs,
   presetId = 'delivery',
 }: Props) {
@@ -117,6 +120,9 @@ export function ResultViewer({
       className="space-y-4"
       dir="rtl"
     >
+      <div className="flex">
+        <BackToCameraButton onClick={onBackToCamera} />
+      </div>
       <div className="flex justify-center gap-2">
         {OWNER_TABS.map(tab => {
           const active = ownerTab === tab.id;

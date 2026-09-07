@@ -15,6 +15,7 @@ import { MoreStylesPanel } from '@/components/MoreStylesPanel';
 import { AdvancedSettings } from '@/components/AdvancedSettings';
 import { StickyCreateBar } from '@/components/StickyCreateBar';
 import { PhotoQaCard } from '@/components/PhotoQaCard';
+import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { KitchenStepper, type KitchenStepId } from '@/components/KitchenStepper';
 import { usePipeline } from '@/hooks/usePipeline';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
@@ -175,6 +176,14 @@ export default function Page() {
     reset();
   };
 
+  const returnToCamera = () => {
+    if (isRunning) return;
+    reset();
+    clearImage('camera');
+    setAnalysisResult(null);
+    setErrorMessage(null);
+  };
+
   const handleGenerate = () => {
     if (!base64 || !selectedPreset || !checkAcknowledged) return;
 
@@ -214,7 +223,7 @@ export default function Page() {
 
   return (
     <main
-      className={`relative min-h-screen p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
+      className={`relative min-h-dvh bg-black p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
       dir="rtl"
     >
       <div
@@ -222,7 +231,7 @@ export default function Page() {
         style={{ backgroundImage: `url('${selectedPreset.image}')` }}
         aria-hidden
       />
-      <div className="absolute inset-0 bg-black/80" aria-hidden />
+      <div className="absolute inset-0 bg-black/92" aria-hidden />
 
       <div className="relative z-10 mx-auto max-w-4xl space-y-5">
         <motion.header
@@ -230,9 +239,6 @@ export default function Page() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-3 text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-lg">
-            Assi &amp; Johnny · {kitchenStep === 'actions' ? 'פעולות מסעדה' : 'זרימת מסעדה'}
-          </span>
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
             {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
@@ -286,6 +292,7 @@ export default function Page() {
                   outputUrl={outputUrl}
                   originalPreview={preview}
                   onReset={handleReset}
+                  onBackToCamera={returnToCamera}
                   latencyMs={latencyMs}
                   menuGenius={analysisResult?.menuGenius ?? undefined}
                   presetId={selectedPreset.id}
@@ -302,6 +309,7 @@ export default function Page() {
                 <div className="space-y-4 rounded-2xl border border-white/10 bg-black/45 p-4 backdrop-blur-xl md:p-5">
                   {showStyles && preview ? (
                     <>
+                      <BackToCameraButton onClick={returnToCamera} disabled={isRunning} />
                       <PrimaryStyleCards
                         selectedId={selectedPreset.id}
                         filter={styleFilter}
@@ -469,12 +477,6 @@ export default function Page() {
             onRunningChange={setBatchRunning}
           />
         </div>
-
-        <footer className="pt-4 pb-2 text-center">
-          <p className="text-xs text-white/30">
-            מופעל ע״י Fal.ai · Assi &amp; Johnny Photobooth AI
-          </p>
-        </footer>
       </div>
 
       {showSticky ? (

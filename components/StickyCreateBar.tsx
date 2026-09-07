@@ -18,8 +18,8 @@ export function StickyCreateBar({
   if (!hasImage) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-4xl flex-col gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="fixed inset-x-0 bottom-0 z-40 bg-black">
+      <div className="mx-auto flex max-w-4xl flex-col gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:px-8">
         <button
           type="button"
           onClick={onGenerate}
