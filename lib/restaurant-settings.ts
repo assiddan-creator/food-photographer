@@ -12,18 +12,23 @@ export const LOYALTY_PERCENT: Record<LoyaltyKind, number> = {
 export const STORAGE_KEY = 'assi.restaurantSettings.v1';
 export const SETTINGS_CHANGED_EVENT = 'assi-restaurant-settings';
 
+export const DEFAULT_FIRST_CUSTOMER_TEXT = `ברוכים הבאים — ${FIRST_ORDER_DISCOUNT_PERCENT}% על ההזמנה הראשונה`;
+export const DEFAULT_RETURNING_CUSTOMER_TEXT = `שמחים שחזרתם — ${RETURNING_DISCOUNT_PERCENT}% עלינו`;
+
 export type RestaurantSettings = {
   name: string;
   whatsapp: string;
   googleReviewUrl: string;
-  nextVisitText: string;
+  firstCustomerText: string;
+  returningCustomerText: string;
 };
 
 export const EMPTY_SETTINGS: RestaurantSettings = {
   name: '',
   whatsapp: '',
   googleReviewUrl: '',
-  nextVisitText: '',
+  firstCustomerText: '',
+  returningCustomerText: '',
 };
 
 function asTrimmedString(value: unknown): string {
@@ -37,7 +42,9 @@ export function parseSettings(raw: unknown): RestaurantSettings {
     name: asTrimmedString(record.name),
     whatsapp: asTrimmedString(record.whatsapp),
     googleReviewUrl: asTrimmedString(record.googleReviewUrl),
-    nextVisitText: asTrimmedString(record.nextVisitText),
+    firstCustomerText: asTrimmedString(record.firstCustomerText),
+    returningCustomerText:
+      asTrimmedString(record.returningCustomerText) || asTrimmedString(record.nextVisitText),
   };
 }
 

@@ -3,6 +3,8 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import {
+  DEFAULT_FIRST_CUSTOMER_TEXT,
+  DEFAULT_RETURNING_CUSTOMER_TEXT,
   FIRST_ORDER_DISCOUNT_PERCENT,
   RETURNING_DISCOUNT_PERCENT,
   envGoogleReviewUrl,
@@ -23,7 +25,7 @@ function GoldDot() {
 function SettingsCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="panel-gold space-y-4 rounded-2xl p-4 md:p-5">
-      <h2 className="flex items-start gap-2 text-sm font-bold text-cream">
+      <h2 className="flex items-start gap-2 text-sm font-bold text-cta">
         <GoldDot />
         {title}
       </h2>
@@ -45,7 +47,8 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
   const [name, setName] = useState(stored.name);
   const [whatsapp, setWhatsapp] = useState(stored.whatsapp);
   const [googleReviewUrl, setGoogleReviewUrl] = useState(stored.googleReviewUrl);
-  const [nextVisitText, setNextVisitText] = useState(stored.nextVisitText);
+  const [firstCustomerText, setFirstCustomerText] = useState(stored.firstCustomerText);
+  const [returningCustomerText, setReturningCustomerText] = useState(stored.returningCustomerText);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +56,8 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
     setName(stored.name);
     setWhatsapp(stored.whatsapp);
     setGoogleReviewUrl(stored.googleReviewUrl);
-    setNextVisitText(stored.nextVisitText);
+    setFirstCustomerText(stored.firstCustomerText);
+    setReturningCustomerText(stored.returningCustomerText);
   }, [stored]);
 
   const envNumber = envWhatsApp();
@@ -95,7 +99,8 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
       name,
       whatsapp,
       googleReviewUrl: normalizedReview,
-      nextVisitText,
+      firstCustomerText,
+      returningCustomerText,
     });
     setGoogleReviewUrl(normalizedReview);
     setStatus('נשמר במכשיר זה');
@@ -179,41 +184,52 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
       </SettingsCard>
 
       <SettingsCard title="מועדון נאמנות">
-        <div className="space-y-2" role="group" aria-label="הנחות קבועות בהזמנה ישירה">
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--gold-border)] bg-bg px-3 py-3">
-            <p className="text-sm font-semibold text-cream">
-              הזמנה ראשונה ישירה · <span className="text-cta">{FIRST_ORDER_DISCOUNT_PERCENT}%</span>
-            </p>
-            <span className="shrink-0 text-[10px] font-semibold text-muted">קבוע</span>
+        <p className="text-[11px] text-muted">קבוע — לא בחירה חופשית</p>
+        <div
+          className="grid grid-cols-2 gap-2"
+          role="group"
+          aria-label="הנחות קבועות בהזמנה ישירה"
+        >
+          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
+            <p className="text-2xl font-bold text-cta">{FIRST_ORDER_DISCOUNT_PERCENT}%</p>
+            <p className="mt-1 text-[11px] font-semibold text-cream">לקוח ראשון</p>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--gold-border)] bg-bg px-3 py-3">
-            <p className="text-sm font-semibold text-cream">
-              לקוח חוזר · <span className="text-cta">{RETURNING_DISCOUNT_PERCENT}%</span>
-            </p>
-            <span className="shrink-0 text-[10px] font-semibold text-muted">קבוע</span>
+          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
+            <p className="text-2xl font-bold text-cta">{RETURNING_DISCOUNT_PERCENT}%</p>
+            <p className="mt-1 text-[11px] font-semibold text-cream">לקוח חוזר</p>
           </div>
         </div>
         <FieldHint>
-          מופיע בתבנית «לפעם הבאה». בוולט הולכת עמלה גדולה — {FIRST_ORDER_DISCOUNT_PERCENT}% לחדש ו־
-          {RETURNING_DISCOUNT_PERCENT}% לחוזר עדיין משאירים יותר במסעדה. אין הנחה תמורת כוכבים או
-          לייקים.
+          מופיע בתבניות וואטסאפ: ראשון מקבל {FIRST_ORDER_DISCOUNT_PERCENT}% · חוזר מקבל{' '}
+          {RETURNING_DISCOUNT_PERCENT}%. בוולט הולכת עמלה גדולה — כאן נשאר יותר במסעדה.
         </FieldHint>
         <label className="block space-y-1.5">
-          <FieldLabel>טקסט קצר ללקוח (אופציונלי)</FieldLabel>
+          <FieldLabel>טקסט ללקוח ראשון (אופציונלי)</FieldLabel>
           <input
             type="text"
             dir="rtl"
-            value={nextVisitText}
+            value={firstCustomerText}
             onChange={e => {
-              setNextVisitText(e.target.value);
+              setFirstCustomerText(e.target.value);
               markDirty();
             }}
-            placeholder={`בפעם הבאה — ${RETURNING_DISCOUNT_PERCENT}% עלינו`}
+            placeholder={DEFAULT_FIRST_CUSTOMER_TEXT}
             className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
-          <FieldHint>
-            נכנס לתבנית «לפעם הבאה». אם ריק — נשלח {RETURNING_DISCOUNT_PERCENT}% ללקוח חוזר.
-          </FieldHint>
+        </label>
+        <label className="block space-y-1.5">
+          <FieldLabel>טקסט ללקוח חוזר (אופציונלי)</FieldLabel>
+          <input
+            type="text"
+            dir="rtl"
+            value={returningCustomerText}
+            onChange={e => {
+              setReturningCustomerText(e.target.value);
+              markDirty();
+            }}
+            placeholder={DEFAULT_RETURNING_CUSTOMER_TEXT}
+            className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
+          />
         </label>
       </SettingsCard>
 

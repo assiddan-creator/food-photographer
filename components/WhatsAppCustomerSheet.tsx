@@ -31,8 +31,7 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack, onOpenSettings }: Pro
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const usesLoyalty =
-    templateId === 'promo' || (templateId === 'next' && !resolved.nextVisitText);
+  const usesLoyalty = templateId === 'promo' || templateId === 'next';
 
   useEffect(() => {
     setMessage(
@@ -42,10 +41,19 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack, onOpenSettings }: Pro
         loyaltyKind,
         reviewUrl,
         businessName: resolved.name,
-        nextVisitText: resolved.nextVisitText,
+        firstCustomerText: resolved.firstCustomerText,
+        returningCustomerText: resolved.returningCustomerText,
       }),
     );
-  }, [templateId, dishName, loyaltyKind, reviewUrl, resolved.name, resolved.nextVisitText]);
+  }, [
+    templateId,
+    dishName,
+    loyaltyKind,
+    reviewUrl,
+    resolved.name,
+    resolved.firstCustomerText,
+    resolved.returningCustomerText,
+  ]);
 
   const pickTemplate = (id: WhatsAppTemplateId) => {
     setTemplateId(id);
@@ -147,7 +155,8 @@ export function WhatsAppCustomerSheet({ outputUrl, onBack, onOpenSettings }: Pro
         </label>
       ) : null}
 
-      {templateId === 'next' && resolved.nextVisitText ? (
+      {templateId === 'next' &&
+      (resolved.firstCustomerText || resolved.returningCustomerText) ? (
         <p className="text-[11px] leading-relaxed text-muted">משתמש בטקסט מ«הגדרות מסעדה».</p>
       ) : null}
 

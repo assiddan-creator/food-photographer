@@ -29,7 +29,8 @@ export function useRestaurantSettings() {
       name: stored.name,
       whatsapp: resolveWhatsApp(stored),
       googleReviewUrl: resolveGoogleReviewUrl(stored),
-      nextVisitText: stored.nextVisitText,
+      firstCustomerText: stored.firstCustomerText,
+      returningCustomerText: stored.returningCustomerText,
     }),
     [stored],
   );
