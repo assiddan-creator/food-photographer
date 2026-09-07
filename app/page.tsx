@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Settings } from 'lucide-react';
 import { Assistant } from 'next/font/google';
@@ -18,6 +18,7 @@ import { PhotoQaCard } from '@/components/PhotoQaCard';
 import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { KitchenStepper, type KitchenStepId } from '@/components/KitchenStepper';
 import { RestaurantSettingsPanel } from '@/components/RestaurantSettingsPanel';
+import { PlatformExportSheet } from '@/components/PlatformExportSheet';
 import { usePipeline } from '@/hooks/usePipeline';
 import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
@@ -69,6 +70,7 @@ export default function Page() {
   const { stage, progress, statusMessage, outputUrl, error, latencyMs, run, reset } = usePipeline();
   const { stored: restaurant } = useRestaurantSettings();
   const [showSettings, setShowSettings] = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -103,6 +105,10 @@ export default function Page() {
         : 'camera';
 
   const showSticky = studioMode === 'single' && kitchenStep === 'style' && hasImage;
+
+  useEffect(() => {
+    if (!outputUrl) setShowExport(false);
+  }, [outputUrl]);
 
   const clearImage = (nextMode: InputMode = 'camera') => {
     qaRequestId.current += 1;
@@ -177,11 +183,13 @@ export default function Page() {
   };
 
   const handleReset = () => {
+    setShowExport(false);
     reset();
   };
 
   const returnToCamera = () => {
     if (isRunning) return;
+    setShowExport(false);
     reset();
     clearImage('camera');
     setAnalysisResult(null);
@@ -233,6 +241,12 @@ export default function Page() {
       <div className="relative z-10 mx-auto max-w-4xl space-y-5">
         {showSettings ? (
           <RestaurantSettingsPanel onClose={() => setShowSettings(false)} />
+        ) : showExport && outputUrl ? (
+          <PlatformExportSheet
+            outputUrl={outputUrl}
+            isStory={selectedPreset.id === 'tiktok'}
+            onBack={() => setShowExport(false)}
+          />
         ) : (
           <>
         <motion.header
@@ -305,6 +319,7 @@ export default function Page() {
                   onReset={handleReset}
                   onBackToCamera={returnToCamera}
                   onOpenSettings={() => setShowSettings(true)}
+                  onOpenExport={() => setShowExport(true)}
                   latencyMs={latencyMs}
                   menuGenius={analysisResult?.menuGenius ?? undefined}
                   presetId={selectedPreset.id}
@@ -493,7 +508,7 @@ export default function Page() {
         )}
       </div>
 
-      {showSticky && !showSettings ? (
+      {showSticky && !showSettings && !showExport ? (
         <StickyCreateBar
           hasImage
           isRunning={isRunning}
