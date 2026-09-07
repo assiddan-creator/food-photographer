@@ -11,7 +11,7 @@ export const PHOTO_QA_PASS_TIP = 'התמונה בסדר';
 
 export function splitImagePayload(image: string): { mimeType: string; base64: string } {
   if (image.startsWith('data:')) {
-    const match = image.match(/^data:(.*?);base64,(.*)$/s);
+    const match = image.match(/^data:([^;]+);base64,([\s\S]*)$/);
     if (match?.[1] && match[2]) {
       return { mimeType: match[1], base64: match[2] };
     }
