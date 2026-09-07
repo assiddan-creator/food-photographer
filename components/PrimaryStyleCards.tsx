@@ -18,7 +18,7 @@ const PRIMARY_CARDS = [
   {
     id: 'delivery' as const,
     tag: 'משלוחים',
-    subtitle: 'משלוחים · 16:9',
+    subtitle: 'רקע מחמיא · מנה זהה · 16:9',
   },
   {
     id: 'tiktok' as const,

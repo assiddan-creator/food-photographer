@@ -319,7 +319,7 @@ export default function Page() {
 
                       {selectedPreset.id === 'delivery' ? (
                         <p className="text-xs leading-relaxed text-muted">
-                          יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פרסום דרמטי.
+                          יחס 16:9 לוולט ולתן ביס. רקע מחמיא מסחרי — המנה עצמה נשארת זהה.
                         </p>
                       ) : null}
                       {selectedPreset.id === 'tiktok' ? (

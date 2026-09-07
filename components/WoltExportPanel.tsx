@@ -43,8 +43,8 @@ export function WoltExportPanel({ outputUrl }: Props) {
         <div className="space-y-1">
           <p className="text-base font-semibold text-cream">מוכן לוולט</p>
           <p className="text-xs leading-relaxed text-muted">
-            הורדה אחת ליחס 16:9 נקי, בלי טקסט או מסגרת. וולט דוחה תמונות שנוצרו לגמרי ב־AI —
-            הנתיב הזה משפר תמונה אמיתית בלבד.
+            הורדה אחת ליחס 16:9 נקי, בלי טקסט או מסגרת. מתאים לוולט ולתן ביס: רקע מחמיא
+            מסחרי, המנה עצמה זהה.
           </p>
         </div>
       </div>
@@ -86,9 +86,9 @@ export function WoltExportPanel({ outputUrl }: Props) {
       </ul>
 
       <p className="text-xs leading-relaxed text-muted">
-        באחריותכם לפני העלאה לוולט:{' '}
+        באחריותכם לפני העלאה לוולט ולתן ביס:{' '}
         <span className="text-cream/80">מנה בגודל אמיתי</span>
-        {' '}(בלי הגדלה מטעה), ללא אנשים בתמונה, ותאורה טבעית בהירה.
+        {' '}(בלי הגדלה מטעה), ללא אנשים בתמונה, ורקע מחמיא בלי כיתוב.
       </p>
 
       {error ? (
