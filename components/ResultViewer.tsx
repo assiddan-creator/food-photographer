@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, RotateCcw, Share2 } from 'lucide-react';
+import { Download, MessageCircle, RotateCcw, Share2 } from 'lucide-react';
 import { toBlob } from 'html-to-image';
+import { getWhatsAppHref } from '@/lib/whatsapp';
 
 interface Props {
   outputUrl: string;
@@ -31,7 +32,7 @@ export function ResultViewer({
     const blob = await fetch(outputUrl).then(r => r.blob());
     const a = Object.assign(document.createElement('a'), {
       href: URL.createObjectURL(blob),
-      download: `food-photo-${Date.now()}.webp`,
+      download: `food-photo-${Date.now()}.jpg`,
     });
     a.click();
   };
@@ -219,6 +220,14 @@ export function ResultViewer({
         >
           <RotateCcw size={17} /> נסה סגנון אחר
         </motion.button>
+        <a
+          href={getWhatsAppHref()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 sm:flex-none flex items-center justify-center gap-2 py-3 px-5 rounded-xl border border-emerald-400/40 bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold transition-colors"
+        >
+          <MessageCircle size={17} /> למסעדות — דברו איתנו
+        </a>
       </div>
     </motion.div>
   );

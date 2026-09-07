@@ -414,6 +414,11 @@ export default function Page() {
                       >
                         <ImageUploader
                           variant="dark"
+                          onClear={() => {
+                            setBase64(null);
+                            setPreview(null);
+                            setSelectedImage(null);
+                          }}
                           onImageReady={(b64, prev) => {
                             setBase64(b64);
                             setPreview(prev);
@@ -452,6 +457,7 @@ export default function Page() {
                               onClick={() => {
                                 setBase64(null);
                                 setPreview(null);
+                                setSelectedImage(null);
                               }}
                               disabled={isRunning}
                               whileHover={{ scale: 1.02 }}
@@ -658,7 +664,7 @@ export default function Page() {
 
         <footer className="text-center pt-4 pb-2">
           <p className="text-white/30 text-xs">
-            מופעל ע״י Nano Banana 2 + CodeFormer.
+            מופעל ע״י Fal.ai · Assi &amp; Johnny Photobooth AI
           </p>
         </footer>
       </div>

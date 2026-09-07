@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable is not set');
+function getGenAI(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY environment variable is not set');
+  }
+  return new GoogleGenerativeAI(apiKey);
 }
-
-const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function analyzeFoodImage(
   imageBase64: string,
@@ -14,7 +14,7 @@ export async function analyzeFoodImage(
   systemPrompt: string,
 ): Promise<unknown> {
   try {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
@@ -41,4 +41,3 @@ export async function analyzeFoodImage(
     throw new Error(`analyzeFoodImage failed: ${(err as Error).message}`);
   }
 }
-

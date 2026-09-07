@@ -8,11 +8,12 @@ import { GlassCard } from './GlassCard';
 
 interface Props {
   onImageReady: (base64: string, preview: string) => void;
+  onClear?: () => void;
   disabled?: boolean;
   variant?: 'dark';
 }
 
-export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Props) {
+export function ImageUploader({ onImageReady, onClear, disabled, variant = 'dark' }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -45,7 +46,11 @@ export function ImageUploader({ onImageReady, disabled, variant = 'dark' }: Prop
           <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative aspect-square">
             <img src={preview} alt="תצוגה מקדימה" className="w-full h-full object-contain rounded-2xl bg-black" />
             <button
-              onClick={() => setPreview(null)}
+              type="button"
+              onClick={() => {
+                setPreview(null);
+                onClear?.();
+              }}
               className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
             >
               <X size={14} />
