@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Smartphone, Truck } from 'lucide-react';
-import { TikTokExportPanel } from '@/components/TikTokExportPanel';
-import { WoltExportPanel } from '@/components/WoltExportPanel';
 import { WhatsAppCustomerSheet } from '@/components/WhatsAppCustomerSheet';
 import { SocialPostSheet } from '@/components/SocialPostSheet';
 import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
@@ -183,6 +181,11 @@ export function ResultViewer({
             )}
             {isStory ? 'הורדה לסטורי · 9:16' : 'הורדה לוולט · 16:9'}
           </motion.button>
+          <p className="text-center text-[11px] text-white/40">
+            {isStory
+              ? '9:16 נקי לסטורי / ריל · מנה במרכז · בלי טקסט על התמונה'
+              : '16:9 נקי לוולט · מנה במרכז · בלי טקסט על התמונה'}
+          </p>
 
           <motion.button
             type="button"
@@ -237,14 +240,6 @@ export function ResultViewer({
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
           {actionError}
         </p>
-      ) : null}
-
-      {ownerTab === 'hub' ? (
-        isStory ? (
-          <TikTokExportPanel outputUrl={outputUrl} />
-        ) : (
-          <WoltExportPanel outputUrl={outputUrl} />
-        )
       ) : null}
 
       {latencyMs != null ? (
