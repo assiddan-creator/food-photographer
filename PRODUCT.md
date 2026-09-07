@@ -13,6 +13,7 @@ Hebrew RTL food-photo studio for a solo creator (Assi). Phone snap in → commer
 - Fal.ai image edit (`FAL_KEY` via `/api/fal/proxy`)
 - Gemini photo QA (`GEMINI_API_KEY`, model `GEMINI_ANALYZE_MODEL` or `gemini-3-flash-preview` with `gemini-2.5-flash` fallback) plus optional dish analysis (“נתח את המנה”)
 - Result kitchen stack (Mock v3.1): «הורדה לוולט · 16:9» (or «הורדה לסטורי · 9:16»), green «שליחה ללקוח בוואטסאפ ▶» (templates: המנה מוכנה / מבצע היום / לפעם הבאה / דירוג בגוגל), outlined «פרסום מוכן לעמוד ▶» (preview + copy/save + system share — no Facebook OAuth), «הורדה | שיתוף», «נסה סגנון אחר».
+- **Restaurant settings («הגדרות מסעדה»):** header entry from the kitchen. Mock layout: חזרה, title, subtitle «וואטסאפ · גוגל · נאמנות — בלי קלוריות», then cards for WhatsApp (number + business name), Google review link + «בדיקת קישור», locked loyalty **הזמנה ראשונה ישירה 10% · לקוח חוזר 12%** (not a 10-or-12 choice), optional short text for «לפעם הבאה». Saved in `localStorage` (env `NEXT_PUBLIC_WHATSAPP` / `NEXT_PUBLIC_GOOGLE_REVIEW_URL` are fallbacks). WhatsApp «מבצע היום» / «לפעם הבאה» pull 10% or 12% via chips (or the optional next-visit line). Google review template is request + link only — **no discount** (Google policy). No discount-for-stars or discount-for-likes.
 
 ## Text overlays are unreliable
 
@@ -20,10 +21,10 @@ Fal image-edit often garbles letters — especially Hebrew. «פירוק מרכ�
 
 ## Not in scope yet
 
-Auth, billing, rate limits, CRM, watermarks.
+Auth, billing, rate limits, CRM, watermarks, multi-tenant cloud settings.
 
 ## Next 3
 
-1. **Restaurant lead CTA** — real `NEXT_PUBLIC_WHATSAPP` (or form) and click tracking. The result-screen button is the stub.
-2. **Watermark free tier** — unpaid downloads get a light mark; restaurants pay for clean files.
-3. **Camera + photo QA for batch** — shoot dishes into the menu queue and reuse the same kitchen photo check.
+1. **Watermark free tier** — unpaid downloads get a light mark; restaurants pay for clean files.
+2. **Camera + photo QA for batch** — shoot dishes into the menu queue and reuse the same kitchen photo check.
+3. **Cloud settings** — sync restaurant WhatsApp / review URL beyond this device when auth exists.
