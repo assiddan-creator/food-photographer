@@ -87,7 +87,7 @@ export const PRESETS = [
   {
     id: 'classic',
     title: 'קלאסי עילי',
-    image: '/Steak_dish_overhead_macro_b67f1558df.jpeg',
+    image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
       'Professional overhead top-down shot of the plated dish, soft even studio lighting, light marble or stone surface, shallow depth of field, sharp focus on the food, clean magazine style. The whole plate is visible. No explosion, no floating ingredients, no text.' +
       AUTHENTICITY_ANCHOR,
@@ -190,9 +190,9 @@ export const PRIMARY_PRESET_IDS = [
   'delivery',
   'tiktok',
   'menu',
-  'marketing',
-  'live-fire',
   'auto',
+  'marketing',
+  'classic',
 ] as const;
 export type PrimaryPresetId = (typeof PRIMARY_PRESET_IDS)[number];
 
@@ -210,13 +210,13 @@ export const STYLE_FILTERS: ReadonlyArray<{
   { id: 'all', label: 'הכל', presetIds: PRIMARY_PRESET_IDS },
   { id: 'delivery', label: 'משלוחים', presetIds: ['delivery'] },
   { id: 'social', label: 'סושיאל', presetIds: ['tiktok', 'marketing'] },
-  { id: 'restaurant', label: 'מסעדה', presetIds: ['menu', 'live-fire', 'auto'] },
+  { id: 'restaurant', label: 'מסעדה', presetIds: ['menu', 'auto', 'classic'] },
 ];
 
 /** Extra catalog presets shown under «עוד סגנונות» for a filter (null = all remaining). */
 export const MORE_STYLE_FILTER_IDS: Record<StyleFilterId, readonly PresetId[] | null> = {
   all: null,
-  delivery: ['classic'],
+  delivery: [],
   social: [
     'paparazzi-flash',
     'zero-gravity',
@@ -225,7 +225,7 @@ export const MORE_STYLE_FILTER_IDS: Record<StyleFilterId, readonly PresetId[] | 
     'ingredients',
     'nutrition',
   ],
-  restaurant: ['classic', 'split', 'cinematic-cut', 'cyberpunk', 'retro-film'],
+  restaurant: ['split', 'cinematic-cut', 'cyberpunk', 'retro-film', 'live-fire'],
 };
 
 /** Text-overlay styles — Fal often garbles letters; treat as experimental. */

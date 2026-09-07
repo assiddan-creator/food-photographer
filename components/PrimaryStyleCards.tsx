@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Flame, Rocket, Sparkles, Smartphone, Truck, UtensilsCrossed } from 'lucide-react';
+import { Check, Rocket, Scan, Sparkles, Smartphone, Truck, UtensilsCrossed } from 'lucide-react';
 import {
   getPresetById,
   STYLE_FILTERS,
@@ -35,6 +35,14 @@ const PRIMARY_CARDS = [
     iconClass: 'text-amber-300',
   },
   {
+    id: 'auto' as const,
+    subtitle: 'תאורה וצבע',
+    Icon: Sparkles,
+    selected: 'border-violet-400 shadow-[0_0_28px_rgba(167,139,250,0.4)]',
+    idle: 'border-violet-400/50',
+    iconClass: 'text-violet-300',
+  },
+  {
     id: 'marketing' as const,
     subtitle: 'תנועה · מודעה',
     Icon: Rocket,
@@ -43,20 +51,12 @@ const PRIMARY_CARDS = [
     iconClass: 'text-orange-300',
   },
   {
-    id: 'live-fire' as const,
-    subtitle: 'אש · דרמה',
-    Icon: Flame,
-    selected: 'border-red-500 shadow-[0_0_28px_rgba(239,68,68,0.4)]',
-    idle: 'border-red-500/50',
-    iconClass: 'text-red-400',
-  },
-  {
-    id: 'auto' as const,
-    subtitle: 'תאורה וצבע',
-    Icon: Sparkles,
-    selected: 'border-violet-400 shadow-[0_0_28px_rgba(167,139,250,0.4)]',
-    idle: 'border-violet-400/50',
-    iconClass: 'text-violet-300',
+    id: 'classic' as const,
+    subtitle: 'מבט מלמעלה',
+    Icon: Scan,
+    selected: 'border-emerald-400 shadow-[0_0_28px_rgba(52,211,153,0.4)]',
+    idle: 'border-emerald-400/50',
+    iconClass: 'text-emerald-300',
   },
 ] as const;
 
