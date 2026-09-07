@@ -5,8 +5,15 @@ export const AUTHENTICITY_ANCHOR =
 export const STYLIZED_IDENTITY_ANCHOR =
   ' Preserve the core identity of the uploaded dish — same proteins, sides, sauces, and recognizable character. Controlled stylization of camera, motion, composition, and atmosphere is allowed. Do not replace the dish with a different meal or invent unrelated ingredients.';
 
+/**
+ * Food identity for Wolt / Ten Bis: lock the plated dish, restyle the room.
+ * Do not append AUTHENTICITY_ANCHOR here — "exactly as photographed" fights background replacement.
+ */
+export const WOLT_DISH_LOCK =
+  ' CRITICAL: Authenticity applies to the plated dish only — keep the exact same food, ingredients, portion size and character, and plating. Do not preserve the original kitchen, clutter, or background. Restyle environment, backdrop, and lighting into polished commercial listing photography.';
+
 export const WOLT_ENHANCE_RULES =
-  ' Horizontal 16:9 landscape. Entire dish visible and centered — do not crop plate edges. Bright natural daylight. Realistic portion size. Food only, no people. No text, logos, graphics, borders, or watermarks. Enhance the real photo only — do not invent a cinematic or fully AI-generated look.';
+  ' Horizontal 16:9 landscape for Wolt, Ten Bis, and Israeli delivery-app listings (one photo works for both). Entire dish visible and centered — do not crop plate edges. Lock the plated food identity: same ingredients, portion, and plating. Replace the original kitchen/background with a flattering complementary commercial backdrop. Apply strong commercial lighting, color, texture, and AI polish — catalog-quality listing photo, not a gentle color-correction of the phone snap. Realistic portion size. Food only: no people, no hands. No exploding ingredients, surreal composites, cinematic advertising, text, logos, graphics, borders, or watermarks.';
 
 export const TIKTOK_ENHANCE_RULES =
   ' Vertical 9:16 portrait only. Entire dish visible and centered — do not crop plate or cake edges. Bright natural daylight. Realistic home-kitchen portion. Food only, no people. No text, logos, graphics, borders, or watermarks. Enhance the real photo only — do not invent a cinematic or fully AI-generated look.';
@@ -57,8 +64,8 @@ export const PRESETS = [
     title: 'מוכן לוולט',
     image: '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg',
     prompt:
-      'Enhance this real photographed dish for a Wolt / delivery-app listing. Horizontal 16:9 landscape only. Keep the entire dish fully visible and centered — do not crop plate or food edges. Bright, even, natural daylight. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail.' +
-      AUTHENTICITY_ANCHOR,
+      'Professional commercial listing photograph of this exact plated dish for Wolt, Ten Bis (תן ביס), and Israeli delivery apps. One photo must work on both Wolt and Ten Bis. Horizontal 16:9 landscape only. Keep the entire dish fully visible and centered — do not crop plate or food edges. FOOD LOCK: the dish itself must stay identical — same ingredients, proteins, sides, sauces, garnishes, portion size and character, plating, and serving vessel. Do not add, remove, rearrange, enlarge, multiply, or invent food. Do not restyle how the dish is plated. BACKGROUND: the source is a casual phone snap without a composed set — do not keep a messy kitchen, cluttered counter, ugly wall, or unflattering home backdrop. Replace the environment with a flattering complementary commercial backdrop (clean table, linen, stone, wood, or soft studio surface whose colors complement this dish). Strong background replacement is required. LOOK: push commercial AI food-photography polish as far as Wolt and Ten Bis listing photos still accept — appetizing studio lighting, rich color, crisp texture, juicy highlights, clean plate rim, professional depth of field, catalog-quality finish. It should look like a high-end delivery-app hero shot of THIS same dish, not like an unedited phone photo. FORBIDDEN: exploding or floating ingredients, surreal composites, cinematic action advertising, people, hands, faces, extra props that change the dish, text, logos, graphics, borders, frames, watermarks, labels, or UI chrome. Food only. Sharp commercial detail.' +
+      WOLT_DISH_LOCK,
   },
   {
     id: 'tiktok',
@@ -275,7 +282,7 @@ export function forcedAspectForPreset(id: PresetId): '16:9' | '9:16' | null {
 
 /**
  * Custom-prompt routing:
- * - Wolt → Wolt 16:9 rules + authenticity
+ * - Wolt → Wolt 16:9 commercial listing rules + dish-only lock (background restyle allowed)
  * - TikTok → TikTok 9:16 rules + authenticity
  * - cinema category → ARRI cinema suffix
  * - classics / studio / social-ai / other enhance → authenticity only (never cinema)
@@ -288,7 +295,7 @@ export function buildGeneratePrompt(
   if (customPrompt.trim() !== '') {
     const custom = customPrompt.trim();
     if (preset.id === WOLT_PRESET_ID) {
-      return custom + '.' + WOLT_ENHANCE_RULES + AUTHENTICITY_ANCHOR;
+      return custom + '.' + WOLT_ENHANCE_RULES + WOLT_DISH_LOCK;
     }
     if (preset.id === TIKTOK_PRESET_ID) {
       return custom + '.' + TIKTOK_ENHANCE_RULES + AUTHENTICITY_ANCHOR;
