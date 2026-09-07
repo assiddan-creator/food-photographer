@@ -185,6 +185,14 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   'social-ai': 'סושיאל ו-AI',
 };
 
+/** Single-dish default path — four cards before «עוד סגנונות». */
+export const PRIMARY_PRESET_IDS = ['delivery', 'tiktok', 'menu', 'auto'] as const;
+export type PrimaryPresetId = (typeof PRIMARY_PRESET_IDS)[number];
+
+export function isPrimaryPreset(id: PresetId): id is PrimaryPresetId {
+  return (PRIMARY_PRESET_IDS as readonly string[]).includes(id);
+}
+
 /** Text-overlay styles — Fal often garbles letters; treat as experimental. */
 export const EXPERIMENTAL_PRESET_IDS = ['ingredients', 'nutrition'] as const;
 
