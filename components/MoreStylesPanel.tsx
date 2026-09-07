@@ -64,7 +64,7 @@ export function MoreStylesPanel({ selectedId, filter, disabled, forceOpen, onSel
       <button
         type="button"
         onClick={() => setOpen(value => !value)}
-        className="w-full py-2 text-center text-sm text-white/55 hover:text-white/80"
+        className="w-full rounded-xl border border-dashed border-white/20 py-2.5 text-center text-sm text-white/55 hover:border-white/35 hover:text-white/80"
         aria-expanded={open}
       >
         {open ? 'עוד סגנונות ▴' : 'עוד סגנונות ▾'}
