@@ -42,6 +42,19 @@ function FieldHint({ children }: { children: ReactNode }) {
   return <p className="text-[11px] leading-relaxed text-muted">{children}</p>;
 }
 
+function LockedRateCard({ title, percent }: { title: string; percent: number }) {
+  return (
+    <div className="relative rounded-xl border border-cta bg-bg px-3 pb-3 pt-7 text-center">
+      <span className="absolute start-2 top-2 rounded-full border border-cta px-2 py-0.5 text-[9px] font-semibold leading-none text-cta">
+        נעול
+      </span>
+      <p className="text-[11px] font-semibold text-cream">{title}</p>
+      <p className="mt-1 text-2xl font-bold text-cta">{percent}%</p>
+      <p className="mt-1 text-[10px] font-semibold text-muted">קבוע</p>
+    </div>
+  );
+}
+
 export function RestaurantSettingsPanel({ onClose }: Props) {
   const { stored, save } = useRestaurantSettings();
   const [name, setName] = useState(stored.name);
@@ -177,34 +190,25 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
           </FieldHint>
         </label>
         <div className="flex justify-center">
-          <button type="button" onClick={handleCheckLink} className="btn-ghost min-w-[12rem]">
+          <button type="button" onClick={handleCheckLink} className="btn-ghost min-w-[12rem] text-cta">
             בדיקת קישור
           </button>
         </div>
       </SettingsCard>
 
       <SettingsCard title="מועדון נאמנות">
-        <p className="text-[11px] text-muted">קבוע — לא בחירה חופשית</p>
+        <p className="text-[11px] text-muted">קבוע במערכת · אין בחירת אחוז</p>
         <div
           className="grid grid-cols-2 gap-2"
           role="group"
           aria-label="הנחות קבועות בהזמנה ישירה"
         >
-          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
-            <p className="text-2xl font-bold text-cta">{FIRST_ORDER_DISCOUNT_PERCENT}%</p>
-            <p className="mt-1 text-[11px] font-semibold text-cream">לקוח ראשון</p>
-          </div>
-          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
-            <p className="text-2xl font-bold text-cta">{RETURNING_DISCOUNT_PERCENT}%</p>
-            <p className="mt-1 text-[11px] font-semibold text-cream">לקוח חוזר</p>
-          </div>
+          <LockedRateCard title="הזמנה ראשונה ישירה" percent={FIRST_ORDER_DISCOUNT_PERCENT} />
+          <LockedRateCard title="לקוח חוזר" percent={RETURNING_DISCOUNT_PERCENT} />
         </div>
-        <FieldHint>
-          מופיע בתבניות וואטסאפ: ראשון מקבל {FIRST_ORDER_DISCOUNT_PERCENT}% · חוזר מקבל{' '}
-          {RETURNING_DISCOUNT_PERCENT}%. בוולט הולכת עמלה גדולה — כאן נשאר יותר במסעדה.
-        </FieldHint>
+        <FieldHint>בלי בחירה בין השניים · בלי 15%</FieldHint>
         <label className="block space-y-1.5">
-          <FieldLabel>טקסט ללקוח ראשון (אופציונלי)</FieldLabel>
+          <FieldLabel>טקסט להזמנה ראשונה (אופציונלי)</FieldLabel>
           <input
             type="text"
             dir="rtl"
@@ -218,7 +222,7 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
           />
         </label>
         <label className="block space-y-1.5">
-          <FieldLabel>טקסט ללקוח חוזר (אופציונלי)</FieldLabel>
+          <FieldLabel>טקסט ל«לפעם הבאה» / חוזר (אופציונלי)</FieldLabel>
           <input
             type="text"
             dir="rtl"
