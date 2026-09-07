@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Download, MessageCircle, RotateCcw, Share2 } from 'lucide-react';
 import { toBlob } from 'html-to-image';
 import { getWhatsAppHref } from '@/lib/whatsapp';
+import { WoltExportPanel } from '@/components/WoltExportPanel';
 
 interface Props {
   outputUrl: string;
@@ -143,7 +144,7 @@ export function ResultViewer({
       <div
         ref={collageRef}
         aria-hidden
-        className="absolute left-[-9999px] top-0 w-[600px] overflow-hidden rounded-2xl border-2 border-white/20 bg-zinc-900 p-6 text-white shadow-2xl"
+        className="fixed left-[-9999px] top-0 w-[600px] overflow-hidden rounded-2xl border-2 border-white/20 bg-zinc-900 p-6 text-white shadow-2xl"
         style={{ direction: 'rtl' }}
       >
         <h2
@@ -166,6 +167,8 @@ export function ResultViewer({
           className="text-sm font-semibold text-violet-300 hidden"
         />
       </div>
+
+      <WoltExportPanel outputUrl={outputUrl} />
 
       {/* Signature input */}
       <div className="max-w-3xl mx-auto space-y-2">

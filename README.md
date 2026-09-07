@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, and share with a personal signature.
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9 export**, and share with a personal signature.
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -11,6 +11,8 @@ Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 A Next.js App Router product. The **live generate path** is client-side Fal.ai (`hooks/usePipeline.ts`) through `/api/fal/proxy` (`FAL_KEY`). Images are uploaded with `fal.storage.upload`, then the selected edit model runs via `fal.subscribe`.
 
 Optional **“נתח את המנה”** (analyze the dish) uses Gemini (`/api/analyze-food` + `lib/gemini.ts`, `GEMINI_API_KEY`).
+
+**Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and an enhance-only prompt (real photo, entire dish, no text/people/cinema explosion). After generate, **«הורדה לוולט (16:9)»** center-crops the output in the browser to a clean JPG (long edge ≥1000px when a local canvas upscale is enough). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
 
 This is not a full SaaS yet: no auth, billing, or rate limits. Treat the public Fal proxy and analyze route as spend-sensitive.
 
@@ -74,7 +76,7 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 # צלם מנות וירטואלי — Assi & Johnny Photobooth AI
 
-מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה ושיתוף עם חתימה אישית.
+מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה, **ייצוא 16:9 לוולט**, ושיתוף עם חתימה אישית.
 
 דמו חי: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -83,6 +85,8 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 אפליקציית Next.js. **נתיב היצירה החי** הוא Fal.ai דרך `hooks/usePipeline.ts` ו־`/api/fal/proxy` (צריך `FAL_KEY`). ההעלאה היא `fal.storage.upload`, ואז המודל שנבחר רץ ב־`fal.subscribe`.
 
 **«נתח את המנה»** אופציונלי — Gemini (`GEMINI_API_KEY`).
+
+**חבילת וולט:** הסגנון «משלוחים (וולט) / מוכן לוולט» כופה 16:9 ושיפור עדין של תמונה אמיתית. במסך התוצאה — «הורדה לוולט (16:9)» (חיתוך ממורכז בדפדפן לקובץ JPG נקי) ורשימת בדיקה בעברית.
 
 אין עדיין התחברות, תשלום או הגבלת קצב. המפתח של Fal חשוף דרך הפרוקסי לכל מי שנכנס לאתר.
 
