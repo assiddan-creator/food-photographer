@@ -45,20 +45,20 @@ export function BatchImageUploader({ items, disabled, onAddFiles, onRemove }: Pr
         }}
         className={`flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-8 cursor-pointer transition-colors ${
           isDragging
-            ? 'border-cyan-300 bg-cyan-500/15'
-            : 'border-white/20 bg-white/5 hover:bg-white/10'
+            ? 'border-cta bg-cta/10'
+            : 'border-cta/50 bg-surface hover:bg-frame'
         } ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
       >
         {isCompressing ? (
-          <Loader2 size={40} className="text-cyan-300 animate-spin" />
+          <Loader2 size={40} className="animate-spin text-cta" />
         ) : (
-          <Upload size={40} className="text-white/40" />
+          <Upload size={40} className="text-muted" />
         )}
-        <div className="text-center space-y-1">
-          <p className="text-white font-medium">
+        <div className="space-y-1 text-center">
+          <p className="font-medium text-cream">
             {isCompressing ? 'מכווץ תמונות...' : 'העלו כמה תמונות מנות'}
           </p>
-          <p className="text-white/45 text-sm">
+          <p className="text-sm text-muted">
             גרירה או לחיצה · עד {BATCH_MAX_IMAGES} תמונות · נשארו {Math.max(remaining, 0)}
           </p>
         </div>
@@ -81,7 +81,7 @@ export function BatchImageUploader({ items, disabled, onAddFiles, onRemove }: Pr
           {items.map(item => (
             <li
               key={item.id}
-              className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40"
+              className="card-gold relative overflow-hidden rounded-xl"
             >
               <img
                 src={item.previewUrl}
@@ -92,13 +92,13 @@ export function BatchImageUploader({ items, disabled, onAddFiles, onRemove }: Pr
                 <button
                   type="button"
                   onClick={() => onRemove(item.id)}
-                  className="absolute top-1 left-1 p-1 rounded-full bg-black/70 text-white hover:bg-black/90"
+                  className="absolute top-1 left-1 rounded-full bg-bg/80 p-1 text-cream hover:bg-bg"
                   aria-label={`הסר ${item.fileName}`}
                 >
                   <X size={12} />
                 </button>
               ) : null}
-              <p className="truncate px-2 py-1 text-[10px] text-white/60">{item.fileName}</p>
+              <p className="truncate px-2 py-1 text-[10px] text-muted">{item.fileName}</p>
             </li>
           ))}
         </ul>

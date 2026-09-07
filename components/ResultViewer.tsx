@@ -6,6 +6,7 @@ import { RotateCcw, Smartphone, Truck } from 'lucide-react';
 import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { WhatsAppCustomerSheet } from '@/components/WhatsAppCustomerSheet';
 import { SocialPostSheet } from '@/components/SocialPostSheet';
+import { WhatsAppMark } from '@/components/WhatsAppMark';
 import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
 import { exportTikTokJpeg } from '@/lib/tiktok-export';
 import type { PresetId } from '@/lib/presets';
@@ -132,9 +133,7 @@ export function ResultViewer({
               type="button"
               onClick={() => setOwnerTab(tab.id)}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold ${
-                active
-                  ? 'border border-cyan-400 text-white'
-                  : 'border border-transparent text-white/45 hover:text-white/75'
+                active ? 'chip-on' : 'border border-transparent text-muted hover:text-cream'
               }`}
             >
               {tab.label}
@@ -142,7 +141,7 @@ export function ResultViewer({
           );
         })}
       </div>
-      <p className="text-center text-xs text-white/40">{tabHint}</p>
+      <p className="text-center text-xs text-muted">{tabHint}</p>
 
       {ownerTab === 'whatsapp' ? (
         <WhatsAppCustomerSheet outputUrl={outputUrl} onBack={() => setOwnerTab('hub')} />
@@ -153,17 +152,17 @@ export function ResultViewer({
           onBack={() => setOwnerTab('hub')}
         />
       ) : (
-        <div className="space-y-4 rounded-2xl border border-white/10 bg-black p-4 md:p-5">
+        <div className="panel-gold space-y-4 rounded-2xl p-4 md:p-5">
           <div className="space-y-1">
-            <p className="font-semibold text-white">{readyLabel}</p>
-            <p className="text-xs text-white/50">לפני / אחרי · מוכן לשליחה</p>
+            <p className="font-semibold text-cream">{readyLabel}</p>
+            <p className="text-xs text-muted">לפני / אחרי · מוכן לשליחה</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {cards.map(({ src, label }) => (
-              <div key={label} className="relative overflow-hidden rounded-2xl bg-zinc-900">
+              <div key={label} className="card-gold relative overflow-hidden rounded-2xl">
                 <img src={src} alt={label} className="aspect-[3/4] w-full object-cover" />
-                <span className="absolute bottom-2 right-2 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white">
+                <span className="absolute bottom-2 right-2 rounded-full bg-bg/80 px-2.5 py-1 text-[11px] font-semibold text-cream">
                   {label}
                 </span>
               </div>
@@ -176,10 +175,10 @@ export function ResultViewer({
             whileTap={!isExportingPrimary ? { scale: 0.98 } : {}}
             onClick={downloadPrimary}
             disabled={isExportingPrimary}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 disabled:opacity-50"
+            className="btn-cta w-full"
           >
             {isExportingPrimary ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />
+              <span className="spinner-ink h-4 w-4 animate-spin rounded-full" />
             ) : isStory ? (
               <Smartphone size={18} />
             ) : (
@@ -187,7 +186,7 @@ export function ResultViewer({
             )}
             {isStory ? 'הורדה לסטורי · 9:16' : 'הורדה לוולט · 16:9'}
           </motion.button>
-          <p className="text-center text-[11px] text-white/40">
+          <p className="text-center text-[11px] text-muted">
             {isStory
               ? '9:16 נקי לסטורי / ריל · מנה במרכז · בלי טקסט על התמונה'
               : '16:9 נקי לוולט · מנה במרכז · בלי טקסט על התמונה'}
@@ -198,8 +197,9 @@ export function ResultViewer({
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setOwnerTab('whatsapp')}
-            className="w-full rounded-2xl bg-[#22c55e] py-3.5 text-sm font-bold text-zinc-950"
+            className="btn-cta w-full"
           >
+            <WhatsAppMark size={16} />
             שליחה ללקוח בוואטסאפ ▶
           </motion.button>
 
@@ -208,34 +208,21 @@ export function ResultViewer({
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setOwnerTab('page')}
-            className="w-full rounded-2xl border border-white/25 bg-transparent py-3.5 text-sm font-semibold text-white hover:bg-white/10"
+            className="btn-ghost w-full py-3.5"
           >
             פרסום מוכן לעמוד ▶
           </motion.button>
 
           <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={download}
-              className="rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10"
-            >
+            <button type="button" onClick={download} className="btn-ghost">
               הורדה
             </button>
-            <button
-              type="button"
-              onClick={shareImage}
-              disabled={isSharing}
-              className="rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50"
-            >
+            <button type="button" onClick={shareImage} disabled={isSharing} className="btn-ghost">
               שיתוף
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={onReset}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10"
-          >
+          <button type="button" onClick={onReset} className="btn-ghost w-full">
             <RotateCcw size={16} />
             נסה סגנון אחר
           </button>
@@ -243,13 +230,11 @@ export function ResultViewer({
       )}
 
       {actionError ? (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-          {actionError}
-        </p>
+        <p className="alert-error rounded-lg px-3 py-2 text-xs">{actionError}</p>
       ) : null}
 
       {latencyMs != null ? (
-        <p className="text-center text-xs text-white/35 tabular-nums">
+        <p className="text-center text-xs text-muted tabular-nums">
           ⏱️ {(latencyMs / 1000).toFixed(2)}s
         </p>
       ) : null}

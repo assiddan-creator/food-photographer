@@ -28,9 +28,7 @@ export function KitchenStepper({ current }: Props) {
             <span
               key={step.id}
               className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${
-                active
-                  ? 'border border-cyan-400 text-white'
-                  : 'border border-transparent text-white/35'
+                active ? 'chip-on' : 'border border-transparent text-muted'
               }`}
             >
               {index + 1} · {step.label}
@@ -38,7 +36,7 @@ export function KitchenStepper({ current }: Props) {
           );
         })}
       </div>
-      <p className="text-center text-xs text-white/40">{CAPTIONS[current]}</p>
+      <p className="text-center text-xs text-muted">{CAPTIONS[current]}</p>
     </div>
   );
 }

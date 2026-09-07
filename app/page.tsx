@@ -223,7 +223,7 @@ export default function Page() {
 
   return (
     <main
-      className={`relative min-h-dvh bg-black p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
+      className={`relative min-h-dvh bg-bg p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
       dir="rtl"
     >
       <div className="relative z-10 mx-auto max-w-4xl space-y-5">
@@ -232,10 +232,10 @@ export default function Page() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-3 text-center"
         >
-          <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
+          <h1 className="text-3xl font-bold tracking-tight text-cream md:text-5xl">
             {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
-          <p className="text-sm text-white/45 md:text-base">
+          <p className="text-sm text-muted md:text-base">
             {kitchenStep === 'actions'
               ? 'בלי קלוריות · רק מה שמוכר במסעדה'
               : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
@@ -245,15 +245,13 @@ export default function Page() {
           ) : null}
         </motion.header>
 
-        <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-lg">
+        <div className="panel-gold flex overflow-hidden rounded-2xl p-1">
           <button
             type="button"
             onClick={() => setStudioMode('single')}
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-              studioMode === 'single'
-                ? 'bg-white text-zinc-950'
-                : 'text-white/60 hover:text-white/80'
+              studioMode === 'single' ? 'chip-on' : 'text-muted hover:text-cream'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
             מנה אחת
@@ -263,9 +261,7 @@ export default function Page() {
             onClick={() => setStudioMode('batch')}
             disabled={isRunning || batchRunning}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-              studioMode === 'batch'
-                ? 'bg-white text-zinc-950'
-                : 'text-white/60 hover:text-white/80'
+              studioMode === 'batch' ? 'chip-on' : 'text-muted hover:text-cream'
             } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
           >
             תפריט שלם
@@ -299,7 +295,7 @@ export default function Page() {
                 exit={{ opacity: 0 }}
                 className="space-y-6"
               >
-                <div className="space-y-4 rounded-2xl border border-white/10 bg-black p-4 md:p-5">
+                <div className="panel-gold space-y-4 rounded-2xl p-4 md:p-5">
                   {showStyles && preview ? (
                     <>
                       <BackToCameraButton onClick={returnToCamera} disabled={isRunning} />
@@ -322,17 +318,17 @@ export default function Page() {
                       />
 
                       {selectedPreset.id === 'delivery' ? (
-                        <p className="text-xs leading-relaxed text-cyan-200/80">
+                        <p className="text-xs leading-relaxed text-muted">
                           יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פרסום דרמטי.
                         </p>
                       ) : null}
                       {selectedPreset.id === 'tiktok' ? (
-                        <p className="text-xs leading-relaxed text-rose-200/80">
+                        <p className="text-xs leading-relaxed text-muted">
                           יחס 9:16 נכפה לסטורי / ריל / טיקטוק. מנה במרכז — שיפור עדין של תמונה אמיתית.
                         </p>
                       ) : null}
                       {isExperimentalPreset(selectedPreset.id) ? (
-                        <p className="text-xs leading-relaxed text-amber-200/80">
+                        <p className="text-xs leading-relaxed text-muted">
                           ניסיוני: כיתוב על התמונה לא אמין — עברית עלולה להתעוות. עדיף תוויות קצרות באנגלית.
                         </p>
                       ) : null}
@@ -365,13 +361,13 @@ export default function Page() {
                   ) : inputMode === 'upload' ? (
                     <div className="space-y-3">
                       <div className="space-y-1 text-center">
-                        <h2 className="text-lg font-bold text-white">העלה מתמונות</h2>
-                        <p className="text-sm text-white/45">משני בלבד — עדיף לצלם את המנה עכשיו</p>
+                        <h2 className="text-lg font-bold text-cream">העלה מתמונות</h2>
+                        <p className="text-sm text-muted">משני בלבד — עדיף לצלם את המנה עכשיו</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setInputMode('camera')}
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                        className="btn-ghost w-full"
                       >
                         <Camera size={16} />
                         חזרה למצלמה
@@ -414,7 +410,7 @@ export default function Page() {
 
           {errorMessage && (
             <div className="mx-auto max-w-4xl">
-              <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+              <div className="alert-error rounded-xl px-4 py-3 text-sm">
                 {errorMessage}
               </div>
             </div>
@@ -422,39 +418,39 @@ export default function Page() {
 
           {analysisResult && (
             <div className="mx-auto max-w-4xl space-y-4">
-              <h2 className="text-center text-lg font-semibold text-white">
+              <h2 className="text-center text-lg font-semibold text-cream">
                 Chef AI – ניתוח מנה
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <GlassCard className="space-y-2 border border-white/10 bg-white/5 p-4 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                <GlassCard className="space-y-2 p-4 text-cream">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cta">
                     גאון הסושיאל
                   </p>
-                  <p className="whitespace-pre-line text-sm text-white/80">
+                  <p className="whitespace-pre-line text-sm text-cream/85">
                     {analysisResult.menuGenius}
                   </p>
                 </GlassCard>
-                <GlassCard className="space-y-2 border border-white/10 bg-white/5 p-4 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-orange-300">
+                <GlassCard className="space-y-2 p-4 text-cream">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cta">
                     ערכים תזונתיים
                   </p>
-                  <p className="whitespace-pre-line text-sm text-white/80">
+                  <p className="whitespace-pre-line text-sm text-cream/85">
                     {analysisResult.healthScanner}
                   </p>
                 </GlassCard>
-                <GlassCard className="space-y-2 border border-white/10 bg-white/5 p-4 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">
+                <GlassCard className="space-y-2 p-4 text-cream">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cta">
                     ביקורת שף
                   </p>
-                  <p className="whitespace-pre-line text-sm text-white/80">
+                  <p className="whitespace-pre-line text-sm text-cream/85">
                     {analysisResult.platingCritic}
                   </p>
                 </GlassCard>
-                <GlassCard className="space-y-2 border border-white/10 bg-white/5 p-4 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">
+                <GlassCard className="space-y-2 p-4 text-cream">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cta">
                     סודות המטבח
                   </p>
-                  <p className="whitespace-pre-line text-sm text-white/80">
+                  <p className="whitespace-pre-line text-sm text-cream/85">
                     {analysisResult.recipeDetective}
                   </p>
                 </GlassCard>

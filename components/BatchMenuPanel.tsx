@@ -30,11 +30,11 @@ const STATUS_HE: Record<BatchItemStatus, string> = {
 };
 
 const STATUS_CLASS: Record<BatchItemStatus, string> = {
-  pending: 'bg-white/10 text-white/70',
-  working: 'bg-violet-500/20 text-violet-200',
-  done: 'bg-emerald-500/20 text-emerald-200',
-  error: 'bg-red-500/20 text-red-200',
-  skipped: 'bg-white/5 text-white/40',
+  pending: 'bg-surface text-muted',
+  working: 'bg-cta/15 text-cta',
+  done: 'bg-cta text-cta-ink',
+  error: 'bg-[#9a3b32]/20 text-[#f3d6d2]',
+  skipped: 'bg-bg text-muted/70',
 };
 
 interface Props {
@@ -120,14 +120,14 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
 
   return (
     <div className="space-y-6" dir="rtl">
-      <div className="rounded-2xl border border-cyan-400/25 bg-cyan-950/35 p-4 md:p-5 space-y-3">
+      <div className="panel-gold space-y-3 rounded-2xl p-4 md:p-5">
         <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cta/15 text-cta">
             <Truck size={18} />
           </span>
           <div className="space-y-1">
-            <p className="text-white font-semibold">תפריט שלם — כמה מנות בבת אחת</p>
-            <p className="text-white/55 text-sm leading-relaxed">
+            <p className="font-semibold text-cream">תפריט שלם — כמה מנות בבת אחת</p>
+            <p className="text-sm leading-relaxed text-muted">
               מעלים עד {BATCH_MAX_IMAGES} תמונות, בוחרים סגנון אחד, ומעבדים מנה אחרי מנה.
               כל תמונה עולה שימוש ב־Fal כמו מנה בודדת. {estimate}.
             </p>
@@ -136,7 +136,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
       </div>
 
       <div className="space-y-2">
-        <p className="text-white/60 text-sm font-semibold">סגנון לכל התפריט</p>
+        <p className="text-sm font-semibold text-muted">סגנון לכל התפריט</p>
         <div className="flex flex-wrap gap-2">
           {SAFE_BATCH_PRESET_IDS.map(id => {
             const preset = getPresetById(id);
@@ -147,14 +147,8 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
                 type="button"
                 disabled={isRunning}
                 onClick={() => setPresetId(id)}
-                className={`px-3 py-2 rounded-xl text-sm font-semibold border transition-all ${
-                  active
-                    ? id === WOLT_PRESET_ID
-                      ? 'bg-cyan-400 text-zinc-950 border-cyan-300'
-                      : id === TIKTOK_PRESET_ID
-                        ? 'bg-rose-400 text-zinc-950 border-rose-300'
-                        : 'bg-white text-black border-white'
-                    : 'bg-white/5 text-white/70 border-white/20 hover:bg-white/10'
+                className={`rounded-xl px-3 py-2 text-sm font-semibold transition-all ${
+                  active ? 'chip-on' : 'chip-off'
                 } ${isRunning ? 'opacity-50' : ''}`}
               >
                 {preset.title}
@@ -169,12 +163,12 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
             onClick={() => {
               if (isSafeBatchPreset(selectedPreset.id)) setPresetId(selectedPreset.id);
             }}
-            className="text-xs text-cyan-200/80 hover:text-cyan-100 underline underline-offset-2"
+            className="text-xs text-cta underline underline-offset-2 hover:text-cream"
           >
             השתמשו בסגנון שנבחר במנה בודדת: {selectedPreset.title}
           </button>
         ) : null}
-        <p className="text-white/40 text-xs leading-relaxed">
+        <p className="text-xs leading-relaxed text-muted">
           ברירת מחדל: מוכן לוולט — יחס 16:9. מוכן לסטורי כופה 9:16. סגנונות פרסום דרמטי / קולנוע לא זמינים כאן כדי לשמור על תפריט אמין.
         </p>
       </div>
@@ -187,7 +181,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
       />
 
       {notice ? (
-        <p className="text-amber-100 text-sm rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2">
+        <p className="rounded-xl border border-cta/40 bg-cta/10 px-3 py-2 text-sm text-cream">
           {notice}
         </p>
       ) : null}
@@ -199,11 +193,11 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
           whileTap={!isRunning && items.some(item => item.status === 'pending' || item.status === 'error') ? { scale: 0.98 } : {}}
           disabled={isRunning || !items.some(item => item.status === 'pending' || item.status === 'error')}
           onClick={() => void runBatch()}
-          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm border border-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="btn-cta flex-1"
         >
           {isRunning ? (
             <>
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="spinner-ink h-4 w-4 animate-spin rounded-full" />
               מעבדים תפריט…
             </>
           ) : (
@@ -217,7 +211,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
           type="button"
           disabled={isRunning || items.length === 0}
           onClick={clearAll}
-          className="px-4 py-3 rounded-xl border border-white/15 bg-white/5 text-white/80 text-sm font-semibold disabled:opacity-30"
+          className="btn-ghost px-4"
         >
           נקה הכל
         </button>
@@ -226,16 +220,16 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
       {items.length > 0 ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-white font-semibold text-sm">
+            <p className="text-sm font-semibold text-cream">
               {progressLabel}
               {doneCount > 0 ? ` · ${doneCount} מוכנות` : ''}
               {errorCount > 0 ? ` · ${errorCount} שגיאות` : ''}
             </p>
-            <p className="text-white/40 text-xs">אחת אחרי השנייה — לא במקביל</p>
+            <p className="text-xs text-muted">אחת אחרי השנייה — לא במקביל</p>
           </div>
-          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1.5 overflow-hidden rounded-full bg-bg">
             <div
-              className="h-full bg-gradient-to-l from-cyan-400 to-emerald-400 transition-all"
+              className="h-full bg-cta transition-all"
               style={{ width: `${items.length ? (processedCount / items.length) * 100 : 0}%` }}
             />
           </div>
@@ -244,28 +238,28 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
             {items.map((item, index) => (
               <li
                 key={item.id}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-2"
+                className="card-gold flex items-center gap-3 rounded-xl p-2"
               >
                 <img
                   src={item.outputUrl ?? item.previewUrl}
                   alt=""
-                  className="h-14 w-20 rounded-lg object-cover bg-black shrink-0"
+                  className="h-14 w-20 shrink-0 rounded-lg bg-bg object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-white text-sm truncate">{index + 1}. {item.fileName}</p>
-                  <p className={`inline-flex mt-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${STATUS_CLASS[item.status]}`}>
+                  <p className="truncate text-sm text-cream">{index + 1}. {item.fileName}</p>
+                  <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_CLASS[item.status]}`}>
                     {STATUS_HE[item.status]}
                   </p>
                   {item.error ? (
-                    <p className="text-red-200/80 text-xs mt-1 line-clamp-2">{item.error}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-[#f3d6d2]/80">{item.error}</p>
                   ) : null}
                 </div>
-                <div className="flex flex-col gap-1 shrink-0">
+                <div className="flex shrink-0 flex-col gap-1">
                   {item.status === 'pending' || item.status === 'error' ? (
                     <button
                       type="button"
                       onClick={() => skipItem(item.id)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-white/70 hover:bg-white/10"
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-muted hover:bg-cta/10 hover:text-cream"
                     >
                       <SkipForward size={12} /> דלג
                     </button>
@@ -275,7 +269,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
                       type="button"
                       disabled={isRunning}
                       onClick={() => void handleRetry(item.id)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-amber-100 hover:bg-white/10 disabled:opacity-40"
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-cta hover:bg-cta/10 disabled:opacity-40"
                     >
                       <RotateCcw size={12} /> נסה שוב
                     </button>
@@ -289,19 +283,19 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
 
       {successes.length > 0 ? (
         <div className="space-y-4">
-          <p className="text-white font-semibold">התוצאות</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <p className="font-semibold text-cream">התוצאות</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {successes.map(item => (
               <figure
                 key={item.id}
-                className="overflow-hidden rounded-xl border border-white/10 bg-black/40"
+                className="card-gold overflow-hidden rounded-xl"
               >
                 <img
                   src={item.outputUrl ?? ''}
                   alt={item.fileName}
                   className={`w-full object-cover ${tiktokMode ? 'aspect-[9/16]' : 'aspect-video'}`}
                 />
-                <figcaption className="px-2 py-1.5 text-[11px] text-white/55 truncate">
+                <figcaption className="truncate px-2 py-1.5 text-[11px] text-muted">
                   {item.fileName}
                 </figcaption>
               </figure>
@@ -314,11 +308,11 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
             whileTap={!zipBusy ? { scale: 0.98 } : {}}
             disabled={zipBusy}
             onClick={() => void handleZip()}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-sm shadow-[0_0_24px_rgba(6,182,212,0.35)] disabled:opacity-50"
+            className="btn-cta w-full"
           >
             {zipBusy ? (
               <>
-                <span className="w-4 h-4 border-2 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" />
+                <span className="spinner-ink h-4 w-4 animate-spin rounded-full" />
                 מכין ZIP…
               </>
             ) : (
@@ -332,7 +326,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
               </>
             )}
           </motion.button>
-          <p className="text-white/40 text-xs text-center">
+          <p className="text-center text-xs text-muted">
             {woltMode
               ? 'הקובץ כולל JPG אופקי 16:9 נקי לכל מנה מוכנה. מנות שנכשלו לא נכנסות.'
               : tiktokMode
@@ -340,9 +334,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
                 : 'הקובץ כולל את התמונות שכבר מוכנות. מנות שנכשלו לא נכנסות.'}
           </p>
           {zipError ? (
-            <p className="text-red-200 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
-              {zipError}
-            </p>
+            <p className="alert-error rounded-lg px-3 py-2 text-xs">{zipError}</p>
           ) : null}
         </div>
       ) : null}
