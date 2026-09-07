@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Assi & Johnny Photobooth AI — Virtual Food Photographer
 
-## Getting Started
+**עברית למטה ↓**
 
-First, run the development server:
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, and share with a personal signature.
+
+Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
+
+## What it is
+
+A Next.js App Router product. The **live generate path** is client-side Fal.ai (`hooks/usePipeline.ts`) through `/api/fal/proxy` (`FAL_KEY`). Images are uploaded with `fal.storage.upload`, then the selected edit model runs via `fal.subscribe`.
+
+Optional **“נתח את המנה”** (analyze the dish) uses Gemini (`/api/analyze-food` + `lib/gemini.ts`, `GEMINI_API_KEY`).
+
+This is not a full SaaS yet: no auth, billing, or rate limits. Treat the public Fal proxy and analyze route as spend-sensitive.
+
+## Required environment variables
+
+Copy `.env.example` to `.env.local`:
+
+| Variable | Required | Used by |
+| --- | --- | --- |
+| `FAL_KEY` | Yes (generate) | `/api/fal/proxy` — Fal storage + image edit |
+| `GEMINI_API_KEY` | Only for analyze | `/api/analyze-food` |
+| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
+
+Do not commit real keys. `.gitignore` ignores `.env*` except `.env.example`.
+
+## Run locally
 
 ```bash
+npm install
+cp .env.example .env.local
+# put FAL_KEY (and optionally GEMINI_API_KEY) in .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # production build
+npm run lint    # eslint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy notes (Vercel)
 
-## Learn More
+1. Import [assiddan-creator/food-photographer](https://github.com/assiddan-creator/food-photographer).
+2. Set `FAL_KEY` in the Vercel project (Production + Preview).
+3. Set `GEMINI_API_KEY` if analyze should work in that environment.
+4. Optionally set `NEXT_PUBLIC_WHATSAPP` so “למסעדות — דברו איתנו” opens your WhatsApp.
+5. Redeploy after changing `NEXT_PUBLIC_*` vars (they are inlined at build time).
 
-To learn more about Next.js, take a look at the following resources:
+The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed site can spend that key — add rate limiting / auth before paid traffic.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture (live vs removed)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Path | Status |
+| --- | --- |
+| `usePipeline` → `/api/fal/proxy` → Fal edit models | **Live** generate |
+| `/api/analyze-food` → Gemini | **Live** optional analyze |
+| Replicate (`/api/generate`, `/api/poll`, `/api/restore`) | **Removed** — unused by UI |
+| Cloudinary (`/api/upload`) | **Removed** — UI uploads via Fal storage |
+| `/api/fal-generate`, `/api/fal-speed-test`, `lib/fal.ts` | **Removed** — leftover experiments |
 
-## Deploy on Vercel
+## Roadmap (next 3)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Restaurant lead CTA** — wire `NEXT_PUBLIC_WHATSAPP` to a real number / CRM and track clicks.
+2. **Watermark free tier** — mark unpaid exports so restaurants can upgrade to clean files.
+3. **Batch menu export** — multi-dish upload → styled set for home creators and restaurant menus.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [PRODUCT.md](./PRODUCT.md) for the short product brief.
+
+---
+
+# צלם מנות וירטואלי — Assi & Johnny Photobooth AI
+
+מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה ושיתוף עם חתימה אישית.
+
+דמו חי: [food-photographer.vercel.app](https://food-photographer.vercel.app)
+
+## מה זה
+
+אפליקציית Next.js. **נתיב היצירה החי** הוא Fal.ai דרך `hooks/usePipeline.ts` ו־`/api/fal/proxy` (צריך `FAL_KEY`). ההעלאה היא `fal.storage.upload`, ואז המודל שנבחר רץ ב־`fal.subscribe`.
+
+**«נתח את המנה»** אופציונלי — Gemini (`GEMINI_API_KEY`).
+
+אין עדיין התחברות, תשלום או הגבלת קצב. המפתח של Fal חשוף דרך הפרוקסי לכל מי שנכנס לאתר.
+
+## משתני סביבה
+
+| משתנה | חובה | שימוש |
+| --- | --- | --- |
+| `FAL_KEY` | כן (יצירה) | פרוקסי Fal |
+| `GEMINI_API_KEY` | רק לניתוח מנה | `/api/analyze-food` |
+| `NEXT_PUBLIC_WHATSAPP` | לא חובה | כפתור «למסעדות — דברו איתנו» |
+
+העתיקו `.env.example` ל־`.env.local`. אל תעלו מפתחות אמיתיים לגיט.
+
+## הרצה מקומית
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+## פריסה ב־Vercel
+
+מגדירים `FAL_KEY` בפרויקט. `GEMINI_API_KEY` אם רוצים ניתוח מנה. `NEXT_PUBLIC_WHATSAPP` לכפתור הוואטסאפ (מספר או קישור מלא). אחרי שינוי משתנה `NEXT_PUBLIC_*` צריך redeploy.
+
+## מפת דרכים (3 הבאים)
+
+1. **ליד למסעדות** — לחבר מספר וואטסאפ אמיתי ולמדוד קליקים.
+2. **שכבת חינם עם ווטרמרק** — ייצוא מסומן עד שמשלמים.
+3. **ייצוא תפריט באצווה** — כמה מנות בבת אחת ליוצרים ביתיים ולמסעדות.
