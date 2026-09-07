@@ -17,6 +17,7 @@ import {
   CATEGORY_LABELS,
   CATEGORY_PRESETS,
   forcedAspectForPreset,
+  isExperimentalPreset,
   PRESETS,
   type CategoryId,
 } from '@/lib/presets';
@@ -410,6 +411,11 @@ export default function Page() {
                     {selectedPreset.id === 'tiktok' ? (
                       <p className="text-rose-200/80 text-xs mt-2 leading-relaxed">
                         יחס 9:16 נכפה לטיקטוק / סטורי / ריל. מנה במרכז — שיפור עדין של תמונה אמיתית.
+                      </p>
+                    ) : null}
+                    {isExperimentalPreset(selectedPreset.id) ? (
+                      <p className="text-amber-200/80 text-xs mt-2 leading-relaxed">
+                        ניסיוני: כיתוב על התמונה לא אמין — עברית עלולה להתעוות. עדיף תוויות קצרות באנגלית.
                       </p>
                     ) : null}
                   </div>
