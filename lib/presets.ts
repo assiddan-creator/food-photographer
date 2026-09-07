@@ -185,13 +185,48 @@ export const CATEGORY_LABELS: Record<CategoryId, string> = {
   'social-ai': 'סושיאל ו-AI',
 };
 
-/** Single-dish default path — four cards before «עוד סגנונות». */
-export const PRIMARY_PRESET_IDS = ['delivery', 'tiktok', 'menu', 'auto'] as const;
+/** Single-dish default path — six photo-first cards before «עוד סגנונות». */
+export const PRIMARY_PRESET_IDS = [
+  'delivery',
+  'tiktok',
+  'menu',
+  'marketing',
+  'live-fire',
+  'auto',
+] as const;
 export type PrimaryPresetId = (typeof PRIMARY_PRESET_IDS)[number];
 
 export function isPrimaryPreset(id: PresetId): id is PrimaryPresetId {
   return (PRIMARY_PRESET_IDS as readonly string[]).includes(id);
 }
+
+export type StyleFilterId = 'all' | 'delivery' | 'social' | 'restaurant';
+
+export const STYLE_FILTERS: ReadonlyArray<{
+  id: StyleFilterId;
+  label: string;
+  presetIds: readonly PrimaryPresetId[];
+}> = [
+  { id: 'all', label: 'הכל', presetIds: PRIMARY_PRESET_IDS },
+  { id: 'delivery', label: 'משלוחים', presetIds: ['delivery'] },
+  { id: 'social', label: 'סושיאל', presetIds: ['tiktok', 'marketing'] },
+  { id: 'restaurant', label: 'מסעדה', presetIds: ['menu', 'live-fire', 'auto'] },
+];
+
+/** Extra catalog presets shown under «עוד סגנונות» for a filter (null = all remaining). */
+export const MORE_STYLE_FILTER_IDS: Record<StyleFilterId, readonly PresetId[] | null> = {
+  all: null,
+  delivery: ['classic'],
+  social: [
+    'paparazzi-flash',
+    'zero-gravity',
+    'pov-action',
+    'ai-director',
+    'ingredients',
+    'nutrition',
+  ],
+  restaurant: ['classic', 'split', 'cinematic-cut', 'cyberpunk', 'retro-film'],
+};
 
 /** Text-overlay styles — Fal often garbles letters; treat as experimental. */
 export const EXPERIMENTAL_PRESET_IDS = ['ingredients', 'nutrition'] as const;

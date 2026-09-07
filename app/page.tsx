@@ -23,8 +23,11 @@ import {
   isExperimentalPreset,
   isPrimaryPreset,
   PRESETS,
+  STYLE_FILTERS,
   WOLT_PRESET_ID,
   type PresetId,
+  type PrimaryPresetId,
+  type StyleFilterId,
 } from '@/lib/presets';
 
 const assistant = Assistant({ subsets: ['latin', 'hebrew'], weight: ['400', '600', '700'] });
@@ -66,6 +69,7 @@ export default function Page() {
   }>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [styleFilter, setStyleFilter] = useState<StyleFilterId>('all');
 
   const isRunning = stage === 'generating';
   const selectedPreset = PRESETS[selectedIndex] ?? getPresetById(WOLT_PRESET_ID);
@@ -145,7 +149,7 @@ export default function Page() {
 
   return (
     <main
-      className={`relative min-h-screen p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-36' : ''}`}
+      className={`relative min-h-screen p-4 md:p-8 ${assistant.className} ${showSticky ? 'pb-40' : ''}`}
       dir="rtl"
     >
       <div
@@ -155,16 +159,16 @@ export default function Page() {
       />
       <div className="absolute inset-0 bg-black/80" aria-hidden />
 
-      <div className="relative z-10 mx-auto max-w-4xl space-y-8">
+      <div className="relative z-10 mx-auto max-w-4xl space-y-6">
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-3 text-center"
+          className="space-y-2 text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-lg">
             <Sparkles size={13} /> Assi &amp; Johnny Photobooth AI
           </span>
-          <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
             צלם מנה → קבל תמונה שמוכרת
           </h1>
           <p className="text-sm text-white/40 md:text-base">
@@ -237,7 +241,7 @@ export default function Page() {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold text-white">תמונה מוכנה</p>
-                          <p className="text-xs text-emerald-300">✓ הועלתה · אפשר לבחור סגנון</p>
+                          <p className="text-xs text-emerald-300">✓ הועלתה · בחר סגנון</p>
                         </div>
                         <button
                           type="button"
@@ -258,8 +262,20 @@ export default function Page() {
 
                       <PrimaryStyleCards
                         selectedId={selectedPreset.id}
+                        filter={styleFilter}
                         disabled={isRunning}
                         onSelect={id => setSelectedIndex(presetIndex(id))}
+                        onFilterChange={id => {
+                          setStyleFilter(id);
+                          const allowed = STYLE_FILTERS.find(item => item.id === id)?.presetIds ?? [];
+                          if (
+                            isPrimaryPreset(selectedPreset.id) &&
+                            !allowed.includes(selectedPreset.id as PrimaryPresetId) &&
+                            allowed[0]
+                          ) {
+                            setSelectedIndex(presetIndex(allowed[0]));
+                          }
+                        }}
                       />
 
                       {selectedPreset.id === 'delivery' ? (
@@ -280,6 +296,7 @@ export default function Page() {
 
                       <MoreStylesPanel
                         selectedId={selectedPreset.id}
+                        filter={styleFilter}
                         disabled={isRunning}
                         forceOpen={!isPrimaryPreset(selectedPreset.id)}
                         onSelect={id => setSelectedIndex(presetIndex(id))}

@@ -4,7 +4,7 @@ Hebrew RTL food-photo studio for a solo creator (Assi). Phone snap in → commer
 
 ## Live product
 
-- **Single-dish create (simplified):** empty state is upload-only (step 1) with a cyan hint and a disabled sticky «צור תמונה משופרת». After upload (step 2), four primary styles — Wolt 16:9, TikTok 9:16, luxury menu, smart auto. Remaining presets sit under «עוד סגנונות»; Fal models (Hebrew: מהיר / מאוזן / איכות) and free-text sit under «הגדרות מתקדמות». Gemini «נתח את המנה» is a ghost secondary sticky action, not a competing green CTA.
+- **Single-dish create (simplified):** empty state is upload-only (step 1) with a cyan hint and a disabled sticky «צור תמונה משופרת». After upload (step 2), six primary photo-first styles — Wolt 16:9, TikTok 9:16, luxury menu, marketing explode, live-fire, smart auto — with chips הכל / משלוחים / סושיאל / מסעדה. Remaining presets sit under «עוד סגנונות»; Fal models (Hebrew: מהיר / מאוזן / איכות) and free-text sit under «הגדרות מתקדמות». Gemini «נתח את המנה» is a ghost secondary sticky action, not a competing green CTA.
 - Style presets (classics / creators / studio / cinema / social-AI) + optional free-text prompt
 - **Preset brain:** classics = honest enhance; studio = commercial composition; cinema = look/grade; social-AI = viral / experimental; creators = TikTok 9:16. Custom text on classics/studio/social-AI appends authenticity only — the ARRI cinema suffix is cinema-category only (Wolt/TikTok still get their own rules).
 - **Wolt-ready pack:** preset «משלוחים (וולט) / מוכן לוולט» forces 16:9 + enhance-only prompt; result screen has «הורדה לוולט (16:9)» (client-side center crop → clean JPG) and a Hebrew checklist

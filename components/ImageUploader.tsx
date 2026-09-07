@@ -76,7 +76,7 @@ export function ImageUploader({ onImageReady, onClear, disabled }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           {...dropHandlers}
-          className={`flex min-h-[220px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 transition-colors ${
+          className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-14 shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-colors ${
             isDragging ? 'border-cyan-400 bg-cyan-400/10' : 'border-white/25 bg-white/5'
           } ${disabled ? 'pointer-events-none opacity-50' : ''}`}
         >
@@ -86,7 +86,7 @@ export function ImageUploader({ onImageReady, onClear, disabled }: Props) {
             <Upload size={44} className="text-white/45" />
           )}
           <div className="text-center">
-            <p className="font-semibold text-white">
+            <p className="text-lg font-bold text-white">
               {isCompressing ? 'מכווץ תמונה...' : 'גרור לכאן או לחץ להעלאה'}
             </p>
             <p className="mt-1 text-sm text-white/40">עד 10MB · כיווץ אוטומטי</p>
