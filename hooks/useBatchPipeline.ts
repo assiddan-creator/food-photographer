@@ -26,7 +26,8 @@ function isAbortError(err: unknown) {
   return err instanceof DOMException && err.name === 'AbortError';
 }
 
-export function useBatchPipeline() {
+export function useBatchPipeline(options?: { maxImages?: number }) {
+  const maxImages = options?.maxImages ?? BATCH_MAX_IMAGES;
   const [items, setItems] = useState<BatchItem[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -50,19 +51,19 @@ export function useBatchPipeline() {
     setItems(prev => prev.map(item => (item.id === id ? { ...item, ...patch } : item)));
   }, []);
 
-  const addFiles = useCallback(async (files: File[]) => {
+  const addFiles = useCallback(async (files: File[]): Promise<BatchItem[]> => {
     const images = files.filter(file => file.type.startsWith('image/'));
-    if (images.length === 0) return;
+    if (images.length === 0) return [];
 
-    const room = BATCH_MAX_IMAGES - itemsRef.current.length;
+    const room = maxImages - itemsRef.current.length;
     if (room <= 0) {
-      setNotice(`אפשר עד ${BATCH_MAX_IMAGES} תמונות בכל הרצה.`);
-      return;
+      setNotice(`אפשר עד ${maxImages} תמונות בכל הרצה.`);
+      return [];
     }
 
     const accepted = images.slice(0, room);
     if (images.length > room) {
-      setNotice(`אפשר עד ${BATCH_MAX_IMAGES} תמונות. לקחנו את ה-${room} הראשונות.`);
+      setNotice(`אפשר עד ${maxImages} תמונות. לקחנו את ה-${room} הראשונות.`);
     } else {
       setNotice(null);
     }
@@ -82,8 +83,13 @@ export function useBatchPipeline() {
       });
     }
 
-    setItems(prev => [...prev, ...next]);
-  }, []);
+    setItems(prev => {
+      const merged = [...prev, ...next];
+      itemsRef.current = merged;
+      return merged;
+    });
+    return next;
+  }, [maxImages]);
 
   const removeItem = useCallback((id: string) => {
     setItems(prev => {
@@ -193,6 +199,6 @@ export function useBatchPipeline() {
     doneCount,
     errorCount,
     workingIndex,
-    maxImages: BATCH_MAX_IMAGES,
+    maxImages,
   };
 }

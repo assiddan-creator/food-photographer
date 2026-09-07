@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL kitchen UI: tap **צלם מנה**, get a photo-quality check, pick a style, generate, then **ייצוא לוולט/תן-ביס/סטורי/ריבוע / שלח ללקוח / הורדה / שתף**. Also **Wolt 16:9**, **Ten Bis 16:9**, **story 9:16**, or **square 1:1** from one generated photo (no extra Fal job), or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL kitchen UI: tap **צלם מנה**, get a photo-quality check, pick a style, generate, then **ייצוא לוולט/תן-ביס/סטורי/ריבוע / שלח ללקוח / הורדה / שתף**. Also **Wolt 16:9**, **Ten Bis 16:9**, **story 9:16**, or **square 1:1** from one generated photo (no extra Fal job), refresh a whole menu with **batch mode** (up to 10 dishes → ZIP), or compose **תפריט צהריים** (3–5 already-enhanced dishes → office WhatsApp).
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -17,6 +17,8 @@ After capture, **photo QA** (`/api/analyze-photo`) uses Gemini vision to check f
 **TikTok / creator pack:** the «ליוצרים / טיקטוק» category and preset force Fal `9:16` and the same enhance-only rules, framed for home bakers, cake makers, and food TikTok creators in Israel. After generate, **«לאן מייצאים?»** can save `story-9x16.jpg` (and the other ratios) from that same photo.
 
 **Batch menu («תפריט שלם (כמה מנות)»):** restaurants or creators upload up to **10** dish photos, pick one style (default Wolt 16:9 enhance-only; TikTok 9:16 is available), and run them **one after another** on the same Fal `usePipeline` / `fal.subscribe` path. Per-item status is ממתין / בעבודה / מוכן / שגיאה. Failed items can be skipped or retried without losing successes. **«הורד הכל (ZIP)»** packs Wolt 16:9 or TikTok 9:16 JPGs with `lib/wolt-export.ts` / `lib/tiktok-export.ts` + client-side JSZip. Each photo spends Fal usage like a single generate.
+
+**Lunch menu («תפריט צהריים»):** pick **3–5** dishes already enhanced in this app (single or batch results are remembered on-device). Optional name + price per card, then a warm office-group WhatsApp message (business name from restaurant settings). Guidance only for a ~10:30 send — not a scheduler. Share attaches the selected photos when the device allows.
 
 This is not a full SaaS yet: no auth, billing, or rate limits. Treat the public Fal proxy and analyze route as spend-sensitive.
 
@@ -98,6 +100,8 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 **חבילת יוצרים / טיקטוק:** הסגנון «ליוצרים / טיקטוק» כופה 9:16 לאופים ביתיים, עוגות ויוצרי אוכל. ב«לאן מייצאים?» אפשר להוריד סטורי 9:16 וגם גדלים אחרים מאותה תמונה.
 
 **תפריט שלם:** עד 10 תמונות, סגנון אחד (ברירת מחדל וולט; אפשר טיקטוק 9:16), עיבוד אחת אחרי השנייה, והורדת ZIP. כל תמונה עולה שימוש ב־Fal.
+
+**תפריט צהריים:** בוחרים 3–5 מנות שכבר שופרו באפליקציה (בלי צילום מחדש), ממלאים שם ומחיר לפי הצורך, ומקבלים הודעת וואטסאפ חמה לקבוצת משרד (~10:30 כהנחיה בלבד).
 
 אין עדיין התחברות, תשלום או הגבלת קצב. המפתח של Fal חשוף דרך הפרוקסי לכל מי שנכנס לאתר.
 

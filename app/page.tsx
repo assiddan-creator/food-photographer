@@ -10,6 +10,7 @@ import { GenerationStatus } from '@/components/GenerationStatus';
 import { ResultViewer } from '@/components/ResultViewer';
 import { GlassCard } from '@/components/GlassCard';
 import { BatchMenuPanel } from '@/components/BatchMenuPanel';
+import { LunchMenuPanel } from '@/components/LunchMenuPanel';
 import { PrimaryStyleCards } from '@/components/PrimaryStyleCards';
 import { MoreStylesPanel } from '@/components/MoreStylesPanel';
 import { AdvancedSettings } from '@/components/AdvancedSettings';
@@ -21,6 +22,7 @@ import { RestaurantSettingsPanel } from '@/components/RestaurantSettingsPanel';
 import { PlatformExportSheet } from '@/components/PlatformExportSheet';
 import { usePipeline } from '@/hooks/usePipeline';
 import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
+import { rememberEnhancedDish } from '@/lib/dish-library';
 import { DEFAULT_FAL_MODEL } from '@/lib/model-labels';
 import { normalizePhotoQa, splitImagePayload, type PhotoQaResult } from '@/lib/photo-qa';
 import {
@@ -46,6 +48,7 @@ const DEFAULT_PRESET_INDEX = Math.max(
 
 type InputMode = 'camera' | 'upload';
 type PhotoQaStatus = 'idle' | 'checking' | 'done' | 'error';
+type StudioMode = 'single' | 'batch' | 'lunch';
 
 function getAspectRatioFromDimensions(width: number, height: number): '16:9' | '9:16' | '1:1' {
   if (width > height) return '16:9';
@@ -65,7 +68,7 @@ export default function Page() {
   const [inputMode, setInputMode] = useState<InputMode>('camera');
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16' | '1:1'>('9:16');
   const [selectedModel, setSelectedModel] = useState(DEFAULT_FAL_MODEL);
-  const [studioMode, setStudioMode] = useState<'single' | 'batch'>('single');
+  const [studioMode, setStudioMode] = useState<StudioMode>('single');
   const [batchRunning, setBatchRunning] = useState(false);
   const { stage, progress, statusMessage, outputUrl, error, latencyMs, run, reset } = usePipeline();
   const { stored: restaurant } = useRestaurantSettings();
@@ -109,6 +112,12 @@ export default function Page() {
   useEffect(() => {
     if (!outputUrl) setShowExport(false);
   }, [outputUrl]);
+
+  useEffect(() => {
+    if (stage === 'done' && outputUrl) {
+      rememberEnhancedDish({ imageUrl: outputUrl });
+    }
+  }, [stage, outputUrl]);
 
   const clearImage = (nextMode: InputMode = 'camera') => {
     qaRequestId.current += 1;
@@ -266,12 +275,18 @@ export default function Page() {
             </button>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-cream md:text-5xl">
-            {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
+            {studioMode === 'lunch'
+              ? 'תפריט צהריים'
+              : kitchenStep === 'actions'
+                ? 'התמונה מוכנה'
+                : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
           <p className="text-sm text-muted md:text-base">
-            {kitchenStep === 'actions'
-              ? 'בלי קלוריות · רק מה שמוכר במסעדה'
-              : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
+            {studioMode === 'lunch'
+              ? '3–5 מנות ליום · הודעה חמה לקבוצת משרד סביב 10:30'
+              : kitchenStep === 'actions'
+                ? 'בלי קלוריות · רק מה שמוכר במסעדה'
+                : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
           </p>
           {restaurant.name ? (
             <p className="text-xs font-semibold text-cta">{restaurant.name}</p>
@@ -282,26 +297,26 @@ export default function Page() {
         </motion.header>
 
         <div className="panel-gold flex overflow-hidden rounded-2xl p-1">
-          <button
-            type="button"
-            onClick={() => setStudioMode('single')}
-            disabled={isRunning || batchRunning}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-              studioMode === 'single' ? 'chip-on' : 'text-muted hover:text-cream'
-            } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
-          >
-            מנה אחת
-          </button>
-          <button
-            type="button"
-            onClick={() => setStudioMode('batch')}
-            disabled={isRunning || batchRunning}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-              studioMode === 'batch' ? 'chip-on' : 'text-muted hover:text-cream'
-            } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
-          >
-            תפריט שלם
-          </button>
+          {(
+            [
+              { id: 'single', label: 'מנה אחת' },
+              { id: 'batch', label: 'תפריט שלם' },
+              { id: 'lunch', label: 'תפריט צהריים' },
+            ] as const
+          ).map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setStudioMode(tab.id)}
+              disabled={isRunning || batchRunning}
+              aria-pressed={studioMode === tab.id}
+              className={`flex flex-1 items-center justify-center rounded-xl px-1 py-3 text-[11px] font-bold transition-all sm:text-sm ${
+                studioMode === tab.id ? 'chip-on' : 'text-muted hover:text-cream'
+              } ${isRunning || batchRunning ? 'pointer-events-none opacity-50' : ''}`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className={studioMode === 'single' ? '' : 'hidden'}>
@@ -502,6 +517,14 @@ export default function Page() {
             selectedPreset={selectedPreset}
             selectedModel={selectedModel}
             onRunningChange={setBatchRunning}
+          />
+        </div>
+
+        <div className={studioMode === 'lunch' ? '' : 'hidden'}>
+          <LunchMenuPanel
+            onOpenSettings={() => setShowSettings(true)}
+            onGoSingle={() => setStudioMode('single')}
+            onGoBatch={() => setStudioMode('batch')}
           />
         </div>
           </>

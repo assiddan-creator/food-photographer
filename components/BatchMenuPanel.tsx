@@ -6,6 +6,7 @@ import { Archive, RotateCcw, SkipForward, Sparkles, Truck } from 'lucide-react';
 import { BatchImageUploader } from '@/components/BatchImageUploader';
 import { useBatchPipeline, type BatchItemStatus } from '@/hooks/useBatchPipeline';
 import { downloadBatchZip } from '@/lib/batch-zip';
+import { rememberEnhancedDish } from '@/lib/dish-library';
 import {
   BATCH_MAX_IMAGES,
   BATCH_SECONDS_PER_IMAGE_MAX,
@@ -87,6 +88,14 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
   }, [items]);
 
   const successes = items.filter(item => item.status === 'done' && item.outputUrl);
+
+  useEffect(() => {
+    for (const item of items) {
+      if (item.status === 'done' && item.outputUrl) {
+        rememberEnhancedDish({ imageUrl: item.outputUrl });
+      }
+    }
+  }, [items]);
 
   const runBatch = async (onlyIds?: string[]) => {
     await start(prompt, batchAspect, selectedModel, onlyIds);
