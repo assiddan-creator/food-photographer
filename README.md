@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9 export**, share with a personal signature, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks, bakers, and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9** or **TikTok 9:16** export, share with a personal signature, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -14,7 +14,9 @@ Optional **“נתח את המנה”** (analyze the dish) uses Gemini (`/api/an
 
 **Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and an enhance-only prompt (real photo, entire dish, no text/people/cinema explosion). After generate, **«הורדה לוולט (16:9)»** center-crops the output in the browser to a clean JPG (long edge ≥1000px when a local canvas upscale is enough). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
 
-**Batch menu («תפריט שלם (כמה מנות)»):** restaurants upload up to **10** dish photos, pick one style (default Wolt 16:9 enhance-only), and run them **one after another** on the same Fal `usePipeline` / `fal.subscribe` path. Per-item status is ממתין / בעבודה / מוכן / שגיאה. Failed items can be skipped or retried without losing successes. **«הורד הכל (ZIP)»** packs Wolt 16:9 JPGs with `lib/wolt-export.ts` + client-side JSZip. Each photo spends Fal usage like a single generate.
+**TikTok / creator pack:** the «ליוצרים / טיקטוק» category and preset force Fal `9:16` and the same enhance-only rules, framed for home bakers, cake makers, and food TikTok creators in Israel. After generate, **«הורדה לטיקטוק (9:16)»** center-crops in the browser to an exact 9:16 JPG (`lib/tiktok-export.ts`, same pattern as Wolt). Assi & Johnny signature/share stays on the result screen.
+
+**Batch menu («תפריט שלם (כמה מנות)»):** restaurants or creators upload up to **10** dish photos, pick one style (default Wolt 16:9 enhance-only; TikTok 9:16 is available), and run them **one after another** on the same Fal `usePipeline` / `fal.subscribe` path. Per-item status is ממתין / בעבודה / מוכן / שגיאה. Failed items can be skipped or retried without losing successes. **«הורד הכל (ZIP)»** packs Wolt 16:9 or TikTok 9:16 JPGs with `lib/wolt-export.ts` / `lib/tiktok-export.ts` + client-side JSZip. Each photo spends Fal usage like a single generate.
 
 This is not a full SaaS yet: no auth, billing, or rate limits. Treat the public Fal proxy and analyze route as spend-sensitive.
 
@@ -78,7 +80,7 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 # צלם מנות וירטואלי — Assi & Johnny Photobooth AI
 
-מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה, **ייצוא 16:9 לוולט**, ושיתוף עם חתימה אישית.
+מעלים תמונת מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL: בחירת סגנון, העלאה או מצלמה, יצירה, הורדה, **ייצוא 16:9 לוולט** או **9:16 לטיקטוק**, ושיתוף עם חתימה אישית.
 
 דמו חי: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -90,7 +92,9 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 **חבילת וולט:** הסגנון «משלוחים (וולט) / מוכן לוולט» כופה 16:9 ושיפור עדין של תמונה אמיתית. במסך התוצאה — «הורדה לוולט (16:9)» (חיתוך ממורכז בדפדפן לקובץ JPG נקי) ורשימת בדיקה בעברית.
 
-**תפריט שלם:** עד 10 תמונות, סגנון אחד (ברירת מחדל וולט), עיבוד אחת אחרי השנייה, והורדת ZIP של קבצי 16:9. כל תמונה עולה שימוש ב־Fal.
+**חבילת יוצרים / טיקטוק:** הסגנון «ליוצרים / טיקטוק» כופה 9:16 לאופים ביתיים, עוגות ויוצרי אוכל. במסך התוצאה — «הורדה לטיקטוק (9:16)» ורשימה קצרה: אנכי 9:16, מתאים לסטורי/ריל, מנה במרכז.
+
+**תפריט שלם:** עד 10 תמונות, סגנון אחד (ברירת מחדל וולט; אפשר טיקטוק 9:16), עיבוד אחת אחרי השנייה, והורדת ZIP. כל תמונה עולה שימוש ב־Fal.
 
 אין עדיין התחברות, תשלום או הגבלת קצב. המפתח של Fal חשוף דרך הפרוקסי לכל מי שנכנס לאתר.
 

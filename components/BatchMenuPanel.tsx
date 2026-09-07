@@ -14,7 +14,9 @@ import {
   getPresetById,
   isSafeBatchPreset,
   SAFE_BATCH_PRESET_IDS,
+  TIKTOK_PRESET_ID,
   WOLT_PRESET_ID,
+  forcedAspectForPreset,
   type Preset,
 } from '@/lib/presets';
 import type { FalModelId } from '@/lib/fal-generate';
@@ -64,8 +66,11 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
 
   const batchPreset = getPresetById(presetId);
   const woltMode = batchPreset.id === WOLT_PRESET_ID;
+  const tiktokMode = batchPreset.id === TIKTOK_PRESET_ID;
+  const batchAspect = forcedAspectForPreset(batchPreset.id) ?? '16:9';
+  const zipKind = woltMode ? 'wolt' : tiktokMode ? 'tiktok' : 'original';
   const prompt = buildGeneratePrompt(batchPreset, '');
-  const canUseCurrent = isSafeBatchPreset(selectedPreset.id) && selectedPreset.id !== WOLT_PRESET_ID;
+  const canUseCurrent = isSafeBatchPreset(selectedPreset.id) && presetId !== selectedPreset.id;
 
   useEffect(() => {
     onRunningChange?.(isRunning);
@@ -84,11 +89,11 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
   const successes = items.filter(item => item.status === 'done' && item.outputUrl);
 
   const runBatch = async (onlyIds?: string[]) => {
-    await start(prompt, '16:9', selectedModel, onlyIds);
+    await start(prompt, batchAspect, selectedModel, onlyIds);
   };
 
   const handleRetry = async (id: string) => {
-    await retryItem(id, prompt, '16:9', selectedModel);
+    await retryItem(id, prompt, batchAspect, selectedModel);
   };
 
   const handleZip = async () => {
@@ -97,7 +102,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
     try {
       await downloadBatchZip(
         successes.map(item => ({ fileName: item.fileName, outputUrl: item.outputUrl as string })),
-        woltMode,
+        zipKind,
       );
     } catch (err) {
       console.error(err);
@@ -146,7 +151,9 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
                   active
                     ? id === WOLT_PRESET_ID
                       ? 'bg-cyan-400 text-zinc-950 border-cyan-300'
-                      : 'bg-white text-black border-white'
+                      : id === TIKTOK_PRESET_ID
+                        ? 'bg-rose-400 text-zinc-950 border-rose-300'
+                        : 'bg-white text-black border-white'
                     : 'bg-white/5 text-white/70 border-white/20 hover:bg-white/10'
                 } ${isRunning ? 'opacity-50' : ''}`}
               >
@@ -168,7 +175,7 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
           </button>
         ) : null}
         <p className="text-white/40 text-xs leading-relaxed">
-          ברירת מחדל: משלוחים (וולט) — יחס 16:9 ושיפור עדין של תמונה אמיתית. סגנונות פיצוץ / קולנוע לא זמינים כאן כדי לשמור על תפריט אמין.
+          ברירת מחדל: משלוחים (וולט) — יחס 16:9. ליוצרים / טיקטוק כופה 9:16. סגנונות פיצוץ / קולנוע לא זמינים כאן כדי לשמור על תפריט אמין.
         </p>
       </div>
 
@@ -289,7 +296,11 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
                 key={item.id}
                 className="overflow-hidden rounded-xl border border-white/10 bg-black/40"
               >
-                <img src={item.outputUrl ?? ''} alt={item.fileName} className="w-full aspect-video object-cover" />
+                <img
+                  src={item.outputUrl ?? ''}
+                  alt={item.fileName}
+                  className={`w-full object-cover ${tiktokMode ? 'aspect-[9/16]' : 'aspect-video'}`}
+                />
                 <figcaption className="px-2 py-1.5 text-[11px] text-white/55 truncate">
                   {item.fileName}
                 </figcaption>
@@ -313,14 +324,20 @@ export function BatchMenuPanel({ selectedPreset, selectedModel, onRunningChange 
             ) : (
               <>
                 <Archive size={18} />
-                {woltMode ? 'הורד הכל (ZIP) — וולט 16:9' : 'הורד הכל (ZIP)'}
+                {woltMode
+                  ? 'הורד הכל (ZIP) — וולט 16:9'
+                  : tiktokMode
+                    ? 'הורד הכל (ZIP) — טיקטוק 9:16'
+                    : 'הורד הכל (ZIP)'}
               </>
             )}
           </motion.button>
           <p className="text-white/40 text-xs text-center">
             {woltMode
               ? 'הקובץ כולל JPG אופקי 16:9 נקי לכל מנה מוכנה. מנות שנכשלו לא נכנסות.'
-              : 'הקובץ כולל את התמונות שכבר מוכנות. מנות שנכשלו לא נכנסות.'}
+              : tiktokMode
+                ? 'הקובץ כולל JPG אנכי 9:16 נקי לכל מנה מוכנה. מנות שנכשלו לא נכנסות.'
+                : 'הקובץ כולל את התמונות שכבר מוכנות. מנות שנכשלו לא נכנסות.'}
           </p>
           {zipError ? (
             <p className="text-red-200 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
