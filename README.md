@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9 export**, and share with a personal signature.
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL studio UI for home cooks and restaurants: pick a style, upload or shoot, generate, download, one-tap **Wolt 16:9 export**, share with a personal signature, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -13,6 +13,8 @@ A Next.js App Router product. The **live generate path** is client-side Fal.ai (
 Optional **“נתח את המנה”** (analyze the dish) uses Gemini (`/api/analyze-food` + `lib/gemini.ts`, `GEMINI_API_KEY`).
 
 **Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and an enhance-only prompt (real photo, entire dish, no text/people/cinema explosion). After generate, **«הורדה לוולט (16:9)»** center-crops the output in the browser to a clean JPG (long edge ≥1000px when a local canvas upscale is enough). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
+
+**Batch menu («תפריט שלם (כמה מנות)»):** restaurants upload up to **10** dish photos, pick one style (default Wolt 16:9 enhance-only), and run them **one after another** on the same Fal `usePipeline` / `fal.subscribe` path. Per-item status is ממתין / בעבודה / מוכן / שגיאה. Failed items can be skipped or retried without losing successes. **«הורד הכל (ZIP)»** packs Wolt 16:9 JPGs with `lib/wolt-export.ts` + client-side JSZip. Each photo spends Fal usage like a single generate.
 
 This is not a full SaaS yet: no auth, billing, or rate limits. Treat the public Fal proxy and analyze route as spend-sensitive.
 
@@ -58,7 +60,7 @@ The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed sit
 
 | Path | Status |
 | --- | --- |
-| `usePipeline` → `/api/fal/proxy` → Fal edit models | **Live** generate |
+| `usePipeline` / `useBatchPipeline` → `/api/fal/proxy` → Fal edit models | **Live** generate (single + sequential batch) |
 | `/api/analyze-food` → Gemini | **Live** optional analyze |
 | Replicate (`/api/generate`, `/api/poll`, `/api/restore`) | **Removed** — unused by UI |
 | Cloudinary (`/api/upload`) | **Removed** — UI uploads via Fal storage |
@@ -68,7 +70,7 @@ The Fal proxy forwards the server `FAL_KEY`. Anyone who can hit the deployed sit
 
 1. **Restaurant lead CTA** — wire `NEXT_PUBLIC_WHATSAPP` to a real number / CRM and track clicks.
 2. **Watermark free tier** — mark unpaid exports so restaurants can upgrade to clean files.
-3. **Batch menu export** — multi-dish upload → styled set for home creators and restaurant menus.
+3. **Camera for batch** — add dishes to the menu queue from the phone camera.
 
 See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
@@ -87,6 +89,8 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 **«נתח את המנה»** אופציונלי — Gemini (`GEMINI_API_KEY`).
 
 **חבילת וולט:** הסגנון «משלוחים (וולט) / מוכן לוולט» כופה 16:9 ושיפור עדין של תמונה אמיתית. במסך התוצאה — «הורדה לוולט (16:9)» (חיתוך ממורכז בדפדפן לקובץ JPG נקי) ורשימת בדיקה בעברית.
+
+**תפריט שלם:** עד 10 תמונות, סגנון אחד (ברירת מחדל וולט), עיבוד אחת אחרי השנייה, והורדת ZIP של קבצי 16:9. כל תמונה עולה שימוש ב־Fal.
 
 אין עדיין התחברות, תשלום או הגבלת קצב. המפתח של Fal חשוף דרך הפרוקסי לכל מי שנכנס לאתר.
 
@@ -116,4 +120,4 @@ npm run dev
 
 1. **ליד למסעדות** — לחבר מספר וואטסאפ אמיתי ולמדוד קליקים.
 2. **שכבת חינם עם ווטרמרק** — ייצוא מסומן עד שמשלמים.
-3. **ייצוא תפריט באצווה** — כמה מנות בבת אחת ליוצרים ביתיים ולמסעדות.
+3. **מצלמה לתפריט שלם** — לצלם מנות ישירות לתור.
