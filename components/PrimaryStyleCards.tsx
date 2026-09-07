@@ -9,12 +9,17 @@ import {
   type StyleFilterId,
 } from '@/lib/presets';
 
+/** Same plated dish on every home card so the user compares style, not food. */
+const SHARED_DISH = '/Grilled_ribeye_steak_with_fries_a9d6150853.jpeg';
+
+const SELECTED_FRAME =
+  'border-cyan-400 ring-2 ring-orange-400 shadow-[0_0_22px_rgba(34,211,238,0.4),0_0_16px_rgba(251,146,60,0.45)]';
+
 const PRIMARY_CARDS = [
   {
     id: 'delivery' as const,
     tag: 'משלוחים',
     subtitle: '16:9 · שיפור עדין לתפריט משלוחים',
-    selected: 'border-cyan-400 shadow-[0_0_28px_rgba(34,211,238,0.4)]',
     idle: 'border-cyan-400/50',
     tagClass: 'bg-cyan-400/90 text-zinc-950',
   },
@@ -22,7 +27,6 @@ const PRIMARY_CARDS = [
     id: 'tiktok' as const,
     tag: 'סטורי',
     subtitle: '9:16 · ריל · טיקטוק · אינסטגרם',
-    selected: 'border-rose-400 shadow-[0_0_28px_rgba(251,113,133,0.4)]',
     idle: 'border-rose-400/50',
     tagClass: 'bg-rose-400/90 text-zinc-950',
   },
@@ -30,7 +34,6 @@ const PRIMARY_CARDS = [
     id: 'menu' as const,
     tag: 'תפריט',
     subtitle: 'מראה יוקרתי',
-    selected: 'border-amber-400 shadow-[0_0_28px_rgba(251,191,36,0.4)]',
     idle: 'border-amber-400/50',
     tagClass: 'bg-amber-400/90 text-zinc-950',
   },
@@ -38,7 +41,6 @@ const PRIMARY_CARDS = [
     id: 'marketing' as const,
     tag: 'פרסום',
     subtitle: 'תנועה · מודעה',
-    selected: 'border-orange-400 shadow-[0_0_28px_rgba(251,146,60,0.4)]',
     idle: 'border-orange-400/50',
     tagClass: 'bg-orange-400/90 text-zinc-950',
   },
@@ -46,7 +48,6 @@ const PRIMARY_CARDS = [
     id: 'live-fire' as const,
     tag: 'גריל',
     subtitle: 'חום · עשן · תחושת בשר חם',
-    selected: 'border-red-500 shadow-[0_0_28px_rgba(239,68,68,0.4)]',
     idle: 'border-red-500/50',
     tagClass: 'bg-red-500/90 text-white',
   },
@@ -54,7 +55,6 @@ const PRIMARY_CARDS = [
     id: 'auto' as const,
     tag: 'אוטומטי',
     subtitle: 'בחירה בטוחה · בלי להתלבט',
-    selected: 'border-violet-400 shadow-[0_0_28px_rgba(167,139,250,0.4)]',
     idle: 'border-violet-400/50',
     tagClass: 'bg-violet-400/90 text-zinc-950',
   },
@@ -115,12 +115,12 @@ export function PrimaryStyleCards({
               disabled={disabled}
               onClick={() => onSelect(card.id)}
               className={`relative aspect-[5/4] min-h-[140px] overflow-hidden rounded-2xl border-2 p-3 text-right shadow-lg transition-all ${
-                isSelected ? card.selected : card.idle
+                isSelected ? SELECTED_FRAME : card.idle
               } ${disabled ? 'pointer-events-none opacity-60' : 'hover:brightness-110'}`}
             >
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url('${preset.image}')` }}
+                style={{ backgroundImage: `url('${SHARED_DISH}')` }}
                 aria-hidden
               />
               <div
@@ -128,7 +128,7 @@ export function PrimaryStyleCards({
                 aria-hidden
               />
               {isSelected ? (
-                <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-white text-zinc-950 shadow">
+                <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-orange-400 text-zinc-950 ring-2 ring-cyan-300 shadow">
                   <Check size={14} strokeWidth={3} />
                 </span>
               ) : null}
