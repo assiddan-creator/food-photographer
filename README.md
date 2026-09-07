@@ -2,7 +2,7 @@
 
 **עברית למטה ↓**
 
-Turn a phone photo of a dish into a commercial food image. Hebrew RTL kitchen UI: tap **צלם מנה**, get a photo-quality check, pick a style, generate, then **הורדה לוולט / שלח ללקוח / הורדה / שתף**. Also one-tap **Wolt 16:9** or **TikTok 9:16** export, signature share, or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
+Turn a phone photo of a dish into a commercial food image. Hebrew RTL kitchen UI: tap **צלם מנה**, get a photo-quality check, pick a style, generate, then **ייצוא לוולט/תן-ביס/סטורי/ריבוע / שלח ללקוח / הורדה / שתף**. Also **Wolt 16:9**, **Ten Bis 16:9**, **story 9:16**, or **square 1:1** from one generated photo (no extra Fal job), or refresh a whole menu with **batch mode** (up to 10 dishes → ZIP).
 
 Live demo: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -12,9 +12,9 @@ A Next.js App Router product. The **live generate path** is client-side Fal.ai (
 
 After capture, **photo QA** (`/api/analyze-photo`) uses Gemini vision to check focus, lighting, and whether the full dish is in frame. Optional **“נתח את המנה”** still uses `/api/analyze-food`. Both share `lib/gemini.ts` (`GEMINI_API_KEY`, optional `GEMINI_ANALYZE_MODEL`, default `gemini-3-flash-preview` with `gemini-2.5-flash` fallback).
 
-**Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and an enhance-only prompt (real photo, entire dish, no text/people/cinema explosion). After generate, **«הורדה לוולט (16:9)»** center-crops the output in the browser to a clean JPG (long edge ≥1000px when a local canvas upscale is enough). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
+**Wolt pack:** the «משלוחים (וולט) / מוכן לוולט» preset forces Fal `16:9` and a commercial listing prompt (complimentary background, same plated dish). After generate, **«לאן מייצאים?»** lets you download **Wolt 16:9** and **Ten Bis / Cibus 16:9** from the same photo (`wolt-16x9.jpg` / `tenbis-16x9.jpg`) plus story 9:16 and square 1:1. Crops run in the browser (center cover, long edge ≥1000px). Cinema / social styles stay separate. The export does not add text, borders, or watermarks.
 
-**TikTok / creator pack:** the «ליוצרים / טיקטוק» category and preset force Fal `9:16` and the same enhance-only rules, framed for home bakers, cake makers, and food TikTok creators in Israel. After generate, **«הורדה לטיקטוק (9:16)»** center-crops in the browser to an exact 9:16 JPG (`lib/tiktok-export.ts`, same pattern as Wolt). Assi & Johnny signature/share stays on the result screen.
+**TikTok / creator pack:** the «ליוצרים / טיקטוק» category and preset force Fal `9:16` and the same enhance-only rules, framed for home bakers, cake makers, and food TikTok creators in Israel. After generate, **«לאן מייצאים?»** can save `story-9x16.jpg` (and the other ratios) from that same photo.
 
 **Batch menu («תפריט שלם (כמה מנות)»):** restaurants or creators upload up to **10** dish photos, pick one style (default Wolt 16:9 enhance-only; TikTok 9:16 is available), and run them **one after another** on the same Fal `usePipeline` / `fal.subscribe` path. Per-item status is ממתין / בעבודה / מוכן / שגיאה. Failed items can be skipped or retried without losing successes. **«הורד הכל (ZIP)»** packs Wolt 16:9 or TikTok 9:16 JPGs with `lib/wolt-export.ts` / `lib/tiktok-export.ts` + client-side JSZip. Each photo spends Fal usage like a single generate.
 
@@ -83,7 +83,7 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 # צלם מנות וירטואלי — Assi & Johnny Photobooth AI
 
-מעלים או מצלמים מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL למטבח: **צלם מנה**, בדיקת איכות, בחירת סגנון, יצירה, ואז **הורדה לוולט / שלח ללקוח / הורדה / שתף**.
+מעלים או מצלמים מנה מהטלפון ומקבלים תמונה שנראית כמו צילום סטודיו. ממשק עברי RTL למטבח: **צלם מנה**, בדיקת איכות, בחירת סגנון, יצירה, ואז **לאן מייצאים? / שלח ללקוח / הורדה / שתף**.
 
 דמו חי: [food-photographer.vercel.app](https://food-photographer.vercel.app)
 
@@ -93,9 +93,9 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 
 **«נתח את המנה»** אופציונלי — Gemini (`GEMINI_API_KEY`).
 
-**חבילת וולט:** הסגנון «משלוחים (וולט) / מוכן לוולט» כופה 16:9 ושיפור עדין של תמונה אמיתית. במסך התוצאה — «הורדה לוולט (16:9)» (חיתוך ממורכז בדפדפן לקובץ JPG נקי) ורשימת בדיקה בעברית.
+**חבילת וולט:** הסגנון «משלוחים (וולט) / מוכן לוולט» כופה 16:9 ורקע מחמיא עם מנה זהה. במסך התוצאה — «לאן מייצאים?» לייצוא וולט, תן ביס/סיבוס, סטורי וריבוע מאותה תמונה (חיתוך ממורכז בדפדפן, בלי יצירה מחדש).
 
-**חבילת יוצרים / טיקטוק:** הסגנון «ליוצרים / טיקטוק» כופה 9:16 לאופים ביתיים, עוגות ויוצרי אוכל. במסך התוצאה — «הורדה לטיקטוק (9:16)» ורשימה קצרה: אנכי 9:16, מתאים לסטורי/ריל, מנה במרכז.
+**חבילת יוצרים / טיקטוק:** הסגנון «ליוצרים / טיקטוק» כופה 9:16 לאופים ביתיים, עוגות ויוצרי אוכל. ב«לאן מייצאים?» אפשר להוריד סטורי 9:16 וגם גדלים אחרים מאותה תמונה.
 
 **תפריט שלם:** עד 10 תמונות, סגנון אחד (ברירת מחדל וולט; אפשר טיקטוק 9:16), עיבוד אחת אחרי השנייה, והורדת ZIP. כל תמונה עולה שימוש ב־Fal.
 

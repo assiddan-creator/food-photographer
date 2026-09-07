@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCcw, Smartphone, Truck } from 'lucide-react';
+import { RotateCcw, Truck } from 'lucide-react';
 import { BackToCameraButton } from '@/components/BackToCameraButton';
 import { WhatsAppCustomerSheet } from '@/components/WhatsAppCustomerSheet';
 import { SocialPostSheet } from '@/components/SocialPostSheet';
 import { WhatsAppMark } from '@/components/WhatsAppMark';
-import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
-import { exportTikTokJpeg } from '@/lib/tiktok-export';
+import { triggerDownload } from '@/lib/wolt-export';
 import type { PresetId } from '@/lib/presets';
 
 type OwnerTab = 'hub' | 'whatsapp' | 'page';
@@ -25,6 +24,7 @@ interface Props {
   onReset: () => void;
   onBackToCamera: () => void;
   onOpenSettings?: () => void;
+  onOpenExport: () => void;
   latencyMs?: number | null;
   menuGenius?: string | null;
   presetId?: PresetId;
@@ -36,10 +36,10 @@ export function ResultViewer({
   onReset,
   onBackToCamera,
   onOpenSettings,
+  onOpenExport,
   latencyMs,
   presetId = 'delivery',
 }: Props) {
-  const [isExportingPrimary, setIsExportingPrimary] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [ownerTab, setOwnerTab] = useState<OwnerTab>('hub');
@@ -61,28 +61,7 @@ export function ResultViewer({
       ? 'תבניות וואטסאפ · בחירה ← העתקה / פתיחה'
       : ownerTab === 'page'
         ? 'פרסום מוכן לעמוד · העתקה / שיתוף מערכת'
-        : 'סדר: וולט ← וואטסאפ ללקוח ← פרסום לעמוד';
-
-  const downloadPrimary = async () => {
-    setIsExportingPrimary(true);
-    setActionError(null);
-    try {
-      if (isStory) {
-        const jpeg = await exportTikTokJpeg(outputUrl);
-        triggerDownload(jpeg, `story-9x16-${Date.now()}.jpg`);
-      } else {
-        const jpeg = await exportWoltJpeg(outputUrl);
-        triggerDownload(jpeg, `wolt-16x9-${Date.now()}.jpg`);
-      }
-    } catch (err) {
-      console.error('Primary export failed:', err);
-      setActionError(
-        isStory ? 'לא הצלחנו להכין את קובץ הסטורי. נסו שוב.' : 'לא הצלחנו להכין את קובץ הוולט. נסו שוב.',
-      );
-    } finally {
-      setIsExportingPrimary(false);
-    }
-  };
+        : 'סדר: ייצוא לפי יעד ← וואטסאפ ללקוח ← פרסום לעמוד';
 
   const shareImage = async () => {
     setIsSharing(true);
@@ -177,25 +156,16 @@ export function ResultViewer({
 
           <motion.button
             type="button"
-            whileHover={!isExportingPrimary ? { scale: 1.01 } : {}}
-            whileTap={!isExportingPrimary ? { scale: 0.98 } : {}}
-            onClick={downloadPrimary}
-            disabled={isExportingPrimary}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onOpenExport}
             className="btn-cta w-full"
           >
-            {isExportingPrimary ? (
-              <span className="spinner-ink h-4 w-4 animate-spin rounded-full" />
-            ) : isStory ? (
-              <Smartphone size={18} />
-            ) : (
-              <Truck size={18} />
-            )}
-            {isStory ? 'הורדה לסטורי · 9:16' : 'הורדה לוולט · 16:9'}
+            <Truck size={18} />
+            לאן מייצאים? ▶
           </motion.button>
           <p className="text-center text-[11px] text-muted">
-            {isStory
-              ? '9:16 נקי לסטורי / ריל · מנה במרכז · בלי טקסט על התמונה'
-              : '16:9 נקי לוולט · מנה במרכז · בלי טקסט על התמונה'}
+            וולט · תן ביס · סטורי · ריבוע · אותה תמונה, בלי ליצור מחדש
           </p>
 
           <motion.button
