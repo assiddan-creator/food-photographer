@@ -24,7 +24,7 @@ export function buildWhatsAppMessage(options: {
 
   switch (options.templateId) {
     case 'ready':
-      return 'היי, המנה שלך מוכנה 🍽️';
+      return 'היי! המנה שלך מוכנה 🍽️ נשמח שתהנו — אפשר לאסוף / אנחנו בדרך.';
     case 'promo':
       return promo || 'הבא עם ההודעה הזו וקבל הנחה על קינוח / שתייה';
     case 'next':
@@ -36,18 +36,19 @@ export function buildWhatsAppMessage(options: {
   }
 }
 
-export type SocialCaptionId = 'grill' | 'new' | 'fresh' | 'storyNow' | 'storyKitchen';
+export type SocialCaptionId = 'kitchen' | 'grill' | 'new' | 'fresh' | 'storyNow' | 'storyKitchen';
 
 export function getSocialCaptionChips(isStory: boolean): { id: SocialCaptionId; label: string }[] {
   if (isStory) {
     return [
       { id: 'storyNow', label: 'סטורי עכשיו' },
       { id: 'storyKitchen', label: 'מהמטבח' },
-      { id: 'grill', label: 'מהגריל' },
+      { id: 'kitchen', label: 'היום במטבח' },
       { id: 'fresh', label: 'טרי' },
     ];
   }
   return [
+    { id: 'kitchen', label: 'היום במטבח' },
     { id: 'grill', label: 'מהגריל' },
     { id: 'new', label: 'חדש בתפריט' },
     { id: 'fresh', label: 'טרי מהמטבח' },
@@ -60,6 +61,10 @@ export function buildSocialCaption(options: {
 }): string {
   const dish = options.dishName?.trim();
   switch (options.captionId) {
+    case 'kitchen':
+      return dish
+        ? `היום במטבח 🔥 ${dish} — רק מהטלפון. תגיעו / הזמינו משלוח. #אוכל #מסעדה`
+        : 'היום במטבח 🔥 מנה שנראית כמו שהיא במסעדה — רק מהטלפון. תגיעו / הזמינו משלוח. #אוכל #מסעדה';
     case 'grill':
       return dish ? `היום מהגריל · ${dish}` : 'היום מהגריל';
     case 'new':

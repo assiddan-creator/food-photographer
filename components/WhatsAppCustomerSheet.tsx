@@ -13,12 +13,11 @@ import { getCustomerWhatsAppHref } from '@/lib/whatsapp';
 import { triggerDownload } from '@/lib/wolt-export';
 
 interface Props {
-  open: boolean;
   outputUrl: string;
-  onClose: () => void;
+  onBack: () => void;
 }
 
-export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
+export function WhatsAppCustomerSheet({ outputUrl, onBack }: Props) {
   const reviewUrl = getGoogleReviewUrl();
   const [templateId, setTemplateId] = useState<WhatsAppTemplateId>('ready');
   const [dishName, setDishName] = useState('');
@@ -28,7 +27,6 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
     setMessage(
       buildWhatsAppMessage({
         templateId,
@@ -37,7 +35,7 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
         reviewUrl,
       }),
     );
-  }, [open, templateId, dishName, promoText, reviewUrl]);
+  }, [templateId, dishName, promoText, reviewUrl]);
 
   const pickTemplate = (id: WhatsAppTemplateId) => {
     setTemplateId(id);
@@ -79,7 +77,11 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
   };
 
   return (
-    <OwnerSheet open={open} title="שליחה ללקוח בוואטסאפ" onClose={onClose}>
+    <OwnerSheet
+      title="הודעה ללקוח"
+      subtitle="בחר תבנית · אפשר לערוך לפני שליחה"
+      onBack={onBack}
+    >
       <div className="flex flex-wrap gap-2">
         {WHATSAPP_TEMPLATE_CHIPS.map(chip => (
           <button
@@ -87,7 +89,9 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
             type="button"
             onClick={() => pickTemplate(chip.id)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              templateId === chip.id ? 'bg-cyan-400 text-zinc-950' : 'border border-white/20 text-white/70'
+              templateId === chip.id
+                ? 'bg-white text-zinc-950'
+                : 'border border-white/20 bg-white/5 text-white/75'
             }`}
           >
             {chip.label}
@@ -123,15 +127,14 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
       ) : null}
 
       <div className="space-y-2">
-        <p className="text-xs text-white/45">תצוגה מקדימה</p>
         <div className="flex justify-start">
-          <div className="max-w-[85%] overflow-hidden rounded-2xl rounded-tl-sm bg-[#005c4b] text-white shadow-lg">
+          <div className="max-w-[90%] overflow-hidden rounded-2xl rounded-tl-sm bg-[#005c4b] text-white shadow-lg">
             <img src={outputUrl} alt="" className="aspect-[4/3] w-full object-cover" />
             <textarea
               dir="rtl"
               value={message}
               onChange={e => setMessage(e.target.value)}
-              rows={3}
+              rows={4}
               className="w-full resize-y bg-transparent px-3 py-2.5 text-sm leading-relaxed text-white outline-none"
             />
           </div>
@@ -143,7 +146,7 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
         type="button"
         onClick={handleOpenWhatsApp}
         disabled={busy || !message.trim()}
-        className="w-full rounded-2xl bg-emerald-600 py-3.5 text-sm font-bold text-white disabled:opacity-40"
+        className="w-full rounded-2xl bg-[#22c55e] py-3.5 text-sm font-bold text-zinc-950 disabled:opacity-40"
       >
         {busy ? 'פותח…' : 'פתח בוואטסאפ'}
       </button>
@@ -155,6 +158,9 @@ export function WhatsAppCustomerSheet({ open, outputUrl, onClose }: Props) {
         העתק טקסט
       </button>
       {status ? <p className="text-center text-xs text-cyan-200">{status}</p> : null}
+      <p className="text-center text-[11px] text-cyan-200/80">
+        טיפ: דירוג גוגל = קישור קבוע של המסעדה + בקשה קצרה
+      </p>
     </OwnerSheet>
   );
 }

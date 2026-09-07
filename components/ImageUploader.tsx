@@ -87,9 +87,9 @@ export function ImageUploader({ onImageReady, onClear, disabled }: Props) {
           )}
           <div className="text-center">
             <p className="text-lg font-bold text-white">
-              {isCompressing ? 'מכווץ תמונה...' : 'גרור לכאן או לחץ להעלאה'}
+              {isCompressing ? 'מכווץ תמונה...' : 'העלה מתמונות'}
             </p>
-            <p className="mt-1 text-sm text-white/40">עד 10MB · כיווץ אוטומטי</p>
+            <p className="mt-1 text-sm text-white/40">לחצו לבחירה מהגלריה · רק אם אי אפשר לצלם עכשיו</p>
           </div>
           <input
             id="file-upload"

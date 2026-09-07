@@ -88,7 +88,6 @@ export default function Page() {
   const showResult = stage === 'done' && Boolean(outputUrl && preview);
   const showStyles = hasImage && checkAcknowledged && !showResult;
   const showCheck = hasImage && !checkAcknowledged && !showResult;
-  const showSticky = studioMode === 'single' && showStyles;
 
   const kitchenStep: KitchenStepId = showResult
     ? 'actions'
@@ -97,6 +96,8 @@ export default function Page() {
       : showCheck
         ? 'check'
         : 'camera';
+
+  const showSticky = studioMode === 'single' && kitchenStep === 'style' && hasImage;
 
   const clearImage = (nextMode: InputMode = 'camera') => {
     qaRequestId.current += 1;
@@ -230,15 +231,19 @@ export default function Page() {
           className="space-y-3 text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-lg">
-            Assi &amp; Johnny · זרימת מסעדה
+            Assi &amp; Johnny · {kitchenStep === 'actions' ? 'פעולות מסעדה' : 'זרימת מסעדה'}
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
-            צלם מנה ← קבל תמונה שמוכרת
+            {kitchenStep === 'actions' ? 'התמונה מוכנה' : 'צלם מנה ← קבל תמונה שמוכרת'}
           </h1>
           <p className="text-sm text-white/45 md:text-base">
-            במסעדה מצלמים עכשיו — לא מחפשים קובץ
+            {kitchenStep === 'actions'
+              ? 'בלי קלוריות · רק מה שמוכר במסעדה'
+              : 'במסעדה מצלמים עכשיו — לא מחפשים קובץ'}
           </p>
-          {studioMode === 'single' ? <KitchenStepper current={kitchenStep} /> : null}
+          {studioMode === 'single' && kitchenStep !== 'actions' ? (
+            <KitchenStepper current={kitchenStep} />
+          ) : null}
         </motion.header>
 
         <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-lg">
@@ -358,20 +363,24 @@ export default function Page() {
                     />
                   ) : inputMode === 'upload' ? (
                     <div className="space-y-3">
+                      <div className="space-y-1 text-center">
+                        <h2 className="text-lg font-bold text-white">העלה מתמונות</h2>
+                        <p className="text-sm text-white/45">משני בלבד — עדיף לצלם את המנה עכשיו</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setInputMode('camera')}
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                      >
+                        <Camera size={16} />
+                        חזרה למצלמה
+                      </button>
                       <ImageUploader
                         variant="dark"
                         onClear={() => clearImage('camera')}
                         onImageReady={applyImage}
                         disabled={isRunning}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setInputMode('camera')}
-                        className="mx-auto flex items-center gap-2 text-sm text-white/45 hover:text-white/75"
-                      >
-                        <Camera size={16} />
-                        חזרה למצלמה
-                      </button>
                     </div>
                   ) : (
                     <CameraCapture

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Camera } from 'lucide-react';
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string) => void;
@@ -63,8 +64,8 @@ export default function CameraCapture({
       console.error('Error accessing camera:', error);
       setErrorMsg(
         error instanceof Error && error.message === 'unsupported'
-          ? 'המצלמה לא זמינה בדפדפן הזה. העלו מתמונות.'
-          : 'אין גישה למצלמה. תוודא שנתת הרשאות, או העלה מתמונות.',
+          ? 'המצלמה לא זמינה בדפדפן הזה. נסו שוב, או צלמו ממכשיר עם מצלמה.'
+          : 'אין גישה למצלמה. בדקו הרשאות בדפדפן, ואז נסו שוב.',
       );
       setIsCameraOpen(false);
     } finally {
@@ -99,60 +100,92 @@ export default function CameraCapture({
     void startCamera(next);
   };
 
+  const cameraFailed = Boolean(errorMsg) && !isStarting && !isCameraOpen;
+
   return (
     <div className="flex w-full flex-col gap-3">
-      {errorMsg ? (
-        <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-100">
-          {errorMsg}
-        </div>
-      ) : null}
+      <div className="space-y-1 text-center">
+        <h2 className="text-xl font-bold text-white">צלמו את המנה עכשיו</h2>
+        <p className="text-sm text-white/50">במטבח מצלמים — לא מחפשים קובץ</p>
+      </div>
 
       <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-black sm:aspect-[4/5]">
-        <video ref={videoRef} autoPlay muted playsInline className="h-full w-full object-cover" />
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          className={`h-full w-full object-cover ${cameraFailed ? 'invisible' : ''}`}
+        />
+
         {isStarting && !isCameraOpen ? (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-white/70">
             פותח מצלמה…
           </div>
         ) : null}
+
         {isCameraOpen ? (
           <span className="absolute top-3 right-3 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white">
             ● LIVE
           </span>
         ) : null}
-        <p className="absolute inset-x-0 bottom-24 bg-black/55 px-4 py-2 text-center text-xs font-medium text-white/90">
-          מקם את כל המנה בתוך המסגרת · אור טבעי עדיף
-        </p>
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center px-4 pb-5 pt-8">
-          <button
-            type="button"
-            onClick={handleCapture}
-            disabled={!isCameraOpen}
-            className="size-[72px] rounded-full border-[5px] border-white bg-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.45)] disabled:opacity-40"
-            aria-label="צלם מנה"
-          />
-        </div>
+
+        {cameraFailed ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black px-5 text-center">
+            <div className="flex size-16 items-center justify-center rounded-full bg-cyan-400 text-zinc-950 shadow-[0_0_32px_rgba(34,211,238,0.35)]">
+              <Camera size={30} strokeWidth={2.25} />
+            </div>
+            <p className="max-w-sm text-sm font-medium text-amber-100">{errorMsg}</p>
+            <button
+              type="button"
+              onClick={() => void startCamera(facingMode)}
+              className="w-full max-w-xs rounded-2xl bg-cyan-400 py-3.5 text-sm font-bold text-zinc-950 hover:bg-cyan-300"
+            >
+              נסה מצלמה שוב
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="absolute inset-x-0 bottom-24 bg-black/55 px-4 py-2 text-center text-xs font-medium text-white/90">
+              מקם את כל המנה בתוך המסגרת · אור טבעי עדיף
+            </p>
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center px-4 pb-5 pt-8">
+              <button
+                type="button"
+                onClick={handleCapture}
+                disabled={!isCameraOpen}
+                className="size-[72px] rounded-full border-[5px] border-white bg-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.45)] disabled:opacity-40"
+                aria-label="צלם מנה"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="flex items-center justify-between px-1 text-sm text-white/55">
-        <button type="button" onClick={switchCamera} className="hover:text-white">
-          החלף מצלמה
-        </button>
-        <button type="button" onClick={onOpenGallery} className="hover:text-white">
-          העלה מתמונות ▾
-        </button>
-      </div>
-
-      {!isCameraOpen && !isStarting ? (
-        <button
-          type="button"
-          onClick={() => void startCamera(facingMode)}
-          className="rounded-2xl bg-cyan-400 py-3 text-sm font-bold text-zinc-950"
-        >
-          פתח מצלמה
-        </button>
-      ) : null}
+      {cameraFailed ? (
+        onOpenGallery ? (
+          <button
+            type="button"
+            onClick={onOpenGallery}
+            className="text-center text-sm text-white/45 hover:text-white/80"
+          >
+            העלה מתמונות
+          </button>
+        ) : null
+      ) : (
+        <div className="flex items-center justify-between px-1 text-sm text-white/55">
+          <button type="button" onClick={switchCamera} className="hover:text-white">
+            החלף מצלמה
+          </button>
+          {onOpenGallery ? (
+            <button type="button" onClick={onOpenGallery} className="hover:text-white">
+              העלה מתמונות
+            </button>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

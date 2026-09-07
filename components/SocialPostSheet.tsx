@@ -12,30 +12,29 @@ import { exportTikTokJpeg, triggerDownload } from '@/lib/tiktok-export';
 import { triggerDownload as triggerBlobDownload } from '@/lib/wolt-export';
 
 interface Props {
-  open: boolean;
   outputUrl: string;
   isStory: boolean;
-  onClose: () => void;
+  onBack: () => void;
 }
 
-export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
+export function SocialPostSheet({ outputUrl, isStory, onBack }: Props) {
   const chips = getSocialCaptionChips(isStory);
-  const [captionId, setCaptionId] = useState<SocialCaptionId>(chips[0]?.id ?? 'grill');
+  const [captionId, setCaptionId] = useState<SocialCaptionId>(chips[0]?.id ?? 'kitchen');
   const [dishName, setDishName] = useState('');
-  const [caption, setCaption] = useState(() => buildSocialCaption({ captionId: chips[0]?.id ?? 'grill' }));
+  const [caption, setCaption] = useState(() =>
+    buildSocialCaption({ captionId: chips[0]?.id ?? 'kitchen' }),
+  );
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
     const nextChips = getSocialCaptionChips(isStory);
     setCaptionId(current => (nextChips.some(chip => chip.id === current) ? current : nextChips[0].id));
-  }, [open, isStory]);
+  }, [isStory]);
 
   useEffect(() => {
-    if (!open) return;
     setCaption(buildSocialCaption({ captionId, dishName }));
-  }, [open, captionId, dishName]);
+  }, [captionId, dishName]);
 
   const saveImage = async () => {
     if (isStory) {
@@ -89,11 +88,11 @@ export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
   };
 
   return (
-    <OwnerSheet open={open} title="פרסום מוכן לעמוד" onClose={onClose}>
-      <p className="text-xs text-white/50">
-        אין פרסום אוטומטי לפייסבוק. מכינים תמונה וכיתוב — אתם מדביקים בעמוד או בסטורי.
-      </p>
-
+    <OwnerSheet
+      title="פוסט מוכן"
+      subtitle="בלי התחברות לפייסבוק/אינסטגרם"
+      onBack={onBack}
+    >
       <div className="flex flex-wrap gap-2">
         {chips.map(chip => (
           <button
@@ -101,7 +100,9 @@ export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
             type="button"
             onClick={() => setCaptionId(chip.id)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              captionId === chip.id ? 'bg-cyan-400 text-zinc-950' : 'border border-white/20 text-white/70'
+              captionId === chip.id
+                ? 'bg-white text-zinc-950'
+                : 'border border-white/20 bg-white/5 text-white/75'
             }`}
           >
             {chip.label}
@@ -122,18 +123,17 @@ export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
       </label>
 
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
-        <img
-          src={outputUrl}
-          alt=""
-          className="h-44 w-full object-cover"
-        />
-        <textarea
-          dir="rtl"
-          value={caption}
-          onChange={e => setCaption(e.target.value)}
-          rows={3}
-          className="w-full resize-y bg-transparent px-3 py-3 text-sm leading-relaxed text-white outline-none"
-        />
+        <img src={outputUrl} alt="" className="aspect-video w-full object-cover" />
+        <div className="space-y-1 px-3 py-3">
+          <p className="text-[11px] text-white/40">העמוד שלך · טיוטה</p>
+          <textarea
+            dir="rtl"
+            value={caption}
+            onChange={e => setCaption(e.target.value)}
+            rows={4}
+            className="w-full resize-y bg-transparent text-sm leading-relaxed text-white outline-none"
+          />
+        </div>
       </div>
 
       {isStory ? (
@@ -154,7 +154,7 @@ export function SocialPostSheet({ open, outputUrl, isStory, onClose }: Props) {
         disabled={busy}
         className="w-full rounded-2xl border border-white/20 py-3 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-40"
       >
-        שיתוף מערכת
+        שיתוף (מערכת)
       </button>
       {status ? <p className="text-center text-xs text-cyan-200">{status}</p> : null}
     </OwnerSheet>

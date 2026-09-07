@@ -8,10 +8,10 @@ export const KITCHEN_STEPS = [
 export type KitchenStepId = (typeof KITCHEN_STEPS)[number]['id'];
 
 const CAPTIONS: Record<KitchenStepId, string> = {
-  camera: 'ברירת מחדל: מצלמה · העלאה משנית',
+  camera: 'צלמו את המנה עכשיו — העלאה רק אם אי אפשר לצלם',
   check: 'אחרי צילום · ניתוח מהיר לפני סגנון',
   style: 'בחירת סגנון · 6 נעולים',
-  actions: 'אחרי תוצאה · פעולות ברורות במסעדה',
+  actions: 'התמונה מוכנה · בלי קלוריות — רק מה שמוכר',
 };
 
 interface Props {
