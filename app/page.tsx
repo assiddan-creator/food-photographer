@@ -17,6 +17,7 @@ import {
   CATEGORY_LABELS,
   CATEGORY_PRESETS,
   forcedAspectForPreset,
+  isExperimentalPreset,
   PRESETS,
   type CategoryId,
 } from '@/lib/presets';
@@ -204,10 +205,9 @@ export default function Page() {
                         onClick={() => {
                           if (isRunning) return;
                           setSelectedCategory(category);
-                          if (category === 'creators') {
-                            const tiktokIndex = PRESETS.findIndex(p => p.id === 'tiktok');
-                            if (tiktokIndex !== -1) setSelectedIndex(tiktokIndex);
-                          }
+                          const firstId = CATEGORY_PRESETS[category][0];
+                          const firstIndex = PRESETS.findIndex(p => p.id === firstId);
+                          if (firstIndex !== -1) setSelectedIndex(firstIndex);
                         }}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                           isActive
@@ -410,6 +410,11 @@ export default function Page() {
                     {selectedPreset.id === 'tiktok' ? (
                       <p className="text-rose-200/80 text-xs mt-2 leading-relaxed">
                         יחס 9:16 נכפה לטיקטוק / סטורי / ריל. מנה במרכז — שיפור עדין של תמונה אמיתית.
+                      </p>
+                    ) : null}
+                    {isExperimentalPreset(selectedPreset.id) ? (
+                      <p className="text-amber-200/80 text-xs mt-2 leading-relaxed">
+                        ניסיוני: כיתוב על התמונה לא אמין — עברית עלולה להתעוות. עדיף תוויות קצרות באנגלית.
                       </p>
                     ) : null}
                   </div>
