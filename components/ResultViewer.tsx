@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Download, MessageCircle, RotateCcw, Share2 } from 'lucide-react';
 import { toBlob } from 'html-to-image';
 import { getWhatsAppHref } from '@/lib/whatsapp';
+import { WoltExportPanel } from '@/components/WoltExportPanel';
 
 interface Props {
   outputUrl: string;
@@ -166,6 +167,8 @@ export function ResultViewer({
           className="text-sm font-semibold text-violet-300 hidden"
         />
       </div>
+
+      <WoltExportPanel outputUrl={outputUrl} />
 
       {/* Signature input */}
       <div className="max-w-3xl mx-auto space-y-2">

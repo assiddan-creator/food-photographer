@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Camera, List, Rocket, Sparkles, Upload } from 'lucide-react';
+import { Activity, Camera, List, Rocket, Sparkles, Truck, Upload } from 'lucide-react';
 import { Assistant } from 'next/font/google';
 import CameraCapture from '@/components/CameraCapture';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -15,6 +15,9 @@ const assistant = Assistant({ subsets: ['latin', 'hebrew'], weight: ['400', '600
 
 const AUTHENTICITY_ANCHOR =
   ' CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.';
+
+const WOLT_ENHANCE_RULES =
+  ' Horizontal 16:9 landscape. Entire dish visible and centered — do not crop plate edges. Bright natural daylight. Realistic portion size. Food only, no people. No text, logos, graphics, borders, or watermarks. Enhance the real photo only — do not invent a cinematic or fully AI-generated look.';
 
 const HEBREW_TYPOGRAPHY =
   ' Use clean, modern Hebrew typography for all text labels. Ensure letters are not reversed.';
@@ -54,10 +57,10 @@ const PRESETS = [
   },
   {
     id: 'delivery',
-    title: 'משלוחים (וולט)',
+    title: 'משלוחים (וולט) / מוכן לוולט',
     image: '/Food_photography_in_takeaway_box_3bfd93d74b.jpeg',
     prompt:
-      'Commercial delivery app food photography, square composition, centered dish, highly vibrant colors, bright even studio lighting, clean minimal background, ultra-sharp detail, mouth-watering appetizing look.' +
+      'Enhance this real photographed dish for a Wolt / delivery-app listing. Horizontal 16:9 landscape only. Keep the entire dish fully visible and centered — do not crop plate or food edges. Bright, even, natural daylight. Realistic portion size — do not enlarge, multiply, restyle, or glamorize the serving. Food only: no people, no hands, no faces. Clean table, no extra props that change the dish. Do not add text, logos, graphics, borders, frames, watermarks, labels, or UI chrome. Do not create a cinematic, exploding, or advertising composite. Gentle color and light correction of the original photo only — it must still look like a real photograph, not an AI-generated image. High clarity, sharp but natural detail.' +
       AUTHENTICITY_ANCHOR,
   },
   {
@@ -214,8 +217,10 @@ export default function Page() {
 
     if (customPrompt.trim() !== '') {
       prompt =
-        customPrompt.trim() +
-        '. Shot on ARRI Alexa 65 cinema camera with an ARRI/Zeiss Master Prime 50mm T1.3 lens. Adaptive cinematic lighting that perfectly matches the described environment while maintaining appetizing highlights, rich textures, and commercial food styling on the main dish. 8k resolution, ultra-photorealistic. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.';
+        selectedPreset.id === 'delivery'
+          ? customPrompt.trim() + '.' + WOLT_ENHANCE_RULES + AUTHENTICITY_ANCHOR
+          : customPrompt.trim() +
+            '. Shot on ARRI Alexa 65 cinema camera with an ARRI/Zeiss Master Prime 50mm T1.3 lens. Adaptive cinematic lighting that perfectly matches the described environment while maintaining appetizing highlights, rich textures, and commercial food styling on the main dish. 8k resolution, ultra-photorealistic. CRITICAL: Preserve the uploaded food exactly as photographed. Do not add, remove, or invent any ingredients. No artistic interpretation of the food itself. Maintain 100% authenticity of the original dish.';
     } else {
       prompt = selectedPreset.prompt;
       if (selectedPreset.id === 'ai-director' && analysisResult?.platingCritic) {
@@ -223,7 +228,8 @@ export default function Page() {
       }
     }
 
-    run(base64, prompt, aspectRatio, selectedModel);
+    const generateAspect = selectedPreset.id === 'delivery' ? '16:9' : aspectRatio;
+    run(base64, prompt, generateAspect, selectedModel);
   };
 
   const handleAnalyze = async () => {
@@ -348,13 +354,18 @@ export default function Page() {
                     const isMarketing = preset.id === 'marketing';
                     const isIngredients = preset.id === 'ingredients';
                     const isNutrition = preset.id === 'nutrition';
+                    const isWolt = preset.id === 'delivery';
                     const borderClass = isAuto && !isSelected
                       ? 'border-amber-400/50'
-                      : isMarketing && !isSelected
-                        ? 'border-violet-400/60'
-                        : isSelected
-                          ? 'border-violet-400 shadow-[0_0_24px_rgba(139,92,246,0.35)] bg-white/10'
-                          : 'border-white/10 hover:border-white/20 hover:bg-white/10';
+                      : isWolt && !isSelected
+                        ? 'border-cyan-400/50'
+                        : isMarketing && !isSelected
+                          ? 'border-violet-400/60'
+                          : isSelected
+                            ? isWolt
+                              ? 'border-cyan-400 shadow-[0_0_24px_rgba(34,211,238,0.35)] bg-white/10'
+                              : 'border-violet-400 shadow-[0_0_24px_rgba(139,92,246,0.35)] bg-white/10'
+                            : 'border-white/10 hover:border-white/20 hover:bg-white/10';
                     return (
                       <motion.button
                         key={preset.id}
@@ -372,6 +383,7 @@ export default function Page() {
                         />
                         <span className="relative font-semibold text-sm line-clamp-2 flex items-center gap-1.5">
                           {isAuto && <Sparkles size={14} className="shrink-0 text-amber-300" />}
+                          {isWolt && <Truck size={14} className="shrink-0 text-cyan-300" />}
                           {isMarketing && <Rocket size={14} className="shrink-0 text-violet-300" />}
                           {isIngredients && <List size={14} className="shrink-0 text-white/70" />}
                           {isNutrition && <Activity size={14} className="shrink-0 text-white/70" />}
@@ -506,6 +518,11 @@ export default function Page() {
                   <div className="rounded-2xl p-5 flex-1 flex flex-col justify-center bg-white/5 backdrop-blur-lg border border-white/10 text-white">
                     <p className="text-white/50 text-sm mb-1">נבחר</p>
                     <p className="font-semibold">{selectedPreset.title}</p>
+                    {selectedPreset.id === 'delivery' ? (
+                      <p className="text-cyan-200/80 text-xs mt-2 leading-relaxed">
+                        יחס 16:9 נכפה לתאימות וולט. שיפור עדין של תמונה אמיתית — בלי פיצוץ שיווקי.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-4">

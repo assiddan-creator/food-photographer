@@ -5,10 +5,11 @@ Hebrew RTL food-photo studio for a solo creator (Assi). Phone snap in → commer
 ## Live product
 
 - Style presets (classics / studio / cinema / social-AI) + optional free-text prompt
+- **Wolt-ready pack:** preset «משלוחים (וולט) / מוכן לוולט» forces 16:9 + enhance-only prompt; result screen has «הורדה לוולט (16:9)» (client-side center crop → clean JPG) and a Hebrew checklist
 - Upload or rear camera
 - Fal.ai image edit (`FAL_KEY` via `/api/fal/proxy`)
 - Optional Gemini dish analysis (“נתח את המנה”)
-- Result: before/after, download, share-with-signature, restaurant WhatsApp stub
+- Result: before/after, Wolt 16:9 export, download, share-with-signature, restaurant WhatsApp stub
 
 ## Not in scope yet
 
