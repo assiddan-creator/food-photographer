@@ -4,9 +4,11 @@ import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, RotateCcw, Share2, Smartphone, Truck } from 'lucide-react';
 import { toBlob } from 'html-to-image';
-import { CUSTOMER_SHARE_TEXT, getCustomerWhatsAppHref, getWhatsAppHref } from '@/lib/whatsapp';
+import { getWhatsAppHref } from '@/lib/whatsapp';
 import { TikTokExportPanel } from '@/components/TikTokExportPanel';
 import { WoltExportPanel } from '@/components/WoltExportPanel';
+import { WhatsAppCustomerSheet } from '@/components/WhatsAppCustomerSheet';
+import { SocialPostSheet } from '@/components/SocialPostSheet';
 import { exportWoltJpeg, triggerDownload } from '@/lib/wolt-export';
 import { exportTikTokJpeg } from '@/lib/tiktok-export';
 import type { PresetId } from '@/lib/presets';
@@ -37,6 +39,8 @@ export function ResultViewer({
   const [isExportingPrimary, setIsExportingPrimary] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [whatsAppOpen, setWhatsAppOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
   const collageRef = useRef<HTMLDivElement>(null);
 
   const fetchOutputFile = async (filename: string) => {
@@ -72,30 +76,7 @@ export function ResultViewer({
   };
 
   const openCustomerWhatsApp = () => {
-    window.open(getCustomerWhatsAppHref(), '_blank', 'noopener,noreferrer');
-  };
-
-  const shareToCustomer = async () => {
-    setIsSharing(true);
-    setActionError(null);
-    try {
-      const file = await fetchOutputFile(`dish-${Date.now()}.jpg`);
-      if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'שלח ללקוח',
-          text: CUSTOMER_SHARE_TEXT,
-        });
-        return;
-      }
-      openCustomerWhatsApp();
-    } catch (err) {
-      if ((err as Error).name === 'AbortError') return;
-      console.error('Customer share failed:', err);
-      openCustomerWhatsApp();
-    } finally {
-      setIsSharing(false);
-    }
+    setWhatsAppOpen(true);
   };
 
   const shareImage = async () => {
@@ -277,13 +258,22 @@ export function ResultViewer({
 
         <motion.button
           type="button"
-          whileHover={!isSharing ? { scale: 1.01 } : {}}
-          whileTap={!isSharing ? { scale: 0.98 } : {}}
-          onClick={shareToCustomer}
-          disabled={isSharing}
-          className="w-full rounded-2xl border border-white/20 bg-white/5 py-3.5 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={openCustomerWhatsApp}
+          className="w-full rounded-2xl border border-white/20 bg-white/5 py-3.5 text-sm font-semibold text-white hover:bg-white/10"
         >
-          שליחה ללקוח (וואטסאפ)
+          שליחה ללקוח בוואטסאפ ▸
+        </motion.button>
+
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setSocialOpen(true)}
+          className="w-full rounded-2xl border border-white/20 bg-white/5 py-3.5 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          פרסום מוכן לעמוד ▸
         </motion.button>
 
         <div className="grid grid-cols-2 gap-3">
@@ -369,6 +359,18 @@ export function ResultViewer({
           <MessageCircle size={17} /> למסעדות — דברו איתנו
         </a>
       </div>
+
+      <WhatsAppCustomerSheet
+        open={whatsAppOpen}
+        outputUrl={outputUrl}
+        onClose={() => setWhatsAppOpen(false)}
+      />
+      <SocialPostSheet
+        open={socialOpen}
+        outputUrl={outputUrl}
+        isStory={isStory}
+        onClose={() => setSocialOpen(false)}
+      />
     </motion.div>
   );
 }

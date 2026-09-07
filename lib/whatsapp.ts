@@ -1,4 +1,4 @@
-export const CUSTOMER_SHARE_TEXT = 'היי, הנה תמונת המנה המוכנה 🍽️';
+export const CUSTOMER_SHARE_TEXT = 'היי, המנה שלך מוכנה 🍽️';
 
 function buildWhatsAppHref(text: string, raw = process.env.NEXT_PUBLIC_WHATSAPP): string {
   const encoded = encodeURIComponent(text);
@@ -11,9 +11,7 @@ function buildWhatsAppHref(text: string, raw = process.env.NEXT_PUBLIC_WHATSAPP)
   if (/^https?:\/\//i.test(value)) {
     try {
       const url = new URL(value);
-      if (!url.searchParams.has('text')) {
-        url.searchParams.set('text', text);
-      }
+      url.searchParams.set('text', text);
       return url.toString();
     } catch {
       return value;
@@ -36,7 +34,7 @@ export function getWhatsAppHref(raw = process.env.NEXT_PUBLIC_WHATSAPP): string 
   );
 }
 
-/** Kitchen "send this dish to a customer" — Web Share fallback. */
-export function getCustomerWhatsAppHref(raw = process.env.NEXT_PUBLIC_WHATSAPP): string {
-  return buildWhatsAppHref(CUSTOMER_SHARE_TEXT, raw);
+/** Kitchen "send this dish to a customer" — wa.me with optional custom text. */
+export function getCustomerWhatsAppHref(text = CUSTOMER_SHARE_TEXT): string {
+  return buildWhatsAppHref(text);
 }

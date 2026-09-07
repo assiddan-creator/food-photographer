@@ -29,7 +29,8 @@ Copy `.env.example` to `.env.local`:
 | `FAL_KEY` | Yes (generate) | `/api/fal/proxy` — Fal storage + image edit |
 | `GEMINI_API_KEY` | Photo QA + optional analyze | `/api/analyze-photo`, `/api/analyze-food` |
 | `GEMINI_ANALYZE_MODEL` | Optional | Vision model override (default `gemini-3-flash-preview`) |
-| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen «שלח ללקוח» fallback + restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
+| `NEXT_PUBLIC_WHATSAPP` | Optional | Result-screen customer WhatsApp templates + restaurant lead CTA (`9725…` or a full `https://wa.me/…` URL) |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | Optional | Appended to the «דירוג בגוגל» WhatsApp template when set |
 
 Do not commit real keys. `.gitignore` ignores `.env*` except `.env.example`.
 
@@ -107,7 +108,8 @@ See [PRODUCT.md](./PRODUCT.md) for the short product brief.
 | `FAL_KEY` | כן (יצירה) | פרוקסי Fal |
 | `GEMINI_API_KEY` | בדיקת תמונה + ניתוח מנה | `/api/analyze-photo`, `/api/analyze-food` |
 | `GEMINI_ANALYZE_MODEL` | לא חובה | מודל Gemini (ברירת מחדל `gemini-3-flash-preview`) |
-| `NEXT_PUBLIC_WHATSAPP` | לא חובה | «שלח ללקוח» ו«למסעדות — דברו איתנו» |
+| `NEXT_PUBLIC_WHATSAPP` | לא חובה | תבניות וואטסאפ ללקוח + «למסעדות — דברו איתנו» |
+| `NEXT_PUBLIC_GOOGLE_REVIEW_URL` | לא חובה | קישור לדירוג בגוגל בתבנית וואטסאפ |
 
 העתיקו `.env.example` ל־`.env.local`. אל תעלו מפתחות אמיתיים לגיט.
 
