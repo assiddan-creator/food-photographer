@@ -148,6 +148,6 @@ export function isLikelyHttpUrl(value: string): boolean {
   }
 }
 
-export function defaultLoyaltyKind(templateId: 'promo' | 'next'): LoyaltyKind {
+export function defaultLoyaltyKind(templateId: 'promo' | 'next' | 'bridge'): LoyaltyKind {
   return templateId === 'next' ? 'returning' : 'first';
 }
