@@ -108,7 +108,6 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
           ← חזרה
         </button>
         <div className="space-y-1">
-          <p className="text-xs font-semibold tracking-wide text-cta">הגדרות</p>
           <h1 className="text-3xl font-bold tracking-tight text-cream md:text-4xl">הגדרות מסעדה</h1>
           <p className="text-sm text-muted">וואטסאפ · גוגל · נאמנות — בלי קלוריות</p>
         </div>
@@ -129,8 +128,9 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
             className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
           <FieldHint>
-            משמש ל«שליחה ללקוח» ולתבניות ההודעות.
-            {!whatsapp.trim() && envNumber ? ' אם ריק — משתמשים במספר שכבר הוגדר במערכת.' : null}
+            {whatsapp.trim() || !envNumber
+              ? 'משמש ל«שליחה ללקוח» ולתבניות ההודעות.'
+              : 'משמש ל«שליחה ללקוח» ולתבניות ההודעות. אם ריק — משתמשים במספר שכבר הוגדר במערכת.'}
           </FieldHint>
         </label>
 
@@ -166,32 +166,37 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
             className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
           <FieldHint>
-            נכנס לתבנית «דירוג בגוגל» בוואטסאפ — בקשה וקישור בלבד, בלי הנחה (מדיניות גוגל).
-            {!googleReviewUrl.trim() && envReview ? ' אם ריק — משתמשים בקישור שכבר הוגדר במערכת.' : null}
+            {googleReviewUrl.trim() || !envReview
+              ? 'נכנס לתבנית «דירוג בגוגל» בוואטסאפ — בקשה וקישור בלבד, בלי הנחה.'
+              : 'נכנס לתבנית «דירוג בגוגל» בוואטסאפ — בקשה וקישור בלבד, בלי הנחה. אם ריק — משתמשים בקישור שכבר הוגדר במערכת.'}
           </FieldHint>
         </label>
-        <button type="button" onClick={handleCheckLink} className="btn-ghost w-full">
-          בדיקת קישור
-        </button>
+        <div className="flex justify-center">
+          <button type="button" onClick={handleCheckLink} className="btn-ghost min-w-[12rem]">
+            בדיקת קישור
+          </button>
+        </div>
       </SettingsCard>
 
       <SettingsCard title="מועדון נאמנות">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
-            <p className="text-2xl font-bold text-cta">{FIRST_ORDER_DISCOUNT_PERCENT}%</p>
-            <p className="mt-1 text-[11px] font-semibold text-cream">הזמנה ראשונה ישירה</p>
-            <p className="text-[10px] text-muted">קבוע</p>
+        <div className="space-y-2" role="group" aria-label="הנחות קבועות בהזמנה ישירה">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--gold-border)] bg-bg px-3 py-3">
+            <p className="text-sm font-semibold text-cream">
+              הזמנה ראשונה ישירה · <span className="text-cta">{FIRST_ORDER_DISCOUNT_PERCENT}%</span>
+            </p>
+            <span className="shrink-0 text-[10px] font-semibold text-muted">קבוע</span>
           </div>
-          <div className="rounded-xl border border-cta bg-bg px-3 py-3 text-center">
-            <p className="text-2xl font-bold text-cta">{RETURNING_DISCOUNT_PERCENT}%</p>
-            <p className="mt-1 text-[11px] font-semibold text-cream">לקוח חוזר</p>
-            <p className="text-[10px] text-muted">קבוע</p>
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--gold-border)] bg-bg px-3 py-3">
+            <p className="text-sm font-semibold text-cream">
+              לקוח חוזר · <span className="text-cta">{RETURNING_DISCOUNT_PERCENT}%</span>
+            </p>
+            <span className="shrink-0 text-[10px] font-semibold text-muted">קבוע</span>
           </div>
         </div>
         <FieldHint>
-          בוולט הולכת עמלה גדולה. כאן נותנים {FIRST_ORDER_DISCOUNT_PERCENT}% ללקוח חדש ו־
-          {RETURNING_DISCOUNT_PERCENT}% לחוזר — והכסף נשאר במסעדה. מופיע בתבניות «מבצע היום»
-          ו«לפעם הבאה». אין הנחה תמורת כוכבים או לייקים.
+          מופיע בתבנית «לפעם הבאה». בוולט הולכת עמלה גדולה — {FIRST_ORDER_DISCOUNT_PERCENT}% לחדש ו־
+          {RETURNING_DISCOUNT_PERCENT}% לחוזר עדיין משאירים יותר במסעדה. אין הנחה תמורת כוכבים או
+          לייקים.
         </FieldHint>
         <label className="block space-y-1.5">
           <FieldLabel>טקסט קצר ללקוח (אופציונלי)</FieldLabel>
@@ -203,11 +208,11 @@ export function RestaurantSettingsPanel({ onClose }: Props) {
               setNextVisitText(e.target.value);
               markDirty();
             }}
-            placeholder={`בפעם הבאה — ${FIRST_ORDER_DISCOUNT_PERCENT}% עלינו`}
+            placeholder={`בפעם הבאה — ${RETURNING_DISCOUNT_PERCENT}% עלינו`}
             className="field-gold w-full rounded-xl px-3 py-2.5 text-sm"
           />
           <FieldHint>
-            נכנס לתבנית «לפעם הבאה». אם ריק — נשלח הטקסט לפי 10% / 12%.
+            נכנס לתבנית «לפעם הבאה». אם ריק — נשלח {RETURNING_DISCOUNT_PERCENT}% ללקוח חוזר.
           </FieldHint>
         </label>
       </SettingsCard>

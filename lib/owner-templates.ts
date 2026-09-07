@@ -45,7 +45,7 @@ export function buildLoyaltyNextMessage(
   const offer =
     kind === 'first'
       ? `בפעם הבאה — ${percent}% הנחה בהזמנה ישירה הראשונה`
-      : `לקוחות חוזרים מקבלים ${percent}% בהזמנה ישירה`;
+      : `בפעם הבאה — ${percent}% עלינו`;
   return dish ? `${offer}. כדאי לנסות גם את ה${dish}.` : `${offer}.`;
 }
 
