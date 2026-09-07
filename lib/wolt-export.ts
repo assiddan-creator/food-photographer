@@ -36,13 +36,17 @@ export function computeCenterCrop16x9(width: number, height: number): CropRect {
 }
 
 /**
- * Output canvas size: exact 16:9, never smaller than the cropped source,
- * and at least 1000px on the long edge (width) when upscaling is needed.
+ * Output canvas size: exact 16:9 (width multiple of 16), never smaller than
+ * the cropped source, and at least 1000px on the long edge when upscaling.
  */
 export function computeWoltOutputSize(cropWidth: number, cropHeight: number): Size {
   const longEdge = Math.max(cropWidth, cropHeight);
-  const width = Math.round(longEdge < WOLT_MIN_LONG_EDGE ? WOLT_MIN_LONG_EDGE : longEdge);
-  const height = Math.round(width / WOLT_ASPECT);
+  let width = Math.round(longEdge < WOLT_MIN_LONG_EDGE ? WOLT_MIN_LONG_EDGE : longEdge);
+  width = Math.ceil(width / 16) * 16;
+  if (width < WOLT_MIN_LONG_EDGE) {
+    width += 16;
+  }
+  const height = (width * 9) / 16;
   return { width, height };
 }
 

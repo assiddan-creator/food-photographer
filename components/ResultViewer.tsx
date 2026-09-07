@@ -144,7 +144,7 @@ export function ResultViewer({
       <div
         ref={collageRef}
         aria-hidden
-        className="absolute left-[-9999px] top-0 w-[600px] overflow-hidden rounded-2xl border-2 border-white/20 bg-zinc-900 p-6 text-white shadow-2xl"
+        className="fixed left-[-9999px] top-0 w-[600px] overflow-hidden rounded-2xl border-2 border-white/20 bg-zinc-900 p-6 text-white shadow-2xl"
         style={{ direction: 'rtl' }}
       >
         <h2
