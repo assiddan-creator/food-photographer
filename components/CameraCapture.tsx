@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, Images } from 'lucide-react';
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string) => void;
@@ -143,6 +143,16 @@ export default function CameraCapture({
             >
               נסה מצלמה שוב
             </button>
+            {onOpenGallery ? (
+              <button
+                type="button"
+                onClick={onOpenGallery}
+                className="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl border border-white/25 bg-transparent py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                <Images size={16} />
+                העלה מתמונות
+              </button>
+            ) : null}
           </div>
         ) : (
           <>
@@ -164,26 +174,27 @@ export default function CameraCapture({
 
       <canvas ref={canvasRef} className="hidden" />
 
-      {cameraFailed ? (
-        onOpenGallery ? (
+      {cameraFailed ? null : (
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={onOpenGallery}
-            className="text-center text-sm text-white/45 hover:text-white/80"
+            onClick={switchCamera}
+            className="rounded-2xl border border-white/20 bg-white/5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white"
           >
-            העלה מתמונות
-          </button>
-        ) : null
-      ) : (
-        <div className="flex items-center justify-between px-1 text-sm text-white/55">
-          <button type="button" onClick={switchCamera} className="hover:text-white">
             החלף מצלמה
           </button>
           {onOpenGallery ? (
-            <button type="button" onClick={onOpenGallery} className="hover:text-white">
+            <button
+              type="button"
+              onClick={onOpenGallery}
+              className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-white/5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white"
+            >
+              <Images size={16} />
               העלה מתמונות
             </button>
-          ) : null}
+          ) : (
+            <span />
+          )}
         </div>
       )}
     </div>
